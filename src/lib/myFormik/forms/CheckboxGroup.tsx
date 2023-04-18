@@ -1,5 +1,5 @@
-import { ErrorMessage, Field, MultiInputProps } from "formik";
-import { ComponentProps } from "react";
+import { ErrorMessage, Field, type MultiInputProps } from "formik";
+import { type ComponentProps } from "react";
 import TextError from "./TextError";
 
 function CheckboxGroup({ label, name, options, ...rest }: MultiInputProps) {
@@ -8,7 +8,7 @@ function CheckboxGroup({ label, name, options, ...rest }: MultiInputProps) {
       <label>{label}</label>
       <Field name={name}>
         {({ field }: { field: ComponentProps<typeof Field> }) => {
-          return options.map(({ key, value }) => {
+          return options.map(({ key, value }): JSX.Element => {
             return (
               <div
                 className="flex items-center justify-center gap-2 "
@@ -21,6 +21,7 @@ function CheckboxGroup({ label, name, options, ...rest }: MultiInputProps) {
                   {...field}
                   {...rest}
                   value={value}
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                   checked={field.value ? field.value.includes(value) : false}
                 />
                 <label htmlFor={value}>{key}</label>

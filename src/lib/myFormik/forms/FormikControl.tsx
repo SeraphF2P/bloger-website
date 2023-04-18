@@ -1,4 +1,4 @@
-import type { FormikControl } from "formik";
+import type { FormikControlProps } from "formik";
 import CheckboxGroup from "./CheckboxGroup";
 import DatePicker from "./DatePicker";
 import Input from "./Input";
@@ -14,8 +14,9 @@ const Col = {
   checkbox: CheckboxGroup,
   date: DatePicker,
 };
-export default ({ control, ...rest }: FormikControl) => {
+export const FormikControl = ({ control, ...rest }: FormikControlProps) => {
   const Component = Col[control] || null;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return <Component {...rest} />;
 };

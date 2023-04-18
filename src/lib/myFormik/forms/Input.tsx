@@ -1,5 +1,5 @@
 "use client";
-import { ErrorMessage, Field, InputProps } from "formik";
+import { ErrorMessage, Field,type InputProps } from "formik";
 import TextError from "./TextError";
 
 function Input({ label, name, className, ...rest }: InputProps) {
@@ -7,7 +7,7 @@ function Input({ label, name, className, ...rest }: InputProps) {
     <div className="form-control">
       <label htmlFor={name}>{label}</label>
       <Field
-        className={`form-input ${className}`}
+        className={`form-input ${className || ""}`}
         id={name}
         name={name}
         {...rest}

@@ -1,4 +1,4 @@
-import { Field, ErrorMessage, MultiInputProps } from "formik";
+import { Field, ErrorMessage, type MultiInputProps } from "formik";
 import TextError from "./TextError";
 
 function Select({ label, name, options, ...rest }: MultiInputProps) {

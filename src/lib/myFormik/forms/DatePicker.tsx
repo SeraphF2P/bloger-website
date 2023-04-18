@@ -1,5 +1,5 @@
-import { ErrorMessage, Field, InputProps } from "formik";
-import React, { ComponentProps } from "react";
+import { ErrorMessage, Field, type InputProps } from "formik";
+import React, { type ComponentProps } from "react";
 import DateView from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import TextError from "./TextError";
@@ -16,8 +16,6 @@ function DatePicker({ label, name, ...rest }: InputProps) {
           form: any;
           field: ComponentProps<typeof Field>;
         }) => {
-          const { setFieldValue } = form;
-          const { value } = field;
           return (
             <DateView
               id={name}
@@ -25,8 +23,10 @@ function DatePicker({ label, name, ...rest }: InputProps) {
               {...rest}
               closeOnScroll
               popperPlacement="top-start"
-              selected={value}
-              onChange={(val) => setFieldValue(name, val)}
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+              selected={field.value}
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+              onChange={(val: any) => form.setFieldValue(name, val)}
             />
           );
         }}

@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, InputHTMLAttributes } from "react";
+import type { DetailedHTMLProps, InputHTMLAttributes } from "react";
 
 declare module "formik" {
   type option = {
@@ -22,6 +22,5 @@ declare module "formik" {
   interface controlMultiInput extends MultiInputProps {
     control: "select" | "radio" | "checkbox";
   }
-  type FormikControl = controlInput | controlMultiInput;
-
+  type FormikControlProps = controlInput | controlMultiInput;
 }

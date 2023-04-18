@@ -1,21 +1,24 @@
 import { useUser } from "@clerk/nextjs";
 import Head from "next/head";
-import { FC } from "react";
 
-interface profileProps {}
-
-const profile: FC<profileProps> = ({}) => {
+const Profile = ({}) => {
   const { user } = useUser();
-if(!user) return null;
+  if (!user) return null;
   return (
     <>
       <Head>
-        <title>{user?.username} profile</title>
-        <meta name="auther" content={user.username || `${user.firstName} ${user.lastName}`} />
+        <title>{user?.username} Profile</title>
+        <meta
+          name="auther"
+          content={
+            user.username ||
+            `${user.firstName || "user"} ${user.lastName || ""}`
+          }
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
     </>
   );
 };
 
-export default profile;
+export default Profile;

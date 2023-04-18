@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import { Field, ErrorMessage, MultiInputProps } from "formik";
-import { ComponentProps } from "react";
+import { Field, ErrorMessage, type MultiInputProps } from "formik";
+import { type ComponentProps } from "react";
 
 import TextError from "./TextError";
 
@@ -20,6 +20,7 @@ function RadioButtons({ label, name, options, ...rest }: MultiInputProps) {
                   {...field}
                   {...rest}
                   value={option.value}
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                   checked={field.value === option.value}
                 />
                 <label htmlFor={option.value}>{option.key}</label>

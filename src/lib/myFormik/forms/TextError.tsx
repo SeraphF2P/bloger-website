@@ -1,6 +1,4 @@
-import {
-  ReactNode
-} from "react";
+import type { ReactNode } from "react";
 
 function TextError({ children }: { children?: ReactNode }) {
   return <div className="form-error">{children}</div>;

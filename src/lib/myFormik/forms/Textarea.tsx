@@ -1,4 +1,4 @@
-import { Field, ErrorMessage, InputProps } from "formik";
+import { Field, ErrorMessage, type InputProps } from "formik";
 import TextError from "./TextError";
 
 function Textarea({ label, name, ...rest }: InputProps) {
