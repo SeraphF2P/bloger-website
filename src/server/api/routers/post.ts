@@ -14,10 +14,8 @@ const filterUser = (user: User) => {
     username:
       user.username ?? `${user.firstName || "user"} ${user.lastName || ""}`,
     profileImageUrl:
-      user.profileImageUrl ?? user.gender == "male"
-        ? "/male-avatar.webp"
-        : "/female-avatar.webp",
-  } as const;
+      user.profileImageUrl == undefined ? user.gender == "male" ? "/male-avatar.webp": "/female-avatar.webp"
+  } ;
   return userInfo;
 };
 export const postRouter = createTRPCRouter({
@@ -41,17 +39,5 @@ export const postRouter = createTRPCRouter({
         auther,
       };
     });
-  }),
-  getSignedUser: publicProcedure.query(() => {
-    const { user, isLoaded, isSignedIn } = useUser();
-    if (isSignedIn)
-      return {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username:
-          user.username ?? `${user.firstName || "user"} ${user.lastName || ""}`,
-        profileImageUrl: "/male-avatar.webp",
-      };
   }),
 });

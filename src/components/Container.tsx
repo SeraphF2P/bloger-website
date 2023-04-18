@@ -5,7 +5,7 @@ const Container = (props: { children: ReactNode; className?: string }) => {
   return (
     <main
       className={cn(
-        "mx-auto min-h-screen max-w-[420px] px-4 pt-24",
+        "mx-auto flex min-h-screen max-w-[420px] flex-col px-4 pt-24",
         props.className
       )}
     >
