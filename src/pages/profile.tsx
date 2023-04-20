@@ -3,7 +3,7 @@ import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { api, type RouterOutputs } from "../utils/api";
+import { api } from "../utils/api";
 
 const Profile: NextPage = ({}) => {
   const { user } = useUser();

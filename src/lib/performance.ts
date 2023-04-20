@@ -1,4 +1,4 @@
-export function debounce<cbType extends (...args: any[]) => void>(
+export function debounce<cbType extends (...args: unknown[]) => void>(
   callBack: cbType,
   delay = 1000
 ) {
@@ -12,7 +12,7 @@ export function debounce<cbType extends (...args: any[]) => void>(
   };
 }
 
-export function throttle<cbType extends (...args: any[]) => void>(
+export function throttle<cbType extends (...args: unknown[]) => void>(
   callBack: cbType,
   delay = 1000
 ) {

@@ -1,6 +1,6 @@
 import { type User } from "@clerk/nextjs/dist/api";
 import { clerkClient } from "@clerk/nextjs/server";
-import { Post } from "@prisma/client";
+import type { Post } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 

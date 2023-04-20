@@ -15,12 +15,11 @@ interface BtnProps
   isToggled?: boolean;
   status?: string;
   hasStatus?: boolean;
-  as?: "button" | "div";
 }
 type renderedPropsType = {
   isToggled: boolean;
   hasStatus: boolean;
-  setToggled: Dispatch<SetStateAction<boolean>>
+  setToggled: Dispatch<SetStateAction<boolean>>;
 };
 const Btn = forwardRef<
   HTMLButtonElement,
