@@ -12,7 +12,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <ClerkProvider {...pageProps}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <Navbar />
-        <Component {...pageProps} />;
+        <Component {...pageProps} />
       </ThemeProvider>
     </ClerkProvider>
   );

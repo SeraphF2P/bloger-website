@@ -1,9 +1,14 @@
-import { useUser } from "@clerk/nextjs";
 import { type User } from "@clerk/nextjs/dist/api";
 import { clerkClient } from "@clerk/nextjs/server";
+import { Post } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  privateProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 const filterUser = (user: User) => {
   const userInfo = {
@@ -14,8 +19,10 @@ const filterUser = (user: User) => {
     username:
       user.username ?? `${user.firstName || "user"} ${user.lastName || ""}`,
     profileImageUrl:
-      user.profileImageUrl == undefined ? user.gender == "male" ? "/male-avatar.webp": "/female-avatar.webp"
-  } ;
+      user.profileImageUrl == undefined ?? user.gender == "male"
+        ? "/male-avatar.webp"
+        : "/female-avatar.webp",
+  };
   return userInfo;
 };
 export const postRouter = createTRPCRouter({
@@ -39,5 +46,54 @@ export const postRouter = createTRPCRouter({
         auther,
       };
     });
+  }),
+  getUserPosts: privateProcedure.query(async ({ ctx }) => {
+    const posts: Post[] = await ctx.prisma.post.findMany({
+      where: {
+        autherId: ctx.userId,
+        published: true,
+      },
+    });
+    const auther = await clerkClient.users.getUser(ctx.userId);
+    if (!auther)
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: `User not found`,
+      });
+    return { posts, auther: filterUser(auther) };
+  }),
+  createDraft: privateProcedure
+    .input(
+      z.object({
+        title: z.string().min(1).max(12),
+        content: z.string().min(1).max(255),
+        published: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.post.create({
+        data: {
+          title: input.title,
+          content: input.content,
+          autherId: ctx.userId,
+          published: input.published || false,
+        },
+      });
+    }),
+  getUserDrafts: privateProcedure.query(async ({ ctx }) => {
+    const posts: Post[] | null = await ctx.prisma.post.findMany({
+      where: {
+        autherId: ctx.userId,
+        published: false,
+      },
+    });
+    const auther = await clerkClient.users.getUser(ctx.userId);
+    console.log(posts);
+    if (!auther)
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: `User not found`,
+      });
+    return { posts, auther: filterUser(auther) };
   }),
 });

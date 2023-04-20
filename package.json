@@ -29,6 +29,7 @@
     "react-datepicker": "^4.11.0",
     "react-dom": "18.2.0",
     "react-error-boundary": "^4.0.3",
+    "react-hot-toast": "^2.4.0",
     "react-loader-spinner": "^5.3.4",
     "superjson": "1.12.2",
     "tailwind-merge": "^1.12.0",

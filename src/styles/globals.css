@@ -8,9 +8,9 @@
   --btn-muted: 99, 102, 241;
 }
 .light {
-  --primary: 185, 28, 28;
-  --btn-hover: 195, 38, 38;
-  --btn-muted: 239, 68, 68;
+  --primary: 28, 28, 235;
+  --btn-hover: 38, 38, 195;
+  --btn-muted: 68, 68, 239;
 }
 .neon {
   --primary: 179, 255, 23;
@@ -36,7 +36,7 @@
   }
 }
 body {
-  @apply  prose-slate dark:prose-invert;
+  @apply prose-slate dark:prose-invert;
 }
 .crystal {
   background-size: 100% 100%;

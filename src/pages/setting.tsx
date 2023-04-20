@@ -1,25 +1,25 @@
-import { type FC } from "react";
 import { Container, ThemeToggler } from "@/components";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { type NextPage } from "next";
+import Image from "next/image";
 
-interface settingProps {}
-
-const setting: FC<settingProps> = ({}) => {
+const Setting: NextPage = ({}) => {
   const { user, isSignedIn } = useUser();
 
   return (
-    <Container>
-      <h1 className=" w-full p-4 text-center capitalize">setting</h1>
-      <div className=" flex h-20 w-full items-center justify-between  px-2">
+    <Container className=" gap-4">
+      <h1 className=" w-full p-4 text-center">Setting</h1>
+      <div className=" flex h-20 w-full items-center justify-between  p-2">
         <div className=" text-xl">
           {!isSignedIn && <SignInButton />}
           {!!isSignedIn && <SignOutButton />}
         </div>
-        <div className=" relative bg-green-400 ">
-          <img
+        <div className=" relative h-20 w-20 overflow-hidden rounded-full bg-green-400 ">
+          <Image
+            fill
             className=" absolute inset-0"
-            src={user?.profileImageUrl}
-            alt={`${user?.username} profile image`}
+            src={isSignedIn ? user.profileImageUrl : "/male-avatar.webp"}
+            alt={`${user?.username || ""} profile image`}
           />
         </div>
       </div>
@@ -28,4 +28,4 @@ const setting: FC<settingProps> = ({}) => {
   );
 };
 
-export default setting;
+export default Setting;
