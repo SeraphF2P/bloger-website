@@ -8,6 +8,8 @@ import {
   UsersIcon,
   PencilSquareIcon,
   XCircleIcon,
+  BookmarkSquareIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import type { SVGProps } from "react";
 type Icon = React.ForwardRefExoticComponent<
@@ -64,5 +66,7 @@ const Icons: {
   usersIcon: UsersIcon,
   drafts: PencilSquareIcon,
   error: XCircleIcon,
+  search: MagnifyingGlassIcon,
+  bookmark: BookmarkSquareIcon,
 };
 export default Icons;

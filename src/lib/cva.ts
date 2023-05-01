@@ -9,11 +9,11 @@ export const btnVariants = cva(
   {
     variants: {
       variant: {
-        fill: " bg-btn hover:bg-btn-hover  active:bg-btn shadow-sm shadow-inherit active:shadow-inner",
+        fill: " bg-btn hover:bg-btn-hover text-white  active:bg-btn shadow-sm shadow-inherit active:shadow-inner",
         outline:
           " ring-solid ring-btn  active:bg-btn   shadow-sm  shadow-inherit  ring-4 active:shadow-inner  ",
         ghost:
-          "  hover:bg-btn/80  active:bg-btn   shadow-sm shadow-inherit active:shadow-inner",
+          "  hover:bg-btn/80  active:bg-btn hover:text-white  shadow-sm shadow-inherit active:shadow-inner",
       },
       shape: {
         pill: "rounded-full",

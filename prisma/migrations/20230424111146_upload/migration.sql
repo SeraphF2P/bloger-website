@@ -16,12 +16,20 @@ CREATE TABLE `Post` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `content` VARCHAR(191) NOT NULL,
     `autherId` VARCHAR(191) NOT NULL,
-    `autherName` VARCHAR(191) NOT NULL,
-    `profileImage` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `published` BOOLEAN NOT NULL DEFAULT false,
 
     INDEX `Post_autherId_idx`(`autherId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- AddForeignKey
-ALTER TABLE `Post` ADD CONSTRAINT `Post_autherId_autherName_profileImage_fkey` FOREIGN KEY (`autherId`, `autherName`, `profileImage`) REFERENCES `User`(`id`, `name`, `profileImage`) ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateTable
+CREATE TABLE `Like` (
+    `id` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `postId` VARCHAR(191) NOT NULL,
+    `autherId` VARCHAR(191) NOT NULL,
+
+    INDEX `Like_postId_idx`(`postId`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

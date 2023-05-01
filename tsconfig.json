@@ -22,12 +22,12 @@
     "paths": {
       "~/*": ["./src/*"],
       "@/components": ["./src/components/index.ts"],
-      "@/hooks/*": ["./src/hooks/*"],
+      "@/hooks": ["./src/hooks/index.ts"],
       "@/lib/*": ["./src/lib/*"],
       "@/prisma/*": ["./prisma/client.js/*"],
       "@/style/*": ["./src/style/*"],
       "@/types/*": ["./src/types/*"],
-      "@/myFormik/*": ["./src/lib/myFormik/*"],
+      "@/myFormik": ["./src/lib/myFormik/index.ts"],
       "@/authantication": ["./src/features/authantication/index.ts"]
     }
   },

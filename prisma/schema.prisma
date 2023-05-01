@@ -6,30 +6,49 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  name      String
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  name         String
   profileImage String
-  posts     Post[]
-  @@unique([id,name,profileImage])
-  @@unique([name,profileImage])
+  posts        Post[]
+  LikedBy      LikedBy[]
+
+  @@unique([id, name, profileImage])
+  @@unique([name, profileImage])
 }
 
 model Post {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  content   String
+  content   String   @db.LongText 
 
   auther   User   @relation(fields: [autherId], references: [id])
   autherId String
-  title String
+
+  title     String
   published Boolean @default(false)
 
+  likedBy LikedBy?
 
+  @@index([autherId])
+}
+
+model LikedBy {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  Post   Post   @relation(fields: [postId], references: [id])
+  postId String @unique
+
+  auther   User   @relation(fields: [autherId], references: [id])
+  autherId String
+
+  @@index([postId])
   @@index([autherId])
 }

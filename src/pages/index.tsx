@@ -1,11 +1,12 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 
-import { BlogPost, Container } from "@/components";
+import { BlogPost, Loading } from "@/components";
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
-  const { data: posts } = api.post.getAll.useQuery();
+  const { data: posts, isLoading } = api.post.getAll.useQuery();
+  if (isLoading) return <Loading as="page" />;
   return (
     <>
       <Head>
@@ -17,12 +18,12 @@ const Home: NextPage = () => {
         <meta name="auther" content="jafer ali" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container>
+      <>
         {posts &&
-          posts.map(({ auther, post }): JSX.Element => {
-            return <BlogPost key={post.id} auther={auther} post={post} />;
+          posts.map((props): JSX.Element => {
+            return <BlogPost key={props.post.id} {...props} />;
           })}
-      </Container>
+      </>
     </>
   );
 };

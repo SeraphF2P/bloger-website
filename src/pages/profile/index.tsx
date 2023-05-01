@@ -1,12 +1,13 @@
-import { BlogPost, Container } from "@/components";
+import { BlogPost, Container, Loading } from "@/components";
 import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { api } from "../utils/api";
+import { api } from "../../utils/api";
 
-const Profile: NextPage = ({}) => {
+const Profile: NextPage = () => {
   const { user } = useUser();
+
   if (!user)
     return (
       <Container>
@@ -14,7 +15,8 @@ const Profile: NextPage = ({}) => {
       </Container>
     );
 
-  const { data } = api.post.getUserPosts.useQuery();
+  const { data, isLoading } = api.post.getUserPosts.useQuery();
+  if (isLoading) return <Loading as="page" />;
 
   return (
     <>
@@ -29,7 +31,7 @@ const Profile: NextPage = ({}) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container>
+      <>
         <div className=" relative mb-[20%] h-40 w-full bg-red-400">
           <div className=" absolute -bottom-1/3 left-1/2 h-36 w-36 -translate-x-1/2 overflow-hidden rounded-full ">
             <Image
@@ -42,15 +44,13 @@ const Profile: NextPage = ({}) => {
         <div className=" w-full p-2  text-center">
           <h1>{user.fullName}</h1>
         </div>
-        <div className=" w-full bg-red-400 p-2">
-          {data?.posts &&
-            data?.posts.map((post): JSX.Element => {
-              return (
-                <BlogPost key={post.id} auther={data.auther} post={post} />
-              );
+        <div className=" flex w-full flex-col gap-8  p-2">
+          {data &&
+            data.map((post): JSX.Element => {
+              return <BlogPost key={post.post.id} {...post} />;
             })}
         </div>
-      </Container>
+      </>
     </>
   );
 };

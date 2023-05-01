@@ -1,13 +1,13 @@
-import { Container, ThemeToggler } from "@/components";
+import { Loading, ThemeToggler } from "@/components";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Image from "next/image";
 
 const Setting: NextPage = ({}) => {
-  const { user, isSignedIn } = useUser();
+  const { user, isSignedIn, isLoaded } = useUser();
 
   return (
-    <Container className=" gap-4">
+    <>
       <h1 className=" w-full p-4 text-center">Setting</h1>
       <div className=" flex h-20 w-full items-center justify-between  p-2">
         <div className=" text-xl">
@@ -21,10 +21,11 @@ const Setting: NextPage = ({}) => {
             src={isSignedIn ? user.profileImageUrl : "/male-avatar.webp"}
             alt={`${user?.username || ""} profile image`}
           />
+          {!isLoaded && <Loading as="component" />}
         </div>
       </div>
       <ThemeToggler />
-    </Container>
+    </>
   );
 };
 

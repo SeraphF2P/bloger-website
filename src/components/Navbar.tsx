@@ -17,7 +17,7 @@ const ListLink = ({ children, href, disabled = false }: ListLink) => {
           variant: "outline",
           disable: disabled ? "link" : "default",
         }),
-        "h-12 w-12 "
+        "h-10 w-10 "
       )}
     >
       <Link className={disabled ? " cursor-auto" : ""} href={href}>
@@ -30,8 +30,8 @@ const ListLink = ({ children, href, disabled = false }: ListLink) => {
 const Navbar = () => {
   const { isSignedIn } = useUser();
   return (
-    <header className=" fixed left-0 top-0 flex w-full justify-center   ">
-      <ul className="flex w-full max-w-screen-xsm items-center justify-between bg-white p-4 text-primary  shadow dark:bg-black">
+    <header className=" fixed left-0 top-0 z-40 flex w-full justify-center   ">
+      <ul className="flex w-full max-w-screen-xsm items-center justify-between bg-white p-6 text-primary  shadow dark:bg-black">
         <ListLink href="/">
           <Icons.news />
         </ListLink>
@@ -40,6 +40,9 @@ const Navbar = () => {
         </ListLink>
         <ListLink disabled={!isSignedIn} href="/profile">
           <Icons.userIcon />
+        </ListLink>
+        <ListLink href="/search">
+          <Icons.search />
         </ListLink>
         <ListLink href="/setting">
           <Icons.settings />

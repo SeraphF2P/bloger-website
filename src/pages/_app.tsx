@@ -5,14 +5,20 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
-import Navbar from "../components/Navbar";
+import { Analytics } from "@vercel/analytics/react";
+import { Container, Navbar } from "@/components";
+import { Toaster } from "../lib/myToast/toast";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <ClerkProvider {...pageProps}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <Navbar />
-        <Component {...pageProps} />
+        <Toaster position="bottom-center"  />
+        <Container>
+          <Navbar />
+          <Component {...pageProps} />
+        </Container>
+        <Analytics />
       </ThemeProvider>
     </ClerkProvider>
   );
