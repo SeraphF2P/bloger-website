@@ -8,8 +8,6 @@ export default function ThemeToggle() {
   return (
     <div className=" flex w-full divide-x-2 ">
       <Btn
-        status="bg-green-500 dark:bg-green-600 text-yellow-400"
-        hasStatus={theme === "light" ? true : false}
         className=" flex w-full items-center justify-center p-2 "
         onClick={() => setTheme("light")}
       >
@@ -17,8 +15,6 @@ export default function ThemeToggle() {
         <span className=" sr-only">Light</span>
       </Btn>
       <Btn
-        status="bg-green-500 dark:bg-green-600 text-yellow-400"
-        hasStatus={theme == "dark"}
         className=" flex w-full items-center justify-center p-2 "
         onClick={() => setTheme("dark")}
       >
@@ -26,8 +22,6 @@ export default function ThemeToggle() {
         <span className=" sr-only">Dark</span>
       </Btn>
       <Btn
-        status="bg-green-500 dark:bg-green-600 text-yellow-400"
-        hasStatus={theme == "system"}
         className=" flex w-full items-center justify-center p-2 "
         onClick={() => setTheme("system")}
       >

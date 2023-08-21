@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { FC, useState } from "react"
+import Btn, { type BtnProps } from "./Btn";
+import { cn } from "@/lib/cva";
+import { type FC, type ReactNode, useState, ReactElement } from "react";
 
-import { cn } from "../../lib/utils"
-import { Button, ButtonProps } from "./button"
-
-interface ToggleBtnProps extends ButtonProps {
-  whenToggled?: string
-  defaultToggleState?: boolean
+interface ToggleBtnProps extends Omit<BtnProps, "children"> {
+  whenToggled?: string;
+  defaultToggleState?: boolean;
+  children: ReactNode | ((_val: any) => ReactNode);
 }
 
 const ToggleBtn: FC<ToggleBtnProps> = ({
@@ -17,19 +17,19 @@ const ToggleBtn: FC<ToggleBtnProps> = ({
   children,
   ...props
 }) => {
-  const [isToggled, setisToggled] = useState(defaultToggleState)
+  const [isToggled, setisToggled] = useState(defaultToggleState);
   return (
-    <Button
+    <Btn
       onClick={(e) => {
-        e.preventDefault()
-        setisToggled((prev) => !prev)
+        e.preventDefault();
+        setisToggled((prev) => !prev);
       }}
       className={cn(className, isToggled && whenToggled)}
       {...props}
     >
       {typeof children == "function" ? children(isToggled) : children}
-    </Button>
-  )
-}
+    </Btn>
+  );
+};
 
-export default ToggleBtn
+export default ToggleBtn;
