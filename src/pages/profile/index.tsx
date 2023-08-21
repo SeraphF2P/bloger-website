@@ -1,19 +1,15 @@
-import { BlogPost, Container, Loading } from "@/components";
+import { api } from "../../utils/api";
+import { BlogPost } from "@/components";
+import { Loading } from "@/ui";
 import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { api } from "../../utils/api";
 
 const Profile: NextPage = () => {
   const { user } = useUser();
 
-  if (!user)
-    return (
-      <Container>
-        <div>please sign in to access this page</div>
-      </Container>
-    );
+  if (!user) return <div>please sign in to access this page</div>;
 
   const { data, isLoading } = api.post.getUserPosts.useQuery();
   if (isLoading) return <Loading as="page" />;

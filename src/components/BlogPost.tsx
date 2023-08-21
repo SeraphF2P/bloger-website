@@ -1,11 +1,11 @@
-import { type FC } from "react";
-import { formatRelativeDate } from "@/lib/formatter";
-import { api, type RouterOutputs } from "../utils/api";
-import Image from "next/image";
-import { Btn, AlertModal } from "@/components";
-import { useUser } from "@clerk/nextjs";
 import { toast } from "../lib/myToast";
+import { api, type RouterOutputs } from "../utils/api";
+import { formatRelativeDate } from "@/lib/formatter";
+import { AlertModal, Btn } from "@/ui";
+import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import Link from "next/link";
+import { type FC } from "react";
 
 type Post = RouterOutputs["post"]["getAll"][number];
 
@@ -31,7 +31,7 @@ const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
   );
   const { mutate: like } = api.post.like.useMutation({
     onSuccess: () => {
-      void ctx.post.getAll.invalidate();
+      void ctx.post.invalidate();
     },
     onError: (err) => {
       toast({
@@ -53,7 +53,7 @@ const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
   return (
     <div
       key={post.id}
-      className="  prose-invert w-full rounded bg-slate-200 p-2"
+      className="   w-full rounded bg-slate-300 dark:bg-slate-700 shadow p-2"
     >
       <div className=" flex">
         <Link
@@ -71,25 +71,25 @@ const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
           />
         </Link>
         <div className=" flex h-20 flex-grow  flex-col justify-between p-2">
-          <div className="prose">
+          <div className="">
             <h3 className="m-0 capitalize">{post.title}</h3>
           </div>
-          <div className="prose flex justify-between">
-            <p className="m-0">{auther.username}</p>
-            <p className="m-0 ">{formatRelativeDate(post.createdAt)}</p>
+          <div className=" flex justify-between">
+            <p>{auther.username}</p>
+            <p>{formatRelativeDate(post.createdAt)}</p>
           </div>
         </div>
       </div>
-      <div className=" prose  min-h-[100px] bg-slate-300 p-4 ">
+      <div className="   min-h-[100px] bg-theme p-4 ">
         <p>{post.content}</p>
       </div>
-      <div className=" px-2 h-6   text-sm  text-black">
+      <div className=" px-2 h-6   text-sm text-revert-theme">
         {validateLikes()}
       </div>
       <div className=" prose  flex items-center justify-between">
         <Btn
           onClick={() => like(post.id)}
-          className=" flex-grow p-2 text-lg font-semibold "
+          className="  flex-grow p-2 text-lg font-semibold "
           variant="ghost"
         >
           like
@@ -101,7 +101,8 @@ const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
           <AlertModal
             disabled={isDeleting}
             onConfirm={() => remove(post.id)}
-            className=" flex-grow p-2 text-lg font-semibold "
+            variant="ghost"
+            className="  flex-grow p-2 text-lg font-semibold "
           >
             delete
           </AlertModal>

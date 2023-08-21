@@ -22,8 +22,11 @@
     "paths": {
       "~/*": ["./src/*"],
       "@/components": ["./src/components/index.ts"],
+      "@/ui": ["./src/components/ui/index.ts"],
       "@/hooks": ["./src/hooks/index.ts"],
+      "@/config/*": ["./src/config/*"],
       "@/lib/*": ["./src/lib/*"],
+      "@/utils/*": ["./src/utils/*"],
       "@/prisma/*": ["./prisma/client.js/*"],
       "@/style/*": ["./src/style/*"],
       "@/types/*": ["./src/types/*"],

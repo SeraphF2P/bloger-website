@@ -1,7 +1,7 @@
+import { BlogPost } from "@/components";
+import { Loading } from "@/ui";
 import { type NextPage } from "next";
 import Head from "next/head";
-
-import { BlogPost, Loading } from "@/components";
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
@@ -18,12 +18,12 @@ const Home: NextPage = () => {
         <meta name="auther" content="jafer ali" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <>
+      <section className=" text-revert-theme flex flex-col gap-4">
         {posts &&
           posts.map((props): JSX.Element => {
             return <BlogPost key={props.post.id} {...props} />;
           })}
-      </>
+      </section>
     </>
   );
 };

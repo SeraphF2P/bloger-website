@@ -1,6 +1,7 @@
-"use client"
+"use client";
+
+import useClickOutside from "../../hooks/useClickOutside";
 import { useRef, type ReactNode } from "react";
-import useClickOutside from "../hooks/useClickOutside";
 
 const Modal = (props: {
   children?: ReactNode;

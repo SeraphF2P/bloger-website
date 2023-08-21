@@ -1,19 +1,20 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { cva, type VariantProps } from "class-variance-authority";
+
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
-export const btnVariants = cva(
-  "duration-400 transition-transform cursor-pointer   hover:scale-105 hover:disabled:scale-100 focus:scale-105 active:scale-100",
+export const variants = cva(
+  "duration-400 transition-colors cursor-pointer text-revert-theme [--variant:--primary]   ",
   {
     variants: {
       variant: {
-        fill: " bg-btn hover:bg-btn-hover text-white  active:bg-btn shadow-sm shadow-inherit active:shadow-inner",
+        fill: " bg-[var(--variant)] hover:bg-[color-mix(in_oklab,var(--variant)_80%,#fff)]   active:bg-[var(--variant)] shadow-sm shadow-inherit active:shadow-inner",
         outline:
           " ring-solid ring-btn  active:bg-btn   shadow-sm  shadow-inherit  ring-4 active:shadow-inner  ",
         ghost:
-          "  hover:bg-btn/80  active:bg-btn hover:text-white  shadow-sm shadow-inherit active:shadow-inner",
+          "  hover:bg-[color-mix(in_oklab,var(--variant)_80%,transparent)]  active:bg-[var(--variant)] hover:text-theme    shadow-sm shadow-inherit active:shadow-inner",
       },
       shape: {
         pill: "rounded-full",
@@ -35,4 +36,4 @@ export const btnVariants = cva(
     },
   }
 );
-export type BtnVariants = VariantProps<typeof btnVariants>;
+export type variantsType = VariantProps<typeof variants>;

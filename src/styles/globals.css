@@ -2,59 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.dark {
-  --primary: 67, 56, 202;
-  --btn-hover: 77, 66, 212;
-  --btn-muted: 99, 102, 241;
-}
-.light {
-  --primary: 28, 28, 235;
-  --btn-hover: 38, 38, 195;
-  --btn-muted: 68, 68, 239;
-}
-.neon {
-  --primary: 179, 255, 23;
-  --btn-hover: 166, 242, 10;
-  --btn-muted: 212, 255, 122;
-}
-
-@layer base {
-  h1 {
-    @apply text-2xl;
-  }
-  h2 {
-    @apply text-xl;
-  }
-  h3 {
-    @apply text-lg;
-  }
-  li {
-    @apply list-none;
-  }
-  a {
-    @apply !text-current;
-  }
-}
-body {
-  @apply prose-slate dark:prose-invert;
-}
-.crystal {
-  background-size: 100% 100%;
-  background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
-  background-image: repeating-linear-gradient(
-      315deg,
-      #00ffff2e 92%,
-      #073aff00 100%
-    ),
-    repeating-radial-gradient(
-      75% 75% at 238% 218%,
-      #00ffff12 30%,
-      #073aff14 39%
-    ),
-    radial-gradient(99% 99% at 109% 2%, #07fff6ff 0%, #073aff00 100%),
-    radial-gradient(99% 99% at 21% 78%, #1f0effff 0%, #073aff00 100%),
-    radial-gradient(160% 154% at 711px -303px, #1111f2ff 0%, #073affff 100%);
-}
 
 /* .form-control {
   @apply relative flex w-full flex-col pb-6;
@@ -68,14 +15,7 @@ body {
 .form-error {
   @apply absolute bottom-0 left-0 p-1 text-xs font-bold text-red-400;
 } */
-.remove_scroll_bar {
-  scroll-behavior: smooth;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.remove_scroll_bar::-webkit-scrollbar {
-  display: none;
-}
+
 html,
 body,
 #root {

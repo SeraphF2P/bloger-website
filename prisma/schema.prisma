@@ -28,25 +28,26 @@ model Post {
   createdAt DateTime @default(now())
   content   String   @db.LongText 
 
-  auther   User   @relation(fields: [autherId], references: [id])
+  auther   User   @relation(fields: [autherId], references: [id],onDelete: Cascade)
   autherId String
 
   title     String
   published Boolean @default(false)
 
-  likedBy LikedBy?
+  likedBy LikedBy? 
 
   @@index([autherId])
+  
 }
 
 model LikedBy {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
 
-  Post   Post   @relation(fields: [postId], references: [id])
+  Post   Post   @relation(fields: [postId], references: [id],onDelete: Cascade)
   postId String @unique
 
-  auther   User   @relation(fields: [autherId], references: [id])
+  auther   User   @relation(fields: [autherId], references: [id],onDelete: Cascade)
   autherId String
 
   @@index([postId])
