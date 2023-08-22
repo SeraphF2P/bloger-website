@@ -2,32 +2,42 @@
 
 import { Btn, Icons } from "@/ui";
 import { useTheme } from "next-themes";
+import type { FC, PropsWithChildren } from "react";
+
+interface ThemeTogglerBtnProps extends PropsWithChildren {
+  toggledTheme: string;
+}
+const ThemeTogglerBtn: FC<ThemeTogglerBtnProps> = ({
+  toggledTheme,
+  children,
+}) => {
+  const { setTheme, theme } = useTheme();
+  const isActive = theme == toggledTheme;
+  return (
+    <Btn
+      className={` rounded-none flex w-full items-center justify-center p-2  ${
+        isActive ? "border-2 border-revert-theme text-yellow-300 dark:text-yellow-400" : ""
+      }`}
+      onClick={() => setTheme(toggledTheme)}
+    >
+      {children}
+      <span className=" sr-only">{toggledTheme}</span>
+    </Btn>
+  );
+};
 
 export default function ThemeToggle() {
-  const { setTheme, theme } = useTheme();
   return (
-    <div className=" flex w-full divide-x-2 ">
-      <Btn
-        className=" flex w-full items-center justify-center p-2 "
-        onClick={() => setTheme("light")}
-      >
+    <div className=" flex w-full  ">
+      <ThemeTogglerBtn toggledTheme="light">
         <Icons.sun className=" h-6 w-6 " />
-        <span className=" sr-only">Light</span>
-      </Btn>
-      <Btn
-        className=" flex w-full items-center justify-center p-2 "
-        onClick={() => setTheme("dark")}
-      >
+      </ThemeTogglerBtn>
+      <ThemeTogglerBtn toggledTheme="dark">
         <Icons.moon className=" h-6 w-6 " />
-        <span className=" sr-only">Dark</span>
-      </Btn>
-      <Btn
-        className=" flex w-full items-center justify-center p-2 "
-        onClick={() => setTheme("system")}
-      >
+      </ThemeTogglerBtn>
+      <ThemeTogglerBtn toggledTheme="system">
         <Icons.system className=" h-6 w-6 " />
-        <span className=" sr-only">System</span>
-      </Btn>
+      </ThemeTogglerBtn>
     </div>
   );
 }

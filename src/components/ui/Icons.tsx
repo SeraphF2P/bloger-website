@@ -10,8 +10,10 @@ import {
   XCircleIcon,
   BookmarkSquareIcon,
   MagnifyingGlassIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 import type { SVGProps } from "react";
+
 type Icon = React.ForwardRefExoticComponent<
   React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & {
     title?: string;
@@ -68,5 +70,6 @@ const Icons: {
   error: XCircleIcon,
   search: MagnifyingGlassIcon,
   bookmark: BookmarkSquareIcon,
+  heart: HeartIcon,
 };
 export default Icons;

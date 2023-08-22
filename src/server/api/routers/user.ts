@@ -1,7 +1,6 @@
 import { clerkClient, type User } from "@clerk/nextjs/dist/api";
 import { Post } from "@prisma/client";
 import { z } from "zod";
-
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 const filterUser = (user: User) => {
@@ -37,7 +36,7 @@ export const userRouter = createTRPCRouter({
           createdAt: "desc",
         },
       });
-      const likes = await ctx.prisma.likedBy.findMany({
+      const likes = await ctx.prisma.like.findMany({
         where: {
           autherId: input,
         },

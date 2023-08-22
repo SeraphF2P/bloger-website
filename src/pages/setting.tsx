@@ -9,7 +9,7 @@ const Setting: NextPage = ({}) => {
   return (
     <>
       <h1 className=" w-full p-4 text-center">Setting</h1>
-      <div className=" flex h-20 w-full items-center justify-between  p-2">
+      <div className=" flex  w-full items-center justify-between  p-2">
         <div className=" text-xl">
           {!isSignedIn && <SignInButton />}
           {!!isSignedIn && <SignOutButton />}

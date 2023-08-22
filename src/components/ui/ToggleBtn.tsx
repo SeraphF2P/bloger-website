@@ -2,12 +2,12 @@
 
 import Btn, { type BtnProps } from "./Btn";
 import { cn } from "@/lib/cva";
-import { type FC, type ReactNode, useState, ReactElement } from "react";
+import { useState, type FC, type ReactNode } from "react";
 
 interface ToggleBtnProps extends Omit<BtnProps, "children"> {
   whenToggled?: string;
   defaultToggleState?: boolean;
-  children: ReactNode | ((_val: any) => ReactNode);
+  children: ReactNode | (({ isToggled }: { isToggled: boolean }) => ReactNode);
 }
 
 const ToggleBtn: FC<ToggleBtnProps> = ({
@@ -15,6 +15,7 @@ const ToggleBtn: FC<ToggleBtnProps> = ({
   className,
   whenToggled,
   children,
+  onClick,
   ...props
 }) => {
   const [isToggled, setisToggled] = useState(defaultToggleState);
@@ -23,11 +24,14 @@ const ToggleBtn: FC<ToggleBtnProps> = ({
       onClick={(e) => {
         e.preventDefault();
         setisToggled((prev) => !prev);
+        if (typeof onClick === "function") {
+          onClick(e);
+        }
       }}
       className={cn(className, isToggled && whenToggled)}
       {...props}
     >
-      {typeof children == "function" ? children(isToggled) : children}
+      {typeof children == "function" ? children({ isToggled }) : children}
     </Btn>
   );
 };

@@ -60,9 +60,12 @@ export const MyPlugin = plugin(
         },
 
         colors: {
-          theme: "var(--theme)",
-          "revert-theme": "var(--revert-theme)",
-          primary: "var(--primary)",
+          theme:
+            "color-mix(in oklab,var(--theme),transparent calc((1 - <alpha-value>) * 100%))",
+          "revert-theme":
+            "color-mix(in oklab,var(--revert-theme),transparent calc((1 - <alpha-value>) * 100%))",
+          primary:
+            "color-mix(in oklab,var(--primary),transparent calc((1 - <alpha-value>) * 100%))",
         },
         screens: {
           min: "320px",

@@ -10,46 +10,46 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
-
 model User {
-  id           String    @id @default(cuid())
-  createdAt    DateTime  @default(now())
-  name         String
-  profileImage String
-  posts        Post[]
-  LikedBy      LikedBy[]
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  
+  gender String  @default("male")
+  firstName String? 
+  lastName String?
+  username String @unique @default("new user")
+  profileImageUrl String?
 
-  @@unique([id, name, profileImage])
-  @@unique([name, profileImage])
+  posts        Post[]
+  Likes        Like[]
+
+  @@unique([id, username])
 }
 
 model Post {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  content   String   @db.LongText 
+  content   String   @db.LongText
 
-  auther   User   @relation(fields: [autherId], references: [id],onDelete: Cascade)
+  auther   User   @relation(fields: [autherId], references: [id], onDelete: Cascade)
   autherId String
 
   title     String
   published Boolean @default(false)
 
-  likedBy LikedBy? 
+  likes Like[]
 
   @@index([autherId])
-  
 }
 
-model LikedBy {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+model Like {
+  Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
 
-  Post   Post   @relation(fields: [postId], references: [id],onDelete: Cascade)
-  postId String @unique
-
-  auther   User   @relation(fields: [autherId], references: [id],onDelete: Cascade)
+  auther   User   @relation(fields: [autherId], references: [id], onDelete: Cascade)
   autherId String
 
+  @@id([postId, autherId])
   @@index([postId])
   @@index([autherId])
 }

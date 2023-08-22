@@ -1,15 +1,16 @@
-import { toast } from "../lib/myToast";
-import { api, type RouterOutputs } from "../utils/api";
 import { formatRelativeDate } from "@/lib/formatter";
-import { AlertModal, Btn } from "@/ui";
+import { toast } from "@/lib/myToast";
+import { AlertModal, Btn, Icons, ToggleBtn } from "@/ui";
+import { api, type RouterOutputs } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
+import { AnimatePresence, motion as m } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { type FC } from "react";
+import { useMemo, type FC } from "react";
 
 type Post = RouterOutputs["post"]["getAll"][number];
 
-const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
+const BlogPost: FC<Post> = ({ auther, post, likesCount, isLiked }) => {
   const { user } = useUser();
   const ctx = api.useContext();
   const { isLoading: isDeleting, mutate: remove } = api.post.delete.useMutation(
@@ -40,16 +41,16 @@ const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
       });
     },
   });
-  const validateLikes = () => {
-    if (likedBy.length > 0) {
-      if (user && likedBy.some((item) => item.autherId == user.id)) {
-        if (likedBy.length == 1) return user.username || "you";
-        return `you and ${likedBy.length} other liked this post`;
+  const validateLikes = useMemo(() => {
+    if (likesCount > 0) {
+      if (user && isLiked) {
+        if (likesCount == 1) return "you";
+        return `you and ${likesCount - 1} other liked this post`;
       } else {
-        return likedBy.length;
+        return likesCount;
       }
     }
-  };
+  }, [isLiked, likesCount, user]);
   return (
     <div
       key={post.id}
@@ -83,17 +84,12 @@ const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
       <div className="   min-h-[100px] bg-theme p-4 ">
         <p>{post.content}</p>
       </div>
-      <div className=" px-2 h-6   text-sm text-revert-theme">
-        {validateLikes()}
+      <div className=" relative h-6 text-sm text-revert-theme">
+        <span className="  px-2">{validateLikes}</span>
+        <hr className=" border-revert-theme/20 absolute top-full  left-4 right-4 " />
       </div>
-      <div className=" prose  flex items-center justify-between">
-        <Btn
-          onClick={() => like(post.id)}
-          className="  flex-grow p-2 text-lg font-semibold "
-          variant="ghost"
-        >
-          like
-        </Btn>
+      <div className="   flex items-center justify-between">
+        <LikeBtn onClick={() => like(post.id)} />
         <Btn className=" flex-grow p-2 text-lg font-semibold " variant="ghost">
           comment
         </Btn>
@@ -113,3 +109,62 @@ const BlogPost: FC<Post> = ({ auther, post, likedBy }) => {
 };
 
 export default BlogPost;
+
+function LikeBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <ToggleBtn
+      onClick={onClick}
+      className=" flex justify-center items-center  flex-grow  p-2 text-lg font-semibold "
+      variant="ghost"
+      whenToggled=""
+      defaultToggleState={false}
+    >
+      {({ isToggled }) => (
+        <>
+          <AnimatePresence initial={false} mode="popLayout">
+            {isToggled && (
+              <m.span
+                initial={{
+                  x: 8,
+                  opacity: 0,
+                }}
+                animate={{
+                  x: 0,
+                  opacity: 1,
+                }}
+                exit={{
+                  x: 8,
+                  opacity: 0,
+                }}
+              >
+                <Icons.heart
+                  className={`w-7 h-7 relative transition-transform fill-red-400 hover:scale-105 `}
+                />
+              </m.span>
+            )}
+          </AnimatePresence>
+          <AnimatePresence initial={false} mode="popLayout">
+            {!isToggled && (
+              <m.span
+                initial={{
+                  x: -8,
+                  opacity: 0,
+                }}
+                animate={{
+                  x: 0,
+                  opacity: 1,
+                }}
+                exit={{
+                  x: -8,
+                  opacity: 0,
+                }}
+              >
+                like
+              </m.span>
+            )}
+          </AnimatePresence>
+        </>
+      )}
+    </ToggleBtn>
+  );
+}

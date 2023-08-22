@@ -1,8 +1,9 @@
-import { BlogPost, Loading } from "@/components";
+import { api } from "../../utils/api";
+import { BlogPost } from "@/components";
+import { Loading } from "@/ui";
 import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { api } from "../../utils/api";
 
 const Profile = ({ userId }: { userId: string }) => {
   const { data: auther, isLoading } = api.user.getUserInfo.useQuery(userId);

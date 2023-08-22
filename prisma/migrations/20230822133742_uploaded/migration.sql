@@ -14,7 +14,7 @@ CREATE TABLE `User` (
 CREATE TABLE `Post` (
     `id` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `content` VARCHAR(191) NOT NULL,
+    `content` LONGTEXT NOT NULL,
     `autherId` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `published` BOOLEAN NOT NULL DEFAULT false,
@@ -25,11 +25,10 @@ CREATE TABLE `Post` (
 
 -- CreateTable
 CREATE TABLE `Like` (
-    `id` VARCHAR(191) NOT NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `postId` VARCHAR(191) NOT NULL,
     `autherId` VARCHAR(191) NOT NULL,
 
     INDEX `Like_postId_idx`(`postId`),
-    PRIMARY KEY (`id`)
+    INDEX `Like_autherId_idx`(`autherId`),
+    PRIMARY KEY (`postId`, `autherId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
