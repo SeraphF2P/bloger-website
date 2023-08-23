@@ -1,12 +1,12 @@
-import { Navbar } from "@/components";
+import { fontOutfit } from "@/config/fonts";
+import { cn } from "@/lib/cva";
 import { Toaster } from "@/lib/myToast/toast";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import { type AppType } from "next/app";
 import "~/styles/globals.css";
-import { fontOutfit } from "@/config/fonts";
-import { cn } from "@/lib/cva";
+import { Navbar } from "./(components)";
 import { api } from "~/utils/api";
 
 const MyApp: AppType = ({ Component, pageProps }) => {

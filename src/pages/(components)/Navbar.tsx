@@ -1,4 +1,5 @@
 import { Icons } from "@/ui";
+import { useUser } from "@clerk/nextjs";
 import { motion as m } from "framer-motion";
 import Link, { type LinkProps } from "next/link";
 import { useRouter } from "next/router";
@@ -9,8 +10,8 @@ interface ListLink {
   href: LinkProps["href"];
 }
 const ListLink = ({ children, href }: ListLink) => {
-  const { pathname } = useRouter();
-  const isActive = pathname == href;
+  const { asPath } = useRouter();
+  const isActive = asPath === href;
   return (
     <li className={" relative  flex-[1_1_40px] p-4 "}>
       <Link href={href}>{children}</Link>
@@ -26,6 +27,7 @@ const ListLink = ({ children, href }: ListLink) => {
 };
 
 const Navbar = () => {
+  const { user } = useUser();
   return (
     <header className=" fixed left-0 top-0 z-40 flex w-full justify-center   ">
       <ul className="flex w-full bg-theme text-revert-theme max-w-screen-xsm items-center justify-between shadow-sm  shadow-revert-theme ">
@@ -35,10 +37,10 @@ const Navbar = () => {
         <ListLink href="/drafts">
           <Icons.drafts />
         </ListLink>
-        <ListLink href="/profile">
+        <ListLink href={"/profile" + `${user ? `/${user?.id}` : ""}`}>
           <Icons.userIcon />
         </ListLink>
-        <ListLink href="/search">
+        <ListLink href="/notification">
           <Icons.search />
         </ListLink>
         <ListLink href="/setting">

@@ -10,18 +10,23 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
+
 model User {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  
-  gender String  @default("male")
-  firstName String? 
-  lastName String?
-  username String @unique @default("new user")
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  gender          String  @default("male")
+  firstName       String?
+  lastName        String?
+  username        String  @unique @default("new user")
   profileImageUrl String?
 
-  posts        Post[]
-  Likes        Like[]
+  posts   Post[]
+  Likes   Like[]
+  Comment Comment[]
+
+  friends     User[] @relation(name: "friendship")
+  friendsWith User[] @relation(name: "friendship")
 
   @@unique([id, username])
 }
@@ -37,7 +42,8 @@ model Post {
   title     String
   published Boolean @default(false)
 
-  likes Like[]
+  likes   Like[]
+  Comment Comment[]
 
   @@index([autherId])
 }
@@ -50,6 +56,21 @@ model Like {
   autherId String
 
   @@id([postId, autherId])
+  @@index([postId])
+  @@index([autherId])
+}
+
+model Comment {
+  id String @id @default(cuid())
+
+  Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  auther   User   @relation(fields: [autherId], references: [id], onDelete: Cascade)
+  autherId String
+
+  content String @db.LongText
+
   @@index([postId])
   @@index([autherId])
 }

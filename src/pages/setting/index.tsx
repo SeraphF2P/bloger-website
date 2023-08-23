@@ -1,4 +1,5 @@
-import { Loading, ThemeToggler } from "@/ui";
+import { ThemeToggler } from "./(components)/index";
+import { Loading } from "@/ui";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Image from "next/image";

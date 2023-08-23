@@ -1,6 +1,4 @@
 import BlogPost from "./BlogPost";
-import CreateDraft from "./CreateDraft";
-import Navbar from "./Navbar";
+import CommentsSec from "./CommentsSec";
 
-
-export { BlogPost, CreateDraft, Navbar };
+export { BlogPost, CommentsSec };

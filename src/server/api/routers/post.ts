@@ -1,4 +1,4 @@
-import { type User } from "@clerk/nextjs/dist/api";
+import { filterUser } from "@/utils/data-filters";
 import { clerkClient } from "@clerk/nextjs/server";
 import type { Post } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
@@ -10,30 +10,6 @@ import {
   privateProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-
-const filterUser = (
-  user:
-    | User
-    | {
-        id: string;
-        gender: string;
-        firstName: string | null;
-        lastName: string | null;
-        username: string | null;
-        profileImageUrl: string | null;
-      }
-) => {
-  const { gender, id, firstName, lastName, profileImageUrl, username } = user;
-  const userInfo = {
-    id: id,
-    gender: gender,
-    firstName: firstName,
-    lastName: lastName,
-    username: username || `${firstName || "user"} ${lastName || ""}`,
-    profileImageUrl: profileImageUrl ?? "/male-avatar.webp",
-  };
-  return userInfo;
-};
 
 const postingRateLimit = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -74,35 +50,54 @@ export const postRouter = createTRPCRouter({
       };
     });
   }),
-  getUserPosts: privateProcedure.query(async ({ ctx }) => {
-    const posts: Post[] = await ctx.prisma.post.findMany({
-      where: {
-        autherId: ctx.userId,
-        published: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+  getUserPosts: publicProcedure
+    .input(z.string().min(1))
+    .query(async ({ ctx, input }) => {
+      const auther = await ctx.prisma.user.findUniqueOrThrow({
+        where: {
+          id: input,
+        },
+        include: {
+          posts: {
+            where: {
+              autherId: input,
+              published: true,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+            include: {
+              likes: true,
+              _count: { select: { likes: true } },
+              auther: {
+                select: {
+                  id: true,
+                  gender: true,
+                  firstName: true,
+                  lastName: true,
+                  username: true,
+                  profileImageUrl: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
-    const auther = await clerkClient.users.getUser(ctx.userId);
-    if (!auther)
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: `User not found`,
+      const posts = auther.posts.map((post) => {
+        const isLiked = post.likes.some((like) => like.autherId == ctx.userId);
+        return {
+          post,
+          auther: filterUser(post.auther),
+          likesCount: post._count.likes,
+          isLiked,
+        };
       });
-    const likes = await ctx.prisma.like.findMany({
-      where: {
-        autherId: ctx.userId,
-      },
-    });
-    return posts.map((post) => {
-      const likedBy = likes.filter((item) => {
-        return item.postId === post.id;
-      });
-      return { post, auther: filterUser(auther), likedBy };
-    });
-  }),
+      return {
+        auther: filterUser(auther),
+        posts,
+      };
+    }),
   createDraft: privateProcedure
     .input(
       z.object({
@@ -185,18 +180,21 @@ export const postRouter = createTRPCRouter({
   like: privateProcedure
     .input(z.string().min(1))
     .mutation(async ({ ctx, input }) => {
-      const liked = await ctx.prisma.like.findFirst({
+      // throw new Error("afa ")
+      const isLiked = await ctx.prisma.like.findUnique({
         where: {
-          autherId: ctx.userId,
-          postId: input,
+          postId_autherId: {
+            autherId: ctx.userId,
+            postId: input,
+          },
         },
       });
-      if (liked) {
+      if (isLiked) {
         await ctx.prisma.like.delete({
           where: {
             postId_autherId: {
-              autherId: liked.autherId,
-              postId: liked.postId,
+              autherId: ctx.userId,
+              postId: input,
             },
           },
         });

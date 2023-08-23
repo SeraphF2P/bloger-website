@@ -1,4 +1,4 @@
-import { CreateDraft } from "@/components";
+import { CreateDraft } from "./(component)";
 import { formatRelativeDate } from "@/lib/formatter";
 import { toast } from "@/lib/myToast";
 import { AlertModal, Btn, Icons, Loading } from "@/ui";

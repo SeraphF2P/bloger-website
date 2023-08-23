@@ -2,7 +2,7 @@
 
 import { Btn, Icons } from "@/ui";
 import { useTheme } from "next-themes";
-import type { FC, PropsWithChildren } from "react";
+import { type FC, type PropsWithChildren } from "react";
 
 interface ThemeTogglerBtnProps extends PropsWithChildren {
   toggledTheme: string;
@@ -13,10 +13,13 @@ const ThemeTogglerBtn: FC<ThemeTogglerBtnProps> = ({
 }) => {
   const { setTheme, theme } = useTheme();
   const isActive = theme == toggledTheme;
+  console.log("theme", theme);
   return (
     <Btn
       className={` rounded-none flex w-full items-center justify-center p-2  ${
-        isActive ? "border-2 border-revert-theme text-yellow-300 dark:text-yellow-400" : ""
+        isActive
+          ? "border-2 border-revert-theme text-yellow-300 dark:text-yellow-400"
+          : ""
       }`}
       onClick={() => setTheme(toggledTheme)}
     >
@@ -34,9 +37,6 @@ export default function ThemeToggle() {
       </ThemeTogglerBtn>
       <ThemeTogglerBtn toggledTheme="dark">
         <Icons.moon className=" h-6 w-6 " />
-      </ThemeTogglerBtn>
-      <ThemeTogglerBtn toggledTheme="system">
-        <Icons.system className=" h-6 w-6 " />
       </ThemeTogglerBtn>
     </div>
   );

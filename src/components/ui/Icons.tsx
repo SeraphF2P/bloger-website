@@ -11,6 +11,7 @@ import {
   BookmarkSquareIcon,
   MagnifyingGlassIcon,
   HeartIcon,
+  ChatBubbleOvalLeftIcon,
 } from "@heroicons/react/24/outline";
 import type { SVGProps } from "react";
 
@@ -71,5 +72,6 @@ const Icons: {
   search: MagnifyingGlassIcon,
   bookmark: BookmarkSquareIcon,
   heart: HeartIcon,
+  chatbubble: ChatBubbleOvalLeftIcon,
 };
 export default Icons;
