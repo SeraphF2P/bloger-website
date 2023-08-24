@@ -68,8 +68,7 @@ export const MyPlugin = plugin(
             "color-mix(in oklab,var(--primary),transparent calc((1 - <alpha-value>) * 100%))",
         },
         screens: {
-          min: "320px",
-          xsm: "420px",
+          mn: "420px",
           xs: "576px",
         },
         gridAutoColumns: {
@@ -85,6 +84,10 @@ export const MyPlugin = plugin(
         },
         animation: {
           reset: "reset var(--reset-duration) infinite var(--reset-delay)",
+          fadein:
+            "fadein var(--fadein-duration,0.3s) forwards  var(--fadein-delay,0s)",
+          fadeout:
+            "fadeout var(--fadeout-duration,0.3s) forwards var(--fadeout-delay,0s)",
         },
         keyframes: {
           reset: {
@@ -95,6 +98,20 @@ export const MyPlugin = plugin(
             "0%,100%": {
               transform:
                 "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));",
+            },
+          },
+          fadein: {
+            to: {
+              opacity: "var(--fadein-opacity,1)",
+              transform:
+                "translate(var(--fade-translate-x,0) , var(--fade-translate-y,0)) rotate(var(--fade-rotate)) skewX(var(--fade-skew-x,0)) skewY(var(--fade-skew-y,0)) scaleX(var(--fade-scale-x,1)) scaleY(var(--fade-scale-y,1));",
+            },
+          },
+          fadeout: {
+            from: {
+              opacity: "var(--fadeout-opacity,1)",
+              transform:
+                "translate(var(--fade-translate-x,0) , var(--fade-translate-y,0)) rotate(var(--fade-rotate)) skewX(var(--fade-skew-x,0)) skewY(var(--fade-skew-y,0)) scaleX(var(--fade-scale-x,1)) scaleY(var(--fade-scale-y,1));",
             },
           },
         },

@@ -30,7 +30,7 @@ const Navbar = () => {
   const { user } = useUser();
   return (
     <header className=" fixed left-0 top-0 z-40 flex w-full justify-center   ">
-      <ul className="flex w-full bg-theme text-revert-theme max-w-screen-xsm items-center justify-between shadow-sm  shadow-revert-theme ">
+      <ul className="flex w-full bg-theme text-revert-theme max-w-screen-mn items-center justify-between shadow-sm  shadow-revert-theme ">
         <ListLink href="/">
           <Icons.news />
         </ListLink>

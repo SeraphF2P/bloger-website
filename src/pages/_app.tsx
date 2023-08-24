@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
 import { type AppType } from "next/app";
 import "~/styles/globals.css";
-import { Navbar } from "./(components)";
+import { Navbar } from "@/components/home";
 import { api } from "~/utils/api";
 
 const MyApp: AppType = ({ Component, pageProps }) => {

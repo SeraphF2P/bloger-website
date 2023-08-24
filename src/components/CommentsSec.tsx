@@ -1,6 +1,5 @@
 import { Btn, type BtnProps } from "@/ui";
 import * as Dialog from "@radix-ui/react-dialog";
-import { motion as m } from "framer-motion";
 
 interface CommentsSecPropsType extends BtnProps {
   asd?: string;
@@ -13,14 +12,11 @@ const AlertModal = ({ ...props }: CommentsSecPropsType) => {
         <Btn {...props} />
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay  className=" fixed inset-0  backdrop-blur-sm dark:bg-gray-700/40">
+        <Dialog.Overlay className=" data-[state=open]:animate-fadein data-[state=closed]:animate-fadeout opacity-0 fixed inset-0  flex justify-center items-end backdrop-blur-sm dark:bg-gray-700/40">
           <Dialog.Content asChild>
-            <m.div
-              animate={{ y: "-100%" }}
-              className=" mx-auto relative top-full bg-sky-500 w-80 h-96"
-            >
+            <div className="data-[state=open]:animate-fadein data-[state=closed]:animate-fadeout  translate-y-full relative  bg-black mn:max-w-xs w-full shadow mx-4 h-full">
               {/* <div className=" relative  h-96  w-80    bg-red-400 "></div> */}
-            </m.div>
+            </div>
           </Dialog.Content>
         </Dialog.Overlay>
       </Dialog.Portal>

@@ -1,6 +1,8 @@
-import { ThemeToggler } from "./(components)/index";
+import Modale from "../../components/ui/Modale";
+import { variants } from "../../lib/cva";
+import { ThemeToggler } from "@/components/setting";
 import { Loading } from "@/ui";
-import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Image from "next/image";
 
@@ -12,8 +14,8 @@ const Setting: NextPage = ({}) => {
       <h1 className=" w-full p-4 text-center">Setting</h1>
       <div className=" flex  w-full items-center justify-between  p-2">
         <div className=" text-xl">
-          {!isSignedIn && <SignInButton />}
-          {!!isSignedIn && <SignOutButton />}
+          {!isSignedIn && <SignInUI />}
+          {isSignedIn && <SignOutButton />}
         </div>
         <div className=" relative h-20 w-20 overflow-hidden rounded-full bg-green-400 ">
           <Image
@@ -29,5 +31,25 @@ const Setting: NextPage = ({}) => {
     </>
   );
 };
-
+const SignInUI = ({}) => {
+  return (
+    <Modale>
+      <Modale.Btn variant="none">sign in</Modale.Btn>
+      <Modale.Content>
+        <SignIn
+          appearance={{
+            elements: {
+              headerTitle: "text-revert-theme",
+              headerSubtitle: "text-revert-theme",
+              card: "bg-gray-700 ",
+              footerActionText: "text-revert-theme",
+              socialButtonsBlockButton: variants({ variant: "fill" }),
+              socialButtons: "",
+            },
+          }}
+        />
+      </Modale.Content>
+    </Modale>
+  );
+};
 export default Setting;

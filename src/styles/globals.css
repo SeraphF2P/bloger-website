@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* .form-control {
   @apply relative flex w-full flex-col pb-6;
 }

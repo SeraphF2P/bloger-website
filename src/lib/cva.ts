@@ -17,6 +17,7 @@ export const variants = cva(
           " ring-solid ring-btn  active:bg-btn   shadow-sm  shadow-inherit  ring-4 active:shadow-inner  ",
         ghost:
           "  hover:bg-[color-mix(in_oklab,var(--variant)_80%,transparent)]  active:bg-[var(--variant)] hover:text-theme    shadow-sm shadow-inherit active:shadow-inner",
+        none: "",
       },
       shape: {
         pill: "rounded-full",

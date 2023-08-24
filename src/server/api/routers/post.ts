@@ -1,6 +1,5 @@
 import { filterUser } from "@/utils/data-filters";
 import { clerkClient } from "@clerk/nextjs/server";
-import type { Post } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -83,7 +82,11 @@ export const postRouter = createTRPCRouter({
           },
         },
       });
-
+      if (!auther)
+        return {
+          auther: filterUser(await clerkClient.users.getUser(input)),
+          posts: [],
+        };
       const posts = auther.posts.map((post) => {
         const isLiked = post.likes.some((like) => like.autherId == ctx.userId);
         return {

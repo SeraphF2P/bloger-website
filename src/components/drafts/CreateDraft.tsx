@@ -1,17 +1,18 @@
 "use client";
 
-import { toast } from "../../../lib/myToast";
+import { toast } from "../../lib/myToast";
 import { Btn } from "@/ui";
 import { api } from "@/utils/api";
 import * as Dialog from "@radix-ui/react-dialog";
-import { AnimatePresence, motion as m, motion } from "framer-motion";
+import { AnimatePresence, motion as m } from "framer-motion";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 type formValuesType = { title: string; content: string };
-const MotionPortal = motion(Dialog.Portal);
+
 const CreateDraft = () => {
   const ctx = api.useContext();
-
+  const [open, setopen] = useState(false);
   const { register, handleSubmit, formState, reset } =
     useForm<formValuesType>();
 
@@ -32,13 +33,16 @@ const CreateDraft = () => {
         message: errorMessage[0],
       });
     },
+    onSettled: () => {
+      setopen(false);
+    },
   });
 
   const onSubmit = (data: formValuesType) => {
     mutate(data);
   };
   return (
-    <Dialog.Root>
+    <Dialog.Root open={open} onOpenChange={setopen}>
       <Dialog.Trigger asChild>
         <Btn className=" fixed bottom-6 left-2/3 -translate-x-1/2 rounded px-8 py-4 text-xl capitalize md:left-[60%]">
           create
@@ -46,18 +50,15 @@ const CreateDraft = () => {
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className=" flex fixed inset-0  items-center justify-center backdrop-blur-sm dark:bg-gray-700/40">
+        <Dialog.Overlay className=" data-[state=open]:animate-fadein data-[state=closed]:animate-fadeout   opacity-0 flex fixed inset-0  items-center justify-center backdrop-blur-sm dark:bg-gray-700/40">
           <Dialog.Content asChild>
-            <m.form
-              initial={{ y: 8, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 8, opacity: 0 }}
+            <form
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onSubmit={handleSubmit(onSubmit)}
-              className=" w-[300px]  relative flex gap-4 flex-col"
+              className=" data-[state=open]:animate-fadein data-[state=closed]:animate-fadeout w-[300px] translate-y-16 opacity-0   relative flex gap-4 flex-col"
             >
               <input
-                className=" w-full rounded border-0 bg-slate-100 placeholder:text-black dark:bg-gray-900"
+                className=" placeholder:text-revert-theme w-full rounded border-0 bg-slate-100  dark:bg-gray-900"
                 type="text"
                 placeholder="title"
                 {...register("title", {
@@ -73,7 +74,7 @@ const CreateDraft = () => {
                 })}
               />
               <textarea
-                className=" min-h-[240px]  resize-none w-full rounded border-0 bg-slate-100 placeholder:text-black dark:bg-gray-900 "
+                className=" placeholder:text-revert-theme min-h-[240px]  resize-none w-full rounded border-0 bg-slate-100  dark:bg-gray-900 "
                 placeholder="content"
                 {...register("content", {
                   required: "content is required",
@@ -100,7 +101,7 @@ const CreateDraft = () => {
                   submit
                 </Btn>
               </div>
-            </m.form>
+            </form>
           </Dialog.Content>
           <AnimatePresence mode="popLayout">
             {errors.title?.message || errors.content?.message ? (

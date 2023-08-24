@@ -1,4 +1,4 @@
-import { BlogPost } from "@/components";
+import { BlogPost } from "@/components/index";
 import { Loading } from "@/ui";
 import { api } from "@/utils/api";
 import type { GetStaticProps } from "next";
@@ -6,10 +6,9 @@ import Head from "next/head";
 import Image from "next/image";
 
 const Profile = ({ userId }: { userId: string }) => {
-  const { data, isLoading, isError } = api.post.getUserPosts.useQuery(userId);
+  const { data, isLoading } = api.post.getUserPosts.useQuery(userId);
   if (isLoading) return <Loading as="page" />;
-  if (isError) return <>no</>;
-
+  if (!data) return;
   const { auther, posts } = data;
   return (
     <>

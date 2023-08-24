@@ -1,4 +1,4 @@
-import { CreateDraft } from "./(component)";
+import CreateDraft from "@/components/drafts/CreateDraft";
 import { formatRelativeDate } from "@/lib/formatter";
 import { toast } from "@/lib/myToast";
 import { AlertModal, Btn, Icons, Loading } from "@/ui";
@@ -7,9 +7,9 @@ import { type NextPage } from "next";
 import { api } from "~/utils/api";
 
 const Drafts: NextPage = () => {
+  const { isSignedIn } = useUser();
+  if (!isSignedIn) return <div>please sign in to access this page</div>;
   const ctx = api.useContext();
-  const { user } = useUser();
-  if (!user) return <div>please sign in to access this page</div>;
   const { data: drafts, isLoading } = api.post.getUserDrafts.useQuery();
   const { isLoading: isPublishing, mutate: publish } =
     api.post.publish.useMutation({

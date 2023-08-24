@@ -21,7 +21,7 @@
     ],
     "paths": {
       "~/*": ["./src/*"],
-      "@/components": ["./src/components/index.ts"],
+      "@/components/*": ["./src/components/*"],
       "@/ui": ["./src/components/ui/index.ts"],
       "@/hooks": ["./src/hooks/index.ts"],
       "@/config/*": ["./src/config/*"],

@@ -3,6 +3,7 @@ import Btn, { type BtnProps } from "./Btn";
 import Container from "./Container";
 import Icons from "./Icons";
 import Loading from "./Loading";
+import Modale from "./Modale";
 import SuspenseErrorBoundary from "./SuspenseErrorBoundary";
 import ToggleBtn from "./ToggleBtn";
 
@@ -15,4 +16,5 @@ export {
   Loading,
   AlertModal,
   ToggleBtn,
+  Modale,
 };

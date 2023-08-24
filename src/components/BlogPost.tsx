@@ -36,7 +36,7 @@ const BlogPost: FC<Post> = ({ auther, post, likesCount, isLiked }) => {
   return (
     <div
       key={post.id}
-      className="   w-full rounded bg-slate-300 dark:bg-slate-700 shadow p-2"
+      className=" font-outfit   w-full rounded bg-slate-300 dark:bg-slate-700 shadow p-2"
     >
       <div className=" flex">
         <Link
