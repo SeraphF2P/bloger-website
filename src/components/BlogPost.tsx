@@ -9,7 +9,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, type FC, useLayoutEffect } from "react";
 
-type Post = RouterOutputs["post"]["getAll"][number];
+type Posts = Exclude<RouterOutputs["post"]["getAll"], null>;
+type Post = Posts[number];
 
 const BlogPost: FC<Post> = ({ auther, post, likesCount, isLiked }) => {
   const { user, isSignedIn } = useUser();

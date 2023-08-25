@@ -13,7 +13,6 @@ const ThemeTogglerBtn: FC<ThemeTogglerBtnProps> = ({
 }) => {
   const { setTheme, theme } = useTheme();
   const isActive = theme == toggledTheme;
-  console.log("theme", theme);
   return (
     <Btn
       className={` rounded-none flex w-full items-center justify-center p-2  ${

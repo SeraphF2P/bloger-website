@@ -1,14 +1,15 @@
 import { BlogPost } from "@/components/index";
 import { Loading } from "@/ui";
 import { api } from "@/utils/api";
+import { clerkClient } from "@clerk/nextjs/server";
 import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 
 const Profile = ({ userId }: { userId: string }) => {
-  const { data, isLoading } = api.post.getUserPosts.useQuery(userId);
+  const { data, isLoading, isError } = api.post.getUserPosts.useQuery(userId);
   if (isLoading) return <Loading as="page" />;
-  if (!data) return;
+  if (isError) return <>no data</>;
   const { auther, posts } = data;
   return (
     <>
@@ -51,9 +52,15 @@ export const getStaticProps: GetStaticProps = (context) => {
     },
   };
 };
-export const getStaticPaths = () => {
+export const getStaticPaths = async () => {
+  const data = await clerkClient.users.getUserList();
+  const paths = data?.map((user) => {
+    return {
+      params: { userId: user.id.toString() },
+    };
+  });
   return {
-    paths: [],
+    paths,
     fallback: false,
   };
 };

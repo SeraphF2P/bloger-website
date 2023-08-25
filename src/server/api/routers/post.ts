@@ -39,25 +39,31 @@ export const postRouter = createTRPCRouter({
         },
       },
     });
-    return posts.map((post) => {
-      const isLiked = post.likes.some((like) => like.autherId == ctx.userId);
-      return {
-        post,
-        auther: filterUser(post.auther),
-        likesCount: post._count.likes,
-        isLiked,
-      };
-    });
+    const filteredPosts = posts
+      ? posts.map((post) => {
+          const isLiked = post.likes.some(
+            (like) => like.autherId == ctx.userId
+          );
+          return {
+            post,
+            auther: filterUser(post.auther),
+            likesCount: post._count.likes,
+            isLiked,
+          };
+        })
+      : null;
+    return filteredPosts;
   }),
   getUserPosts: publicProcedure
     .input(z.string().min(1))
     .query(async ({ ctx, input }) => {
-      const auther = await ctx.prisma.user.findUniqueOrThrow({
+      const auther = await ctx.prisma.user.findUnique({
         where: {
           id: input,
         },
         include: {
           posts: {
+            take: 10,
             where: {
               autherId: input,
               published: true,

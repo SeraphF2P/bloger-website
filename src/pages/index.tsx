@@ -5,8 +5,14 @@ import Head from "next/head";
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
-  const { data: posts, isLoading } = api.post.getAll.useQuery();
+  const { data: posts, isLoading } = api.post.getAll.useQuery(undefined, {
+    onError: (e) => {
+      const errorMSG = e.message;
+      console.log("errorMSG", errorMSG);
+    },
+  });
   if (isLoading) return <Loading as="page" />;
+
   return (
     <>
       <Head>
