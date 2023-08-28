@@ -1,20 +1,13 @@
 import { filterUser } from "@/utils/data-filters";
+import { postingRateLimit } from "@/utils/ratelimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import { z } from "zod";
 import {
   createTRPCRouter,
   privateProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-
-const postingRateLimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(1, "1 m"),
-  analytics: true,
-});
 
 export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -26,7 +19,7 @@ export const postRouter = createTRPCRouter({
       },
       include: {
         likes: true,
-        _count: { select: { likes: true } },
+        _count: { select: { likes: true, Comment: true } },
         auther: {
           select: {
             id: true,
@@ -48,6 +41,7 @@ export const postRouter = createTRPCRouter({
             post,
             auther: filterUser(post.auther),
             likesCount: post._count.likes,
+            commentsCount: post._count.Comment,
             isLiked,
           };
         })
@@ -73,7 +67,7 @@ export const postRouter = createTRPCRouter({
             },
             include: {
               likes: true,
-              _count: { select: { likes: true } },
+              _count: { select: { likes: true, Comment: true } },
               auther: {
                 select: {
                   id: true,
@@ -99,6 +93,7 @@ export const postRouter = createTRPCRouter({
           post,
           auther: filterUser(post.auther),
           likesCount: post._count.likes,
+          commentsCount: post._count.Comment,
           isLiked,
         };
       });
@@ -189,7 +184,6 @@ export const postRouter = createTRPCRouter({
   like: privateProcedure
     .input(z.string().min(1))
     .mutation(async ({ ctx, input }) => {
-      // throw new Error("afa ")
       const isLiked = await ctx.prisma.like.findUnique({
         where: {
           postId_autherId: {

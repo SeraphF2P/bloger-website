@@ -26,7 +26,7 @@ const AlertModal = ({ onConfirm, ...props }: AlertModalPropsType) => {
           <Modale.Close
             onClick={() => onConfirm()}
             variant="fill"
-            className=" [--variant:rgb(153_27_27)] text-theme rounded px-4 py-2"
+            className=" [--variant:--alert] text-theme rounded px-4 py-2"
           >
             confirm
           </Modale.Close>

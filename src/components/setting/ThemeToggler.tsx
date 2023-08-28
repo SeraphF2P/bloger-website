@@ -1,6 +1,7 @@
 "use client";
 
 import { Btn, Icons } from "@/ui";
+import { motion as m } from "framer-motion";
 import { useTheme } from "next-themes";
 import { type FC, type PropsWithChildren } from "react";
 
@@ -15,14 +16,18 @@ const ThemeTogglerBtn: FC<ThemeTogglerBtnProps> = ({
   const isActive = theme == toggledTheme;
   return (
     <Btn
-      className={` rounded-none flex w-full items-center justify-center p-2  ${
-        isActive
-          ? "border-2 border-revert-theme text-yellow-300 dark:text-yellow-400"
-          : ""
+      className={` relative rounded-none flex w-full items-center justify-center p-2  ${
+        isActive ? " text-yellow-300 dark:text-yellow-400" : ""
       }`}
       onClick={() => setTheme(toggledTheme)}
     >
       {children}
+      {isActive && (
+        <m.span
+          layoutId="active-theme-border"
+          className=" absolute inset-0 z-10  border-2 border-revert-theme pointer-events-none"
+        />
+      )}
       <span className=" sr-only">{toggledTheme}</span>
     </Btn>
   );

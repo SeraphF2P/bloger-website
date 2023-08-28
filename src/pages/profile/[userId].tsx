@@ -1,5 +1,5 @@
 import { BlogPost } from "@/components/index";
-import { Loading } from "@/ui";
+import { Container, Loading } from "@/ui";
 import { api } from "@/utils/api";
 import { clerkClient } from "@clerk/nextjs/server";
 import type { GetStaticProps } from "next";
@@ -18,16 +18,18 @@ const Profile = ({ userId }: { userId: string }) => {
         <meta name="auther" content={auther.username} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <>
-        <div className=" relative mb-[20%] h-40 w-full bg-primary">
-          <div className=" absolute -bottom-1/3 left-1/2 h-36 w-36 -translate-x-1/2 overflow-hidden rounded-full ">
-            <Image
-              fill
-              src={auther.profileImageUrl}
-              alt={`${auther.username}'s profile picture`}
-            />
+      <Container>
+        <section className=" pb-[51px] ">
+          <div className=" relative h-40 w-full bg-primary">
+            <div className=" absolute -bottom-1/3 left-1/2 h-36 w-36 -translate-x-1/2 overflow-hidden rounded-full ">
+              <Image
+                fill
+                src={auther.profileImageUrl}
+                alt={`${auther.username}'s profile picture`}
+              />
+            </div>
           </div>
-        </div>
+        </section>
         <div className=" w-full p-2  text-center">
           <h1>{auther.username}</h1>
         </div>
@@ -37,7 +39,7 @@ const Profile = ({ userId }: { userId: string }) => {
               return <BlogPost key={post.post.id} {...post} />;
             })}
         </div>
-      </>
+      </Container>
     </>
   );
 };

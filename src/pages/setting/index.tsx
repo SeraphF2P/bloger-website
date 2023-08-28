@@ -1,7 +1,7 @@
 import Modale from "../../components/ui/Modale";
 import { variants } from "../../lib/cva";
 import { ThemeToggler } from "@/components/setting";
-import { Loading } from "@/ui";
+import { Container, Loading } from "@/ui";
 import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Image from "next/image";
@@ -10,7 +10,7 @@ const Setting: NextPage = ({}) => {
   const { user, isSignedIn, isLoaded } = useUser();
 
   return (
-    <>
+    <Container>
       <h1 className=" w-full p-4 text-center">Setting</h1>
       <div className=" flex  w-full items-center justify-between  p-2">
         <div className=" text-xl">
@@ -28,7 +28,7 @@ const Setting: NextPage = ({}) => {
         </div>
       </div>
       <ThemeToggler />
-    </>
+    </Container>
   );
 };
 const SignInUI = ({}) => {
@@ -41,7 +41,7 @@ const SignInUI = ({}) => {
             elements: {
               headerTitle: "text-revert-theme",
               headerSubtitle: "text-revert-theme",
-              card: "bg-gray-700 ",
+              card: " bg-gray-100 dark:bg-gray-700 ",
               footerActionText: "text-revert-theme",
               socialButtonsBlockButton: variants({ variant: "fill" }),
               socialButtons: "",

@@ -1,7 +1,7 @@
 import CreateDraft from "@/components/drafts/CreateDraft";
 import { formatRelativeDate } from "@/lib/formatter";
 import { toast } from "@/lib/myToast";
-import { AlertModal, Btn, Icons, Loading } from "@/ui";
+import { AlertModal, Btn, Container, Icons, Loading } from "@/ui";
 import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { api } from "~/utils/api";
@@ -48,7 +48,7 @@ const Drafts: NextPage = () => {
   if (isLoading) return <Loading as="page" />;
 
   return (
-    <section className=" flex flex-col gap-4">
+    <Container className=" flex flex-col gap-4">
       {drafts?.length == 0 && (
         <div className=" min-h-40 flex  w-full flex-col items-center justify-center rounded bg-slate-300 p-8 dark:bg-slate-500">
           <Icons.error className=" w-40  " />
@@ -76,7 +76,7 @@ const Drafts: NextPage = () => {
                     onConfirm={() => remove(id)}
                     disabled={isDeleting}
                     variant="fill"
-                    className=" [--variant:#c33]  px-4 py-2"
+                    className=" [--variant:--alert]  px-4 py-2"
                   >
                     delete
                   </AlertModal>
@@ -94,7 +94,7 @@ const Drafts: NextPage = () => {
         })}
 
       <CreateDraft />
-    </section>
+    </Container>
   );
 };
 

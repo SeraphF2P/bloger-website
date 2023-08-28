@@ -23,7 +23,7 @@ const ModaleContent = ({
 }: DialogContentProps & React.RefAttributes<HTMLDivElement>) => {
   return (
     <Dialog.Portal>
-      <Dialog.Overlay className=" data-[state=open]:animate-fadein data-[state=closed]:animate-fadeout opacity-0 fixed inset-0 flex items-center justify-center backdrop-blur-sm dark:bg-gray-700/40">
+      <Dialog.Overlay className=" z-50 data-[state=open]:animate-fadein data-[state=closed]:animate-fadeout opacity-0 fixed inset-0 flex items-center justify-center backdrop-blur-sm dark:bg-gray-700/40">
         <Dialog.Content
           {...props}
           className={cn(

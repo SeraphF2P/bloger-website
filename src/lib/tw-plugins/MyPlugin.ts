@@ -1,4 +1,3 @@
-import c from "tailwindcss/colors";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import plugin from "tailwindcss/plugin";
 
@@ -6,14 +5,16 @@ export const MyPlugin = plugin(
   ({ addBase, addUtilities }) => {
     addBase({
       ".dark": {
-        "--theme": c.slate["800"],
-        "--revert-theme": c.slate["200"],
-        "--primary": c.violet["400"],
+        "--theme": "30,41,59", //? slate["800"]
+        "--revert-theme": "226,232,240", //? slate["200"]
+        "--theme-shadow": "245,245,245", //?
+        "--primary": "167,139,250", //?violet["400"]
       },
       ".light": {
-        "--theme": c.slate["200"],
-        "--revert-theme": c.slate["800"],
-        "--primary": c.violet["500"],
+        "--theme": "226,232,240", //? slate["200"]
+        "--revert-theme": "30,41,59", //? slate["800"]
+        "--theme-shadow": "0,0,0", //?
+        "--primary": "139,92,246", //?violet["500"]
       },
     });
     addBase({
@@ -60,12 +61,12 @@ export const MyPlugin = plugin(
         },
 
         colors: {
-          theme:
-            "color-mix(in oklab,var(--theme),transparent calc((1 - <alpha-value>) * 100%))",
-          "revert-theme":
-            "color-mix(in oklab,var(--revert-theme),transparent calc((1 - <alpha-value>) * 100%))",
-          primary:
-            "color-mix(in oklab,var(--primary),transparent calc((1 - <alpha-value>) * 100%))",
+          theme: "rgb(var(--theme),<alpha-value>)",
+          "revert-theme": "rgb(var(--revert-theme),<alpha-value>)",
+          primary: "rgb(var(--primary),<alpha-value>)",
+        },
+        boxShadowColor: {
+          dynamic: "rgb(var(--theme-shadow),<alpha-value>)",
         },
         screens: {
           mn: "420px",

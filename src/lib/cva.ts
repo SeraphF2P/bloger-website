@@ -8,19 +8,19 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 export const variants = cva(
-  "duration-400 transition-colors cursor-pointer text-revert-theme [--variant:--primary]   ",
+  "duration-400 transition-colors flex justify-center items-center tracking-wider cursor-pointer text-revert-theme [--variant:--primary] [--alert:200,50,50] [--success:50,200,50]   ",
   {
     variants: {
       variant: {
-        fill: " bg-[var(--variant)] hover:bg-[color-mix(in_oklab,var(--variant)_80%,#fff)]   active:bg-[var(--variant)] shadow-sm shadow-inherit active:shadow-inner",
+        fill: " bg-[rgb(var(--variant))] hover:bg-[color-mix(in_oklab,rgb(var(--variant))_80%,#fff)]   active:bg-[rgb(var(--variant))] shadow-sm shadow-inherit active:shadow-inner",
         outline:
-          " ring-solid ring-btn  active:bg-btn   shadow-sm  shadow-inherit  ring-4 active:shadow-inner  ",
+          " ring-solid transition-[shadow_colors] duration-700  ring-2 ring-[rgb(var(--variant))] hover:bg-[rgb(var(--variant))] hover:ring-transparent  active:bg-[rgb(var(--variant))]   shadow-sm  shadow-inherit   active:shadow-inner  ",
         ghost:
-          "  hover:bg-[color-mix(in_oklab,var(--variant)_80%,transparent)]  active:bg-[var(--variant)] hover:text-theme    shadow-sm shadow-inherit active:shadow-inner",
+          "  hover:bg-[rgb(var(--variant),0.8)]   active:bg-[rgb(var(--variant))] hover:text-theme    shadow-sm  active:shadow-inner",
         none: "",
       },
       shape: {
-        pill: "rounded-full",
+        pill: "rounded-[50%]",
         circle: "rounded-full aspect-square",
         rect: "rounded-sm",
       },

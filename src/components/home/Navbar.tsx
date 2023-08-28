@@ -12,14 +12,17 @@ interface ListLink {
 const ListLink = ({ children, href }: ListLink) => {
   const { asPath } = useRouter();
   const isActive = asPath === href;
+
   return (
-    <li className={" relative  flex-[1_1_40px] p-4 "}>
+    <li className={" relative   flex-[1_1_40px] p-4 "}>
       <Link href={href}>{children}</Link>
       <span className="sr-only">{href.toString()}</span>
+
       {isActive && (
         <m.span
           layoutId="nav-underline"
-          className=" bg-primary rounded-t-md h-1.5  left-2 right-2 absolute   bottom-0"
+          transition={{ layout: { duration: 0.2, ease: "linear" } }}
+          className={`   bg-primary rounded-t-md h-1.5   left-2 right-2   absolute   bottom-0`}
         />
       )}
     </li>
@@ -29,8 +32,8 @@ const ListLink = ({ children, href }: ListLink) => {
 const Navbar = () => {
   const { user } = useUser();
   return (
-    <header className=" fixed left-0 top-0 z-40 flex w-full justify-center   ">
-      <ul className="flex w-full bg-theme text-revert-theme max-w-screen-mn items-center justify-between shadow-sm  shadow-revert-theme ">
+    <header className=" fixed z-40 top-0  left-1/2 -translate-x-1/2  flex w-full justify-center max-w-[420px]  ">
+      <ul className=" flex relative w-full bg-theme text-revert-theme  items-center justify-between  ">
         <ListLink href="/">
           <Icons.news />
         </ListLink>

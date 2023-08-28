@@ -12,7 +12,12 @@ import { useMemo, useState, type FC, useLayoutEffect } from "react";
 type Posts = Exclude<RouterOutputs["post"]["getAll"], null>;
 type Post = Posts[number];
 
-const BlogPost: FC<Post> = ({ auther, post, likesCount, isLiked }) => {
+const BlogPost: FC<Post> = ({
+  auther,
+  post,
+  likesCount,
+  isLiked,
+}) => {
   const { user, isSignedIn } = useUser();
   const ctx = api.useContext();
   const { isLoading: isDeleting, mutate: remove } = api.post.delete.useMutation(
@@ -71,6 +76,8 @@ const BlogPost: FC<Post> = ({ auther, post, likesCount, isLiked }) => {
       <div className="   flex items-center justify-between">
         <LikeBtn postId={post.id} isLiked={isLiked} />
         <CommentsSec
+          postId={post.id}
+          likesCount={likesCount}
           variant="ghost"
           className=" flex justify-center items-center gap-1 flex-grow p-2 text-lg font-semibold "
         >
