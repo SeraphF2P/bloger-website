@@ -91,7 +91,9 @@ const AddComment = ({ postId }: { postId: string }) => {
           </Btn>
         </form>
       ) : (
-        <p>you cannot comment on this post login or try again later</p>
+        <p className=" px-4 py-2">
+          you cannot comment on this post login or try again later
+        </p>
       )}
     </div>
   );

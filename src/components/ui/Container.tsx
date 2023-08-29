@@ -1,18 +1,22 @@
 "use client";
 
+import { Thumb, Track } from "@/components/ui/ScrollBar";
 import { fontOutfit } from "@/config/fonts";
 import { cn } from "@/lib/cva";
-// import { ScrollBar } from "@/ui";
 import { motion as m } from "framer-motion";
-import React from "react";
+import dynamic from "next/dynamic";
+import React, { useRef } from "react";
 import type { ReactNode } from "react";
 
+const ScrollBar = dynamic(() => import("@/components/ui/ScrollBar"), {
+  ssr: false,
+});
 const Container = (props: { children?: ReactNode; className?: string }) => {
-  // const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   return (
     <m.main
-      // ref={ref}
+      ref={ref}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -24,11 +28,12 @@ const Container = (props: { children?: ReactNode; className?: string }) => {
       )}
     >
       {props.children}
-      {/* <ScrollBar scrollContainer={ref}>
-        <ScrollBar.track className="z-40 left-0 bottom-0  top-0 bg-revert-theme/20 w-6">
-          <ScrollBar.thumb className="bg-primary" />
-        </ScrollBar.track>
-      </ScrollBar> */}
+
+      <ScrollBar container={ref}>
+        <Track className="z-40 left-0 bottom-0  top-0 bg-revert-theme/20 w-6">
+          <Thumb className="bg-primary" />
+        </Track>
+      </ScrollBar>
     </m.main>
   );
 };

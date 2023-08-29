@@ -1,143 +1,163 @@
-// "use client";
+"use client";
 
-// import { cn } from "@/lib/cva";
-// import { throttle } from "@/lib/performance";
-// import { useMove, useResizeObserver, useViewportSize } from "@mantine/hooks";
-// import {
-//   motion as m,
-//   useMotionTemplate,
-//   useScroll,
-//   useTransform,
-// } from "framer-motion";
-// import type { FC, MutableRefObject, ReactNode, RefObject } from "react";
-// import { createContext, useContext } from "react";
-// import { createPortal } from "react-dom";
+import { cn } from "@/lib/cva";
+import { throttle } from "@/lib/performance";
+import { useMove, useResizeObserver, useViewportSize } from "@mantine/hooks";
+import {
+  motion as m,
+  useMotionTemplate,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import type { FC, MutableRefObject, ReactNode, RefObject } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 
-// //TODO fix the error: window not found
-// //TODO add xAxis option
+//TODO fix the referance error for the refs in thumb component
+//TODO add xAxis option
 
-// type scrollBarProps = {
-//   children: ReactNode;
-//   scrollContainer?: RefObject<HTMLElement>;
-//   step?: number;
-//   throttleDelay?: number;
-// };
-// const Context = createContext<{
-//   trackRef: MutableRefObject<HTMLDivElement | null>;
-//   thumbRef: MutableRefObject<HTMLDivElement | null>;
-//   scrollContainer?: RefObject<HTMLElement>;
-//   active: boolean;
-//   visible: boolean;
-//   height: number | string;
-//   maxY: number;
-// }>({
-//   active: false,
-//   visible: false,
-//   height: 0,
-//   maxY: 0,
-//   scrollContainer: { current: null },
-//   trackRef: { current: null },
-//   thumbRef: { current: null },
-// });
-// const useContextHook = () => useContext(Context);
+type scrollBarProps = {
+  children: ReactNode;
+  container?: RefObject<HTMLElement>;
+  step?: number;
+  throttleDelay?: number;
+};
+const Context = createContext<{
+  trackRef: MutableRefObject<HTMLDivElement | null>;
+  thumbRef: MutableRefObject<HTMLDivElement | null>;
+  scrollContainer: RefObject<HTMLElement>;
+  container?: RefObject<HTMLElement>;
+  visible: boolean;
+  height: number | string;
+  maxY: number;
+  step: number;
+  throttleDelay: number;
+}>({
+  visible: false,
+  height: 0,
+  maxY: 0,
+  scrollContainer: { current: null },
+  trackRef: { current: null },
+  thumbRef: { current: null },
+  step: 200,
+  throttleDelay: 100,
+});
+const useContextHook = () => useContext(Context);
 
-// const ScrollBar = ({
-//   children,
-//   scrollContainer,
-//   step = 200,
-//   throttleDelay = 100,
-// }: scrollBarProps) => {
-//   const [thumbRef, thumb] = useResizeObserver<HTMLDivElement>();
-//   const [trackRef, track] = useResizeObserver<HTMLDivElement>();
-//   const { height: ViewportHeight } = useViewportSize();
+export const ScrollBar = ({
+  children,
+  container,
+  step = 200,
+  throttleDelay = 100,
+}: scrollBarProps) => {
+  const [thumbRef, thumb] = useResizeObserver<HTMLDivElement>();
+  const [trackRef, track] = useResizeObserver<HTMLDivElement>();
+  const { height: ViewportHeight } = useViewportSize();
+  const scrollContainer = useMemo(() => {
+    return container ? container : { current: document.body };
+  }, [container]);
 
-//   const maxY = track.height - thumb.height;
-//   const container = scrollContainer ?? { current: document.body };
-//   const scrollByStep = throttle((coord) => {
-//     const { y } = coord as { x: number; y: number };
-//     const dir = y >= 0.5 ? 1 : -1;
-//     container.current?.scrollBy({
-//       top: step * dir,
-//       behavior: "smooth",
-//     });
-//   }, throttleDelay);
+  const maxY = track.height - thumb.height;
 
-//   const { ref, active } = useMove(scrollByStep);
-//   thumbRef.current = ref.current;
-//   const config =
-//     container.current instanceof HTMLElement
-//       ? {
-//           scrollableHeight: container.current.scrollHeight,
-//           minHeight: ViewportHeight,
-//         }
-//       : {
-//           scrollableHeight: document.body.scrollHeight,
-//           minHeight: ViewportHeight,
-//         };
-//   const visible = config.scrollableHeight > config.minHeight;
-//   return (
-//     <Context.Provider
-//       value={{
-//         trackRef,
-//         thumbRef: ref,
-//         scrollContainer,
-//         maxY,
-//         active,
-//         visible,
-//         height: `${track.height ** 2 / config.scrollableHeight}px`,
-//       }}
-//     >
-//       <Portal>{children}</Portal>
-//     </Context.Provider>
-//   );
-// };
-// type ThumbPropsType = {
-//   className?: string;
-// };
+  const config = useMemo(() => {
+    return {
+      scrollableHeight: 0,
+      minHeight: ViewportHeight,
+    };
+  }, [ViewportHeight]);
 
-// const Thumb: FC<ThumbPropsType> = ({ className }) => {
-//   const { thumbRef, active, maxY, height, scrollContainer } = useContextHook();
+  useEffect(() => {
+    if (scrollContainer.current instanceof HTMLElement) {
+      config.scrollableHeight = scrollContainer.current.scrollHeight;
+    } else {
+      config.scrollableHeight = document.body.scrollHeight;
+    }
+  }, [config, container, scrollContainer]);
+  const visible = config.scrollableHeight > config.minHeight;
+  return (
+    <Context.Provider
+      value={{
+        trackRef,
+        thumbRef,
+        container,
+        scrollContainer,
+        step,
+        throttleDelay,
+        maxY,
+        visible,
+        height: `${track.height ** 2 / config.scrollableHeight}px`,
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
+type ThumbPropsType = {
+  className?: string;
+  children?: ReactNode;
+};
 
-//   const { scrollYProgress } = useScroll({ container: scrollContainer });
-//   console.log("scrollYProgress", scrollYProgress);
-//   const dragY = useTransform(scrollYProgress, [0, 1], [0, maxY]);
-//   return (
-//     <m.div
-//       ref={thumbRef}
-//       data-active={active}
-//       style={{
-//         y: useMotionTemplate`${dragY}px`,
-//         height,
-//       }}
-//       className={cn(" h-10 w-2 rounded-full  bg-red-500", className)}
-//     />
-//   );
-// };
+export const Thumb: FC<ThumbPropsType> = ({ className, children }) => {
+  const {
+    thumbRef,
+    maxY,
+    height,
+    scrollContainer,
+    step,
+    throttleDelay,
+    container,
+  } = useContextHook();
+  const scrollAbleContainer = container ? scrollContainer : { current: window };
+  const scrollByStep = throttle((coord) => {
+    const { y } = coord as { x: number; y: number };
+    const dir = y >= 0.5 ? 1 : -1;
+    scrollAbleContainer.current?.scrollBy({
+      top: step * dir,
+      behavior: "smooth",
+    });
+  }, throttleDelay);
 
-// type TrackPropsType = {
-//   children: ReactNode;
-//   className?: string;
-// };
-// const Track: FC<TrackPropsType> = ({ children, className }) => {
-//   const { active, visible, trackRef } = useContextHook();
-//   return (
-//     <div
-//       ref={trackRef}
-//       data-active={active}
-//       data-visible={visible}
-//       className={cn(
-//         " data-[visible=false]:hidden  rounded-full flex justify-center w-4  bg-blue-400 fixed ",
-//         className
-//       )}
-//     >
-//       {children}
-//     </div>
-//   );
-// };
-// const Portal = ({ children }: { children: ReactNode }) => {
-//   const { scrollContainer } = useContextHook();
-//   return createPortal(children, scrollContainer?.current ?? document.body);
-// };
-// ScrollBar.track = Track;
-// ScrollBar.thumb = Thumb;
-// export default ScrollBar;
+  const { ref, active } = useMove(scrollByStep);
+
+  const { scrollYProgress } = useScroll({ container });
+
+  const dragY = useTransform(scrollYProgress, [0, 1], [0, maxY]);
+  thumbRef.current = ref.current;
+
+  return (
+    <m.div
+      ref={ref}
+      data-active={active}
+      style={{
+        y: useMotionTemplate`${dragY}px`,
+        height,
+      }}
+      className={cn(" h-10 w-2 rounded-full  bg-red-500", className)}
+    >
+      {children}
+    </m.div>
+  );
+};
+
+type TrackPropsType = {
+  children: ReactNode;
+  className?: string;
+};
+export const Track: FC<TrackPropsType> = ({ children, className }) => {
+  const { visible, trackRef } = useContextHook();
+  return (
+    <div
+      ref={trackRef}
+      data-visible={visible}
+      className={cn(
+        " data-[visible=false]:hidden  rounded-full flex justify-center w-4  bg-blue-400 fixed ",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
+ScrollBar.track = Track;
+ScrollBar.thumb = Thumb;
+export default ScrollBar;
