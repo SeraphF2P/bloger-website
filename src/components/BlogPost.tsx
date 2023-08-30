@@ -12,19 +12,14 @@ import { useMemo, useState, type FC, useLayoutEffect } from "react";
 type Posts = Exclude<RouterOutputs["post"]["getAll"], null>;
 type Post = Posts[number];
 
-const BlogPost: FC<Post> = ({
-  auther,
-  post,
-  likesCount,
-  isLiked,
-}) => {
+const BlogPost: FC<Post> = ({ auther, ...props }) => {
   const { user, isSignedIn } = useUser();
   const ctx = api.useContext();
   const { isLoading: isDeleting, mutate: remove } = api.post.delete.useMutation(
     {
       onSuccess: () => {
         void ctx.post.getAll.invalidate();
-        void ctx.post.getUserPosts.invalidate();
+        void ctx.user.getUserPosts.invalidate();
         toast({
           type: "success",
           message: "deleted successfully",
@@ -41,12 +36,12 @@ const BlogPost: FC<Post> = ({
 
   return (
     <div
-      key={post.id}
+      key={props.id}
       className=" font-outfit   w-full rounded bg-slate-300 dark:bg-slate-700 shadow p-2"
     >
       <div className=" flex">
         <Link
-          href={`/profile/${auther.id}`}
+          href={`/profile/${props.id}`}
           className="relative h-20 w-20 rounded-sm"
         >
           <Image
@@ -61,23 +56,23 @@ const BlogPost: FC<Post> = ({
         </Link>
         <div className=" flex h-20 flex-grow  flex-col justify-between p-2">
           <div className="">
-            <h3 className="m-0 capitalize">{post.title}</h3>
+            <h3 className="m-0 capitalize">{props.title}</h3>
           </div>
           <div className=" flex justify-between">
             <p>{auther.username}</p>
-            <p>{formatRelativeDate(post.createdAt)}</p>
+            <p>{formatRelativeDate(props.createdAt)}</p>
           </div>
         </div>
       </div>
       <div className="   min-h-[100px] bg-theme p-4 ">
-        <p>{post.content}</p>
+        <p>{props.content}</p>
       </div>
-      <LikesSec isLiked isSignedIn likesCount={likesCount} />
+      <LikesSec isLiked isSignedIn likesCount={props.likesCount} />
       <div className="   flex items-center justify-between">
-        <LikeBtn postId={post.id} isLiked={isLiked} />
+        <LikeBtn postId={props.id} isLiked={props.isLiked} />
         <CommentsSec
-          postId={post.id}
-          likesCount={likesCount}
+          postId={props.id}
+          likesCount={props.likesCount}
           variant="ghost"
           className=" flex justify-center items-center gap-1 flex-grow p-2 text-lg font-semibold "
         >
@@ -87,7 +82,7 @@ const BlogPost: FC<Post> = ({
         {isSignedIn && user.id == auther.id && (
           <AlertModal
             disabled={isDeleting}
-            onConfirm={() => remove(post.id)}
+            onConfirm={() => remove(props.id)}
             variant="ghost"
             className="  flex-grow p-2 text-lg font-semibold "
           >
@@ -110,8 +105,8 @@ function LikeBtn({ isLiked, postId }: { isLiked: boolean; postId: string }) {
       return isLiked;
     },
     onSettled: () => {
+      void ctx.user.getUserPosts.invalidate();
       void ctx.post.getAll.invalidate();
-      void ctx.post.getUserPosts.invalidate();
     },
     onError: (err, _val, context) => {
       setIsToggled(!!context);

@@ -109,7 +109,7 @@ export const Thumb: FC<ThumbPropsType> = ({ className, children }) => {
   const scrollAbleContainer = container ? scrollContainer : { current: window };
   const scrollByStep = throttle((coord) => {
     const { y } = coord as { x: number; y: number };
-    const dir = y >= 0.5 ? 1 : -1;
+    const dir = y - 0.5;
     scrollAbleContainer.current?.scrollBy({
       top: step * dir,
       behavior: "smooth",
@@ -118,7 +118,7 @@ export const Thumb: FC<ThumbPropsType> = ({ className, children }) => {
 
   const { ref, active } = useMove(scrollByStep);
 
-  const { scrollYProgress } = useScroll({ container });
+  const { scrollYProgress } = useScroll({ container, layoutEffect: false });
 
   const dragY = useTransform(scrollYProgress, [0, 1], [0, maxY]);
   thumbRef.current = ref.current;

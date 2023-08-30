@@ -1,4 +1,4 @@
-import { filterUser } from "@/utils/data-filters";
+import { filterPostsWithAuther, filterUser } from "@/utils/data-filters";
 import { postingRateLimit } from "@/utils/ratelimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
@@ -14,94 +14,16 @@ export const postRouter = createTRPCRouter({
     const posts = await ctx.prisma.post.findMany({
       take: 10,
       where: { published: true },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [{ id: "desc" }, { createdAt: "desc" }],
       include: {
         likes: true,
         _count: { select: { likes: true, Comment: true } },
-        auther: {
-          select: {
-            id: true,
-            gender: true,
-            firstName: true,
-            lastName: true,
-            username: true,
-            profileImageUrl: true,
-          },
-        },
+        auther: true,
       },
     });
-    const filteredPosts = posts
-      ? posts.map((post) => {
-          const isLiked = post.likes.some(
-            (like) => like.autherId == ctx.userId
-          );
-          return {
-            post,
-            auther: filterUser(post.auther),
-            likesCount: post._count.likes,
-            commentsCount: post._count.Comment,
-            isLiked,
-          };
-        })
-      : null;
-    return filteredPosts;
+    if (!posts) return null;
+    return filterPostsWithAuther(posts, ctx.userId);
   }),
-  getUserPosts: publicProcedure
-    .input(z.string().min(1))
-    .query(async ({ ctx, input }) => {
-      const auther = await ctx.prisma.user.findUnique({
-        where: {
-          id: input,
-        },
-        include: {
-          posts: {
-            take: 10,
-            where: {
-              autherId: input,
-              published: true,
-            },
-            orderBy: {
-              createdAt: "desc",
-            },
-            include: {
-              likes: true,
-              _count: { select: { likes: true, Comment: true } },
-              auther: {
-                select: {
-                  id: true,
-                  gender: true,
-                  firstName: true,
-                  lastName: true,
-                  username: true,
-                  profileImageUrl: true,
-                },
-              },
-            },
-          },
-        },
-      });
-      if (!auther)
-        return {
-          auther: filterUser(await clerkClient.users.getUser(input)),
-          posts: [],
-        };
-      const posts = auther.posts.map((post) => {
-        const isLiked = post.likes.some((like) => like.autherId == ctx.userId);
-        return {
-          post,
-          auther: filterUser(post.auther),
-          likesCount: post._count.likes,
-          commentsCount: post._count.Comment,
-          isLiked,
-        };
-      });
-      return {
-        auther: filterUser(auther),
-        posts,
-      };
-    }),
   createDraft: privateProcedure
     .input(
       z.object({
@@ -134,25 +56,6 @@ export const postRouter = createTRPCRouter({
         },
       });
     }),
-  getUserDrafts: privateProcedure.query(async ({ ctx }) => {
-    const user = await ctx.prisma.user.findUnique({
-      where: {
-        id: ctx.userId,
-      },
-      select: {
-        posts: {
-          where: {
-            published: false,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-      },
-    });
-
-    return user?.posts;
-  }),
   publish: privateProcedure
     .input(z.string().min(1))
     .mutation(async ({ ctx, input }) => {

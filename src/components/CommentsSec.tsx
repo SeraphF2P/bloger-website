@@ -1,5 +1,12 @@
 import { toast } from "@/lib/myToast";
-import { Btn, Icons, Modale, NextImage, type BtnProps } from "@/ui";
+import {
+  Btn,
+  Icons,
+  Modale,
+  NextImage,
+  type BtnProps,
+  SkeletonLoadingPage,
+} from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
@@ -100,7 +107,15 @@ const AddComment = ({ postId }: { postId: string }) => {
 };
 
 const Comments = ({ postId }: { postId: string }) => {
-  const { data: comments } = api.comment.getComments.useQuery(postId);
+  const { data: comments, isLoading } =
+    api.comment.getComments.useQuery(postId);
+  if (isLoading)
+    return (
+      <SkeletonLoadingPage
+        count={4}
+        className=" pb-10 p-4 flex justify-start items-start flex-col gap-8 overflow-y-scroll remove-scroll-bar  h-full"
+      />
+    );
   return (
     <section className=" pb-10 p-4 flex justify-start items-start flex-col gap-8 overflow-y-scroll remove-scroll-bar  h-full">
       {comments &&

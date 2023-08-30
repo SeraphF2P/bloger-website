@@ -14,6 +14,8 @@ import {
   ChatBubbleOvalLeftIcon,
   ArrowRightIcon,
   PaperAirplaneIcon,
+  BellIcon,
+  ChatBubbleOvalLeftEllipsisIcon,
 } from "@heroicons/react/24/outline";
 import type { ReactNode, SVGProps } from "react";
 
@@ -70,5 +72,7 @@ Icons.heart = HeartIcon;
 Icons.chatbubble = ChatBubbleOvalLeftIcon;
 Icons.arrowRight = ArrowRightIcon;
 Icons.send = PaperAirplaneIcon;
+Icons.notification = BellIcon;
+Icons.chat = ChatBubbleOvalLeftEllipsisIcon;
 
 export default Icons;

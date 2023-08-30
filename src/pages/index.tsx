@@ -1,12 +1,18 @@
 import { BlogPost } from "@/components/index";
-import { Container, Loading } from "@/ui";
+import { Container, SkeletonLoadingPage } from "@/ui";
 import { type NextPage } from "next";
 import Head from "next/head";
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
   const { data: posts, isLoading } = api.post.getAll.useQuery();
-  if (isLoading) return <Loading as="page" />;
+  if (isLoading)
+    return (
+      <SkeletonLoadingPage
+        className="pt-24 flex-col  w-full items-center flex gap-4"
+        count={4}
+      />
+    );
 
   return (
     <>
@@ -22,7 +28,7 @@ const Home: NextPage = () => {
       <Container className="text-revert-theme flex flex-col gap-4">
         {posts &&
           posts.map((props): JSX.Element => {
-            return <BlogPost key={props.post.id} {...props} />;
+            return <BlogPost key={props.id} {...props} />;
           })}
       </Container>
     </>

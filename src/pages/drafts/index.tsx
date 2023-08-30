@@ -10,11 +10,11 @@ const Drafts: NextPage = () => {
   const { isSignedIn } = useUser();
   if (!isSignedIn) return <div>please sign in to access this page</div>;
   const ctx = api.useContext();
-  const { data: drafts, isLoading } = api.post.getUserDrafts.useQuery();
+  const { data: drafts, isLoading } = api.user.getUserDrafts.useQuery();
   const { isLoading: isPublishing, mutate: publish } =
     api.post.publish.useMutation({
       onSuccess: () => {
-        void ctx.post.getUserDrafts.invalidate();
+        void ctx.user.getUserDrafts.invalidate();
         toast({
           type: "success",
           message: "published successfully",
@@ -30,7 +30,7 @@ const Drafts: NextPage = () => {
   const { isLoading: isDeleting, mutate: remove } = api.post.delete.useMutation(
     {
       onSuccess: () => {
-        void ctx.post.getUserDrafts.invalidate();
+        void ctx.user.getUserDrafts.invalidate();
         toast({
           type: "success",
           message: "deleted successfully",

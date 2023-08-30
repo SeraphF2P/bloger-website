@@ -46,6 +46,7 @@ model Post {
   Comment Comment[]
 
   @@index([autherId])
+  @@unique([createdAt,id])
 }
 
 model Like {

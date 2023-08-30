@@ -44,7 +44,10 @@ const Navbar = () => {
           <Icons.userIcon />
         </ListLink>
         <ListLink href="/notification">
-          <Icons.search />
+          <Icons.notification />
+        </ListLink>
+        <ListLink href="/chat">
+          <Icons.chat />
         </ListLink>
         <ListLink href="/setting">
           <Icons.settings />

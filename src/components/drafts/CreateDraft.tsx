@@ -15,7 +15,7 @@ const CreateDraft = () => {
 
   const { mutate, isLoading: isValidating } = api.post.createDraft.useMutation({
     onSuccess: () => {
-      void ctx.post.getUserDrafts.invalidate();
+      void ctx.user.getUserDrafts.invalidate();
       reset();
       toast({ type: "success", message: "new draft has been created" });
     },
