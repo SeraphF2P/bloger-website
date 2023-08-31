@@ -9,7 +9,6 @@ import Loading from "./Loading";
 import Modale from "./Modale";
 import NextImage from "./NextImage";
 import ScrollBar from "./ScrollBar";
-import SkeletonLoadingPage from "./SkeletonLoadingPage";
 import ToggleBtn from "./ToggleBtn";
 
 export {
@@ -24,5 +23,4 @@ export {
   ScrollBar,
   ErrorBoundary,
   ToggleBtn,
-  SkeletonLoadingPage,
 };

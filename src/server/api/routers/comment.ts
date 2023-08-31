@@ -6,25 +6,55 @@ import { z } from "zod";
 
 export const commentRouter = createTRPCRouter({
   getComments: publicProcedure
-    .input(z.string().min(1))
-    .query(async ({ ctx, input }) => {
-      const comments = await ctx.prisma.comment.findMany({
-        take: 10,
+    .input(
+      z.object({
+        postId: z.string(),
+        limit: z.number().optional(),
+        cursor: z
+          .object({
+            id: z.string(),
+            createdAt: z.date(),
+          })
+          .optional(),
+      })
+    )
+    .query(async ({ ctx, input: { cursor, limit = 5, postId } }) => {
+      const data = await ctx.prisma.comment.findMany({
+        take: limit + 1,
         where: {
-          postId: input,
+          postId,
         },
+        cursor: cursor
+          ? { id: cursor.id, createdAt: cursor.createdAt }
+          : undefined,
+        orderBy: [{ id: "desc" }, { createdAt: "desc" }],
         include: {
           auther: true,
         },
       });
+      let nextCursor;
+      if (data.length > limit) {
+        const lastCursor = data.pop();
+        if (lastCursor != null) {
+          nextCursor = {
+            id: lastCursor.id,
+            createdAt: lastCursor.createdAt,
+          };
+        }
+      }
 
-      return comments.map((comment) => {
+      const comments = data.map((comment) => {
         return {
           id: comment.id,
           content: comment.content,
           auther: filterUser(comment.auther),
         };
       });
+
+      return {
+        comments,
+        nextCursor,
+      };
     }),
   createComment: privateProcedure
     .input(

@@ -1,19 +1,31 @@
-import { BlogPost } from "@/components/index";
-import { Container, SkeletonLoadingPage } from "@/ui";
+import { toast } from "../lib/myToast";
+import { BlogPost, ScrollEndIndecator } from "@/components/index";
+import { Container, Loading } from "@/ui";
 import { type NextPage } from "next";
 import Head from "next/head";
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
-  const { data: posts, isLoading } = api.post.getAll.useQuery();
+  const { data, isLoading, fetchNextPage, hasNextPage } =
+    api.post.getAll.useInfiniteQuery(
+      {},
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      }
+    );
   if (isLoading)
     return (
-      <SkeletonLoadingPage
-        className="pt-24 flex-col  w-full items-center flex gap-4"
-        count={4}
-      />
+      <Container>
+        <Loading.SkeletonPage
+          className="pt-24 flex-col  w-full items-center flex gap-4"
+          count={4}
+        />
+      </Container>
     );
-
+  const posts = data?.pages.flatMap((page) => page.posts);
+  if (!posts || posts.length == 0) {
+    return <>no post</>;
+  }
   return (
     <>
       <Head>
@@ -26,10 +38,18 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container className="text-revert-theme flex flex-col gap-4">
-        {posts &&
-          posts.map((props): JSX.Element => {
-            return <BlogPost key={props.id} {...props} />;
-          })}
+        {posts.map((props): JSX.Element => {
+          return <BlogPost key={props.id} {...props} />;
+        })}
+        <ScrollEndIndecator
+          hasNextPage={hasNextPage || false}
+          fetchNextPage={fetchNextPage}
+          onError={() => {
+            toast({ message: "no more posts", type: "error" });
+          }}
+        >
+          {hasNextPage && <Loading.SkelatonPost />}
+        </ScrollEndIndecator>
       </Container>
     </>
   );

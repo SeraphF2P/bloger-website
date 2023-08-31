@@ -1,4 +1,5 @@
-import { filterPostsWithAuther, filterUser } from "@/utils/data-filters";
+import { getInfinitePosts } from "../../../utils/getInfinitePosts";
+import { filterUser } from "@/utils/data-filters";
 import { postingRateLimit } from "@/utils/ratelimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
@@ -10,20 +11,41 @@ import {
 } from "~/server/api/trpc";
 
 export const postRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const posts = await ctx.prisma.post.findMany({
-      take: 10,
-      where: { published: true },
-      orderBy: [{ id: "desc" }, { createdAt: "desc" }],
-      include: {
-        likes: true,
-        _count: { select: { likes: true, Comment: true } },
-        auther: true,
-      },
-    });
-    if (!posts) return null;
-    return filterPostsWithAuther(posts, ctx.userId);
-  }),
+  getAll: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).optional(),
+        cursor: z
+          .object({
+            id: z.string(),
+            createdAt: z.date(),
+          })
+          .optional(),
+      })
+    )
+    .query(async ({ ctx, input: { cursor, limit = 5 } }) => {
+      return await getInfinitePosts({
+        ctx,
+        cursor,
+        limit,
+        whereClause: {
+          published: true,
+        },
+      });
+      // const posts = await ctx.prisma.post.findMany({
+      //   take: 10,
+      //   where: { published: true },
+      //   orderBy: [{ id: "desc" }, { createdAt: "desc" }],
+      //   include: {
+      //     likes: true,
+      //     _count: { select: { likes: true, Comment: true } },
+      //     auther: true,
+      //   },
+      // });
+      // if (!posts) return null;
+
+      // return filterPostsWithAuther(posts, ctx.userId);
+    }),
   createDraft: privateProcedure
     .input(
       z.object({

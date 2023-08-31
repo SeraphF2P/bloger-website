@@ -45,7 +45,7 @@ const Drafts: NextPage = () => {
     }
   );
 
-  if (isLoading) return <Loading as="page" />;
+  if (isLoading) return <Loading.Mesh />;
 
   return (
     <Container className=" flex flex-col gap-4">

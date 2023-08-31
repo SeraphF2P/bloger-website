@@ -2,18 +2,13 @@ import { CommentsSec } from ".";
 import { formatRelativeDate } from "@/lib/formatter";
 import { toast } from "@/lib/myToast";
 import { AlertModal, Btn, Icons } from "@/ui";
-import { api, type RouterOutputs } from "@/utils/api";
-import { useUser } from "@clerk/nextjs";
+import { api } from "@/utils/api";
 import { AnimatePresence, motion as m } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState, type FC, useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo, useState, type FC } from "react";
 
-type Posts = Exclude<RouterOutputs["post"]["getAll"], null>;
-type Post = Posts[number];
-
-const BlogPost: FC<Post> = ({ auther, ...props }) => {
-  const { user, isSignedIn } = useUser();
+const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
   const ctx = api.useContext();
   const { isLoading: isDeleting, mutate: remove } = api.post.delete.useMutation(
     {
@@ -41,7 +36,7 @@ const BlogPost: FC<Post> = ({ auther, ...props }) => {
     >
       <div className=" flex">
         <Link
-          href={`/profile/${props.id}`}
+          href={`/profile/${auther.id}`}
           className="relative h-20 w-20 rounded-sm"
         >
           <Image
@@ -79,7 +74,7 @@ const BlogPost: FC<Post> = ({ auther, ...props }) => {
           comment
           <Icons.chatbubble width="16" height="16" />
         </CommentsSec>
-        {isSignedIn && user.id == auther.id && (
+        {props.isAuther && (
           <AlertModal
             disabled={isDeleting}
             onConfirm={() => remove(props.id)}

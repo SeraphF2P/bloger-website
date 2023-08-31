@@ -28,6 +28,7 @@ export const filterPostsWithAuther = (
   userId: string | null
 ) => {
   return posts.map((post) => {
+    const isAuther = post.autherId && post.autherId == userId;
     const isLiked = userId
       ? post.likes.some((like) => like.autherId == userId)
       : false;
@@ -37,6 +38,7 @@ export const filterPostsWithAuther = (
       likesCount: post._count.likes,
       commentsCount: post._count.Comment,
       isLiked,
+      isAuther,
       ...rest,
     };
   });
@@ -49,11 +51,12 @@ export const filterPostsWithOutAuther = (
     const isLiked = userId
       ? post.likes.some((like) => like.autherId == userId)
       : false;
-
+    const isAuther = post.autherId && post.autherId == userId;
     return {
       likesCount: post._count.likes,
       commentsCount: post._count.Comment,
       isLiked,
+      isAuther,
       ...post,
     };
   });

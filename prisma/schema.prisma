@@ -33,15 +33,15 @@ model User {
 
 model Post {
   id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @updatedAt()
+  
   content   String   @db.LongText
 
   auther   User   @relation(fields: [autherId], references: [id], onDelete: Cascade)
   autherId String
 
   title     String
-  published Boolean @default(false)
-
+  published Boolean @default(false) 
   likes   Like[]
   Comment Comment[]
 
@@ -63,6 +63,7 @@ model Like {
 
 model Comment {
   id String @id @default(cuid())
+  createdAt DateTime @default(now())
 
   Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String

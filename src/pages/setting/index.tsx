@@ -23,7 +23,7 @@ const Setting: NextPage = ({}) => {
             src={isSignedIn ? user.profileImageUrl : "/male-avatar.webp"}
             alt={`${user?.username || ""} profile image`}
           />
-          {!isLoaded && <Loading as="component" />}
+          {!isLoaded && <Loading.Spinner />}
         </div>
       </div>
       <ThemeToggler />

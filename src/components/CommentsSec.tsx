@@ -1,12 +1,6 @@
+import ScrollEndIndecator from "./ui/ScrollEndIndecator";
 import { toast } from "@/lib/myToast";
-import {
-  Btn,
-  Icons,
-  Modale,
-  NextImage,
-  type BtnProps,
-  SkeletonLoadingPage,
-} from "@/ui";
+import { Btn, Icons, Modale, NextImage, type BtnProps, Loading } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
@@ -107,35 +101,51 @@ const AddComment = ({ postId }: { postId: string }) => {
 };
 
 const Comments = ({ postId }: { postId: string }) => {
-  const { data: comments, isLoading } =
-    api.comment.getComments.useQuery(postId);
+  const { data, isLoading, fetchNextPage, hasNextPage } =
+    api.comment.getComments.useInfiniteQuery(
+      { postId },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      }
+    );
   if (isLoading)
     return (
-      <SkeletonLoadingPage
+      <Loading.SkeletonPage
+        className="pb-20 p-4 flex justify-start items-start flex-col gap-8 overflow-y-scroll remove-scroll-bar  h-full"
         count={4}
-        className=" pb-10 p-4 flex justify-start items-start flex-col gap-8 overflow-y-scroll remove-scroll-bar  h-full"
       />
     );
+  if (!data) return null;
+  const comments = data?.pages.flatMap((page) => page.comments);
+  if (comments.length === 0 && !comments) {
+    return <p> be the first on to comment on this post</p>;
+  }
   return (
-    <section className=" pb-10 p-4 flex justify-start items-start flex-col gap-8 overflow-y-scroll remove-scroll-bar  h-full">
-      {comments &&
-        comments.map(({ id, auther, content }) => (
-          <div key={id} className="   ">
-            <div className=" flex gap-2 items-center">
-              <NextImage
-                src={auther.profileImageUrl}
-                className="  rounded-full overflow-hidden h-16 w-16"
-                alt="profile pic"
-              />
-              <h3>{auther.username}</h3>
-            </div>
-            <div className=" m-2">
-              <p className=" line-clamp-4 rounded bg-revert-theme/10 p-2">
-                {content}
-              </p>
-            </div>
+    <section className=" pb-20 p-4 flex justify-start items-start flex-col gap-8 overflow-y-scroll remove-scroll-bar  h-full">
+      {comments.map(({ id, auther, content }) => (
+        <div key={id} className=" max-w-full    ">
+          <div className=" flex gap-2 items-center">
+            <NextImage
+              src={auther.profileImageUrl}
+              className="  rounded-full overflow-hidden h-16 w-16"
+              alt="profile pic"
+            />
+            <h3>{auther.username}</h3>
           </div>
-        ))}
+          <div className=" m-2">
+            <p className=" line-clamp-4 rounded bg-revert-theme/10 p-2">
+              {content}
+            </p>
+          </div>
+        </div>
+      ))}
+      <ScrollEndIndecator
+        key={"scrollEnd"}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage || false}
+      >
+        {hasNextPage && <Loading.SkelatonPost />}
+      </ScrollEndIndecator>
     </section>
   );
 };
