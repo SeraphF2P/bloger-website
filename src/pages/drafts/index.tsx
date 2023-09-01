@@ -49,14 +49,15 @@ const Drafts: NextPage = () => {
 
   return (
     <Container className=" flex flex-col gap-4">
-      {drafts?.length == 0 && (
-        <div className=" min-h-40 flex  w-full flex-col items-center justify-center rounded bg-slate-300 p-8 dark:bg-slate-500">
-          <Icons.error className=" w-40  " />
+      {!drafts ||
+        (drafts?.length == 0 && (
+          <div className=" min-h-40 flex  w-full flex-col items-center justify-center rounded bg-slate-300 p-8 dark:bg-slate-500">
+            <Icons.error className=" w-40  " />
 
-          <h2>you dont have any drafts</h2>
-        </div>
-      )}
-      {!!drafts &&
+            <h2>you dont have any drafts</h2>
+          </div>
+        ))}
+      {drafts &&
         drafts?.map(({ id, content, createdAt, title }): JSX.Element => {
           return (
             <div

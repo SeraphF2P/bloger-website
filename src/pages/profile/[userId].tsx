@@ -1,8 +1,9 @@
 import { BlogPost, ScrollEndIndecator } from "@/components/index";
 import { toast } from "@/lib/myToast";
-import { Container, Icons, Loading } from "@/ui";
+import { Btn, Container, Icons, Loading } from "@/ui";
 import { api, type RouterOutputs } from "@/utils/api";
 import { ssgHelper } from "@/utils/ssgHelper";
+import { useUser } from "@clerk/nextjs";
 import type {
   GetStaticPaths,
   GetStaticPropsContext,
@@ -59,7 +60,34 @@ function PostsSection({ auther }: { auther: User }) {
     </>
   );
 }
-
+function AddFriend({ autherId }: { autherId: string }) {
+  const ctx = api.useContext();
+  const { user } = useUser();
+  const addFriend = api.user.toggleFriend.useMutation({
+    // onSuccess: ({ addedFriend }) => {
+    //   ctx.user.getUserProfile.setData({ userId: autherId }, (oldData) => {
+    //     if (oldData == null) return;
+    //     return {
+    //       ...oldData,
+    //       isFriend: addedFriend,
+    //     };
+    //   });
+    // },
+    onError: () => {
+      toast({ message: "some thing went wrong", type: "error" });
+    },
+  });
+  if (user?.id == autherId) return null;
+  return (
+    <Btn
+      disabled={addFriend.isLoading}
+      onClick={() => addFriend.mutate(autherId)}
+      className="  px-4 py-2 "
+    >
+      add friend
+    </Btn>
+  );
+}
 const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
   userId,
 }) => {
@@ -87,6 +115,13 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
         </section>
         <div className=" w-full p-2  text-center">
           <h1>{auther.username}</h1>
+          <div className="  flex gap-2  justify-center w-full p-2">
+            <Btn variant="outline" className="  px-4 py-2 ">
+              friends list
+              {/* <pre>{auther.friends}</pre> */}
+            </Btn>
+            <AddFriend autherId={auther.id} />
+          </div>
         </div>
         <PostsSection auther={auther} />
       </Container>

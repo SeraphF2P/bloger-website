@@ -12,6 +12,9 @@ export const userRouter = createTRPCRouter({
         where: {
           id: userId,
         },
+        include: {
+          friends: true,
+        },
       });
       if (!user) {
         const clerkUser = await clerkClient.users.getUser(userId);
@@ -64,6 +67,41 @@ export const userRouter = createTRPCRouter({
       },
     });
 
-    return user?.posts;
+    return user?.posts || [];
   }),
+  toggleFriend: privateProcedure
+    .input(z.string().min(1))
+    .mutation(async ({ ctx, input: friendId }) => {
+      const existingFriend = await ctx.prisma.user.findFirst({
+        where: {
+          id: friendId,
+          friends: { some: { id: ctx.userId } },
+        },
+      });
+      let addedFriend;
+      if (existingFriend == null) {
+        await ctx.prisma.user.update({
+          where: {
+            id: friendId,
+          },
+          data: {
+            friends: { connect: { id: ctx.userId } },
+          },
+        });
+        addedFriend = true;
+      } else {
+        await ctx.prisma.user.update({
+          where: {
+            id: ctx.userId,
+          },
+          data: {
+            friends: { disconnect: { id: friendId } },
+          },
+        });
+        addedFriend = false;
+      }
+      return {
+        addedFriend,
+      };
+    }),
 });

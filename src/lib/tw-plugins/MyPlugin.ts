@@ -64,6 +64,10 @@ export const MyPlugin = plugin(
           theme: "rgb(var(--theme),<alpha-value>)",
           "revert-theme": "rgb(var(--revert-theme),<alpha-value>)",
           primary: "rgb(var(--primary),<alpha-value>)",
+          variant: "rgb(var(--variant,0,0,0),<alpha-value>)",
+        },
+        boxShadow: {
+          lightness: "inset 0px 0px 200px 0px rgb(255,255,255,0.4)",
         },
         boxShadowColor: {
           dynamic: "rgb(var(--theme-shadow),<alpha-value>)",

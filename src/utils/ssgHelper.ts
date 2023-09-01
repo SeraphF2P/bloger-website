@@ -6,7 +6,7 @@ import SuperJSON from "superjson";
 export function ssgHelper() {
   return createServerSideHelpers({
     router: appRouter,
-    ctx: { prisma, userId: null },
+    ctx: { prisma, userId: null, revalidate: null },
     transformer: SuperJSON,
   });
 }

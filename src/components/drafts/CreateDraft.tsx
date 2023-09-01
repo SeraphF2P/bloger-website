@@ -1,6 +1,6 @@
 "use client";
 
-import { toast } from "../../lib/myToast";
+import { toast } from "@/lib/myToast";
 import { Btn, Modale } from "@/ui";
 import { api } from "@/utils/api";
 import { useState } from "react";

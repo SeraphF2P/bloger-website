@@ -2,15 +2,10 @@
 
 import { cn } from "@/lib/cva";
 import { throttle } from "@/lib/performance";
-import { useMove, useResizeObserver, useViewportSize } from "@mantine/hooks";
-import {
-  motion as m,
-  useMotionTemplate,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { useMove, useResizeObserver } from "@mantine/hooks";
+import { motion as m, useMotionTemplate, useScroll } from "framer-motion";
 import type { FC, MutableRefObject, ReactNode, RefObject } from "react";
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 //TODO fix the referance error for the refs in thumb component
 //TODO add xAxis option
@@ -18,61 +13,85 @@ import { createContext, useContext, useEffect, useMemo } from "react";
 type scrollBarProps = {
   children: ReactNode;
   container?: RefObject<HTMLElement>;
-  step?: number;
   throttleDelay?: number;
+  orientation?: "x" | "y";
+  axis?: "x" | "y";
 };
 const Context = createContext<{
   trackRef: MutableRefObject<HTMLDivElement | null>;
   thumbRef: MutableRefObject<HTMLDivElement | null>;
   scrollContainer: RefObject<HTMLElement>;
   container?: RefObject<HTMLElement>;
-  visible: boolean;
-  height: number | string;
-  maxY: number;
-  step: number;
+  config: {
+    trackLength: number;
+    thumbLength: number;
+    maxTrackScroll: number;
+    scrollableLength: number;
+    isVisiable: boolean;
+  };
   throttleDelay: number;
+  orientation: "x" | "y";
+  axis: "x" | "y";
 }>({
-  visible: false,
-  height: 0,
-  maxY: 0,
   scrollContainer: { current: null },
   trackRef: { current: null },
   thumbRef: { current: null },
-  step: 200,
-  throttleDelay: 100,
+  config: {
+    scrollableLength: 0,
+    trackLength: 0,
+    thumbLength: 0,
+    maxTrackScroll: 0,
+    isVisiable: false,
+  },
+  throttleDelay: 0,
+  orientation: "y",
+  axis: "y",
 });
 const useContextHook = () => useContext(Context);
 
 export const ScrollBar = ({
   children,
   container,
-  step = 200,
   throttleDelay = 100,
+  orientation = "y",
+  axis = "y",
 }: scrollBarProps) => {
   const [thumbRef, thumb] = useResizeObserver<HTMLDivElement>();
   const [trackRef, track] = useResizeObserver<HTMLDivElement>();
-  const { height: ViewportHeight } = useViewportSize();
   const scrollContainer = useMemo(() => {
     return container ? container : { current: document.body };
   }, [container]);
 
-  const maxY = track.height - thumb.height;
-
   const config = useMemo(() => {
-    return {
-      scrollableHeight: 0,
-      minHeight: ViewportHeight,
-    };
-  }, [ViewportHeight]);
-
-  useEffect(() => {
+    let scrollableLength = 0;
+    let scrollOffset = 0;
     if (scrollContainer.current instanceof HTMLElement) {
-      config.scrollableHeight = scrollContainer.current.scrollHeight;
+      if (axis == "y") {
+        scrollableLength = scrollContainer.current.scrollHeight;
+        scrollOffset = scrollContainer.current.offsetHeight;
+      } else if (axis == "x") {
+        scrollableLength = scrollContainer.current.scrollWidth;
+        scrollOffset = scrollContainer.current.offsetWidth;
+      }
     } else {
-      config.scrollableHeight = document.body.scrollHeight;
+      if (axis == "y") {
+        scrollableLength = document.body.scrollHeight;
+        scrollOffset = document.body.offsetHeight;
+      } else if (axis == "x") {
+        scrollableLength = document.body.scrollWidth;
+        scrollOffset = document.body.offsetWidth;
+      }
     }
-  }, [config, container, scrollContainer]);
-  const visible = config.scrollableHeight > config.minHeight;
+    const thumbLength = track.height ** 2 / scrollableLength;
+    return {
+      scrollableLength,
+      maxTrackScroll: track.height - thumb.height,
+      trackLength: track.height,
+      thumbLength,
+      isVisiable: scrollOffset != scrollableLength,
+    };
+  }, [axis, scrollContainer, thumb.height, track.height]);
+
   return (
     <Context.Provider
       value={{
@@ -80,11 +99,10 @@ export const ScrollBar = ({
         thumbRef,
         container,
         scrollContainer,
-        step,
+        axis,
+        orientation,
+        config,
         throttleDelay,
-        maxY,
-        visible,
-        height: `${track.height ** 2 / config.scrollableHeight}px`,
       }}
     >
       {children}
@@ -99,28 +117,47 @@ type ThumbPropsType = {
 export const Thumb: FC<ThumbPropsType> = ({ className, children }) => {
   const {
     thumbRef,
-    maxY,
-    height,
+
     scrollContainer,
-    step,
+    config,
     throttleDelay,
     container,
+    orientation,
+    axis,
   } = useContextHook();
   const scrollAbleContainer = container ? scrollContainer : { current: window };
-  const scrollByStep = throttle((coord) => {
-    const { y } = coord as { x: number; y: number };
-    const dir = y - 0.5;
-    scrollAbleContainer.current?.scrollBy({
-      top: step * dir,
-      behavior: "smooth",
-    });
-  }, throttleDelay);
 
-  const { ref, active } = useMove(scrollByStep);
+  const { scrollYProgress, scrollXProgress } = useScroll({
+    container,
+    layoutEffect: false,
+  });
+  function scrollCousure() {
+    const modifier = config.thumbLength / config.trackLength;
+    const Action = {
+      y: (y: number) => {
+        const dir = orientation == "y" ? y : -y;
+        scrollAbleContainer.current?.scrollBy({
+          top: config.scrollableLength * modifier * dir,
+          behavior: "smooth",
+        });
+      },
+      x: (x: number) => {
+        const dir = orientation == "y" ? x : -x;
+        scrollAbleContainer.current?.scrollBy({
+          left: config.scrollableLength * modifier * dir,
+          behavior: "smooth",
+        });
+      },
+    };
+    return (coord: { x: number; y: number }) => {
+      const dir = coord[orientation] * 2 - 1;
+      Action[axis](dir);
+    };
+  }
+  const scroll = scrollCousure() as (...arg: unknown[]) => void;
 
-  const { scrollYProgress } = useScroll({ container, layoutEffect: false });
+  const { ref, active } = useMove(throttle(scroll, throttleDelay));
 
-  const dragY = useTransform(scrollYProgress, [0, 1], [0, maxY]);
   thumbRef.current = ref.current;
 
   return (
@@ -128,10 +165,12 @@ export const Thumb: FC<ThumbPropsType> = ({ className, children }) => {
       ref={ref}
       data-active={active}
       style={{
-        y: useMotionTemplate`${dragY}px`,
-        height,
+        y: useMotionTemplate`calc(${
+          axis == "y" ? scrollYProgress : scrollXProgress
+        } * ${config.maxTrackScroll}px)`,
+        height: `${config.thumbLength}px`,
       }}
-      className={cn(" h-10 w-2 rounded-full  bg-red-500", className)}
+      className={cn(" min-w-[1px] rounded-full  bg-red-500", className)}
     >
       {children}
     </m.div>
@@ -143,13 +182,37 @@ type TrackPropsType = {
   className?: string;
 };
 export const Track: FC<TrackPropsType> = ({ children, className }) => {
-  const { visible, trackRef } = useContextHook();
+  const { trackRef, scrollContainer, axis } = useContextHook();
+  const [isVisiable, setIsVisiable] = useState(true);
+  useEffect(() => {
+    let scrollableLength = 0;
+    let scrollOffset = 0;
+    if (scrollContainer.current instanceof HTMLElement) {
+      if (axis == "y") {
+        scrollableLength = scrollContainer.current.scrollHeight;
+        scrollOffset = scrollContainer.current.offsetHeight;
+      } else if (axis == "x") {
+        scrollableLength = scrollContainer.current.scrollWidth;
+        scrollOffset = scrollContainer.current.offsetWidth;
+      }
+    } else {
+      if (axis == "y") {
+        scrollableLength = document.body.scrollHeight;
+        scrollOffset = document.body.offsetHeight;
+      } else if (axis == "x") {
+        scrollableLength = document.body.scrollWidth;
+        scrollOffset = document.body.offsetWidth;
+      }
+    }
+    setIsVisiable(scrollOffset != scrollableLength);
+  }, [axis, scrollContainer]);
+
   return (
     <div
       ref={trackRef}
-      data-visible={visible}
+      data-visiable={isVisiable}
       className={cn(
-        " data-[visible=false]:hidden  rounded-full flex justify-center w-4  bg-blue-400 fixed ",
+        " data-[visiable=false]:hidden  rounded-full flex justify-center w-4  bg-blue-400 fixed ",
         className
       )}
     >

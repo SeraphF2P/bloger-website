@@ -1,10 +1,9 @@
-import type { createTRPCContext } from "../server/api/trpc";
+import type { createTRPCContextType } from "../server/api/trpc";
 import {
   filterPostsWithAuther,
   filterPostsWithOutAuther,
 } from "./data-filters";
 import type { Prisma } from "@prisma/client";
-import type { inferAsyncReturnType } from "@trpc/server";
 
 export async function getInfiniteProfilePosts({
   userId,
@@ -17,7 +16,7 @@ export async function getInfiniteProfilePosts({
   whereClause: Prisma.PostWhereInput;
   limit: number;
   cursor: { id: string; createdAt: Date } | undefined;
-  ctx: inferAsyncReturnType<typeof createTRPCContext>;
+  ctx: createTRPCContextType;
 }) {
   const posts = await ctx.prisma.post.findMany({
     where: whereClause,
@@ -55,7 +54,7 @@ export async function getInfinitePosts({
   whereClause: Prisma.PostWhereInput;
   limit: number;
   cursor: { id: string; createdAt: Date } | undefined;
-  ctx: inferAsyncReturnType<typeof createTRPCContext>;
+  ctx: createTRPCContextType;
 }) {
   const posts = await ctx.prisma.post.findMany({
     where: whereClause,

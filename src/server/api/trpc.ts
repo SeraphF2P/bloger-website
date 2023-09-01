@@ -14,8 +14,19 @@
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
+import { getAuth } from "@clerk/nextjs/server";
+import type { Prisma, PrismaClient } from "@prisma/client";
+import type { DefaultArgs } from "@prisma/client/runtime/library";
+/**
+ * 2. INITIALIZATION
+ *
+ * This is where the tRPC API is initialized, connecting the context and transformer.
+ */
+import { initTRPC, TRPCError } from "@trpc/server";
+import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import superjson from "superjson";
+import { ZodError } from "zod";
 import { prisma } from "~/server/db";
 
 /**
@@ -24,8 +35,22 @@ import { prisma } from "~/server/db";
  *
  * @see https://trpc.io/docs/context
  */
+export type createTRPCContextType = {
+  prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
+  userId: string | null;
+  revalidate?:
+    | ((
+        urlPath: string,
+        opts?:
+          | {
+              unstable_onlyGenerated?: boolean | undefined;
+            }
+          | undefined
+      ) => Promise<void>)
+    | null;
+};
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
-  const { req } = opts;
+  const { req, res } = opts;
   const sesh = getAuth(req);
 
   const userId = sesh.userId;
@@ -33,20 +58,11 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
   return {
     prisma,
     userId,
+    revalidateSSG: res.revalidate,
   };
 };
 
-/**
- * 2. INITIALIZATION
- *
- * This is where the tRPC API is initialized, connecting the context and transformer.
- */
-import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
-import { getAuth } from "@clerk/nextjs/server";
-import { ZodError } from "zod";
-
-const t = initTRPC.context<typeof createTRPCContext>().create({
+const t = initTRPC.context<createTRPCContextType>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     return {

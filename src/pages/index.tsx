@@ -1,5 +1,5 @@
-import { toast } from "../lib/myToast";
 import { BlogPost, ScrollEndIndecator } from "@/components/index";
+import { toast } from "@/lib/myToast";
 import { Container, Loading } from "@/ui";
 import { type NextPage } from "next";
 import Head from "next/head";
