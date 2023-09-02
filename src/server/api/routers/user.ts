@@ -76,8 +76,12 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      const usersfriends = (userFriendTable?.friends || []) as string[] | [];
-      const autherfriends = (autherFriendTable?.friends || []) as string[] | [];
+      const usersfriends = (userFriendTable?.friends || []) as unknown as
+        | string[]
+        | [];
+      const autherfriends = (autherFriendTable?.friends || []) as unknown as
+        | string[]
+        | [];
       let addedFriend = false;
       function toggleFriend({
         friends,
