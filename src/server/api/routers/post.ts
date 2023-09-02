@@ -32,19 +32,6 @@ export const postRouter = createTRPCRouter({
           published: true,
         },
       });
-      // const posts = await ctx.prisma.post.findMany({
-      //   take: 10,
-      //   where: { published: true },
-      //   orderBy: [{ id: "desc" }, { createdAt: "desc" }],
-      //   include: {
-      //     likes: true,
-      //     _count: { select: { likes: true, Comment: true } },
-      //     auther: true,
-      //   },
-      // });
-      // if (!posts) return null;
-
-      // return filterPostsWithAuther(posts, ctx.userId);
     }),
   createDraft: privateProcedure
     .input(
@@ -62,19 +49,18 @@ export const postRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { success } = await postingRateLimit.limit(ctx.userId);
       if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
-      const auther = filterUser(await clerkClient.users.getUser(ctx.userId));
+      const drafts = await ctx.prisma.post.count({
+        where: {
+          autherId: ctx.userId,
+        },
+      });
+      if (drafts > 4)
+        throw new Error("Too many drafts emty some space then try again");
       await ctx.prisma.post.create({
         data: {
           title: input.title,
           content: input.content,
-          auther: {
-            connectOrCreate: {
-              where: {
-                id: ctx.userId,
-              },
-              create: auther,
-            },
-          },
+          autherId: ctx.userId,
         },
       });
     }),
@@ -89,17 +75,11 @@ export const postRouter = createTRPCRouter({
           id: input,
         },
       });
+      void ctx.revalidate?.(`/profile/${ctx.userId}`);
     }),
   delete: privateProcedure
     .input(z.string().min(1))
     .mutation(async ({ ctx, input }) => {
-      const post = await ctx.prisma.post.findUnique({
-        where: {
-          id: input,
-        },
-      });
-      if (post?.autherId !== ctx.userId)
-        return new TRPCError({ code: "UNAUTHORIZED" });
       await ctx.prisma.post.delete({
         where: {
           id: input,

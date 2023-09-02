@@ -1,6 +1,6 @@
-import { getInfiniteProfilePosts } from "../../../utils/getInfinitePosts";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { filterUser } from "@/utils/data-filters";
+import { getInfiniteProfilePosts } from "@/utils/getInfinitePosts";
 import { clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
 
@@ -8,24 +8,18 @@ export const userRouter = createTRPCRouter({
   getUserProfile: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input: userId }) => {
-      const user = await ctx.prisma.user.findUnique({
+      const user = await clerkClient.users.getUser(userId);
+      const friendList = await ctx.prisma.friend.findUnique({
         where: {
-          id: userId,
-        },
-        include: {
-          friends: true,
+          userId,
         },
       });
-      if (!user) {
-        const clerkUser = await clerkClient.users.getUser(userId);
-        if (!clerkUser) throw new Error("User not found", { cause: 404 });
-        return {
-          ...filterUser(clerkUser),
-        };
-      }
-
+      const friends = friendList?.friends as string[] | null;
+      const isFriend = friends?.some((friend) => friend == userId) || false;
       return {
         ...filterUser(user),
+        friends,
+        isFriend,
       };
     }),
   getUserPosts: publicProcedure
@@ -51,55 +45,93 @@ export const userRouter = createTRPCRouter({
       });
     }),
   getUserDrafts: privateProcedure.query(async ({ ctx }) => {
-    const user = await ctx.prisma.user.findUnique({
+    const drafts = await ctx.prisma.post.findMany({
       where: {
-        id: ctx.userId,
+        autherId: ctx.userId,
+        published: false,
       },
-      select: {
-        posts: {
-          where: {
-            published: false,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
+      orderBy: {
+        createdAt: "desc",
       },
     });
-
-    return user?.posts || [];
+    return drafts || [];
   }),
   toggleFriend: privateProcedure
     .input(z.string().min(1))
-    .mutation(async ({ ctx, input: friendId }) => {
-      const existingFriend = await ctx.prisma.user.findFirst({
+    .mutation(async ({ ctx, input: autherId }) => {
+      const userFriendTable = await ctx.prisma.friend.findUnique({
         where: {
-          id: friendId,
-          friends: { some: { id: ctx.userId } },
+          userId: ctx.userId,
+        },
+        select: {
+          friends: true,
         },
       });
+      const autherFriendTable = await ctx.prisma.friend.findUnique({
+        where: {
+          userId: autherId,
+        },
+        select: {
+          friends: true,
+        },
+      });
+
+      const usersfriends = (userFriendTable?.friends || []) as string[] | [];
+      const autherfriends = (autherFriendTable?.friends || []) as string[] | [];
       let addedFriend;
-      if (existingFriend == null) {
-        await ctx.prisma.user.update({
-          where: {
-            id: friendId,
-          },
-          data: {
-            friends: { connect: { id: ctx.userId } },
-          },
-        });
-        addedFriend = true;
-      } else {
-        await ctx.prisma.user.update({
-          where: {
-            id: ctx.userId,
-          },
-          data: {
-            friends: { disconnect: { id: friendId } },
-          },
-        });
-        addedFriend = false;
+      function toggleFriend({
+        friends,
+        friendId,
+      }: {
+        friends: string[] | [];
+        friendId: string;
+      }) {
+        let friendList;
+        if (friends) {
+          const index = friends.findIndex((f) => f == friendId);
+          if (index != -1) {
+            friendList = [
+              ...friends.slice(0, index),
+              ...friends.slice(index + 1),
+            ];
+            addedFriend = false;
+          } else {
+            friendList = [...friends, friendId];
+            addedFriend = true;
+          }
+        }
+        return friendList;
       }
+      const createFriendship = ctx.prisma.friend.upsert({
+        where: {
+          userId: ctx.userId,
+        },
+        create: {
+          userId: ctx.userId,
+          friends: [autherId],
+        },
+        update: {
+          friends: toggleFriend({ friends: usersfriends, friendId: autherId }),
+        },
+      });
+      const createFriendshipBack = ctx.prisma.friend.upsert({
+        where: {
+          userId: autherId,
+        },
+        create: {
+          userId: autherId,
+          friends: [ctx.userId],
+        },
+        update: {
+          friends: toggleFriend({
+            friends: autherfriends,
+            friendId: ctx.userId,
+          }),
+        },
+      });
+      await ctx.prisma.$transaction([createFriendship, createFriendshipBack]);
+      void ctx.revalidate?.(`/profile/${ctx.userId}`);
+      void ctx.revalidate?.(`/profile/${autherId}`);
       return {
         addedFriend,
       };

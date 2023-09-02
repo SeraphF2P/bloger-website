@@ -1,7 +1,7 @@
 import type { User as ClerkUser } from "@clerk/nextjs/dist/api";
-import type { Like, Post, User as PrismaUser } from "@prisma/client";
+import type { Like, Post } from "@prisma/client";
 
-export const filterUser = (user: PrismaUser | ClerkUser) => {
+export const filterUser = (user: ClerkUser) => {
   const { gender, id, firstName, lastName, profileImageUrl, username } = user;
   const userInfo = {
     id: id,
@@ -21,25 +21,21 @@ interface UnfilterPostWithOutAuther extends Post {
   };
 }
 interface UnfilterPostWithAuther extends UnfilterPostWithOutAuther {
-  auther: PrismaUser;
+  auther: AutherType;
 }
 export const filterPostsWithAuther = (
   posts: UnfilterPostWithAuther[],
   userId: string | null
 ) => {
   return posts.map((post) => {
-    const isAuther = post.autherId && post.autherId == userId;
     const isLiked = userId
       ? post.likes.some((like) => like.autherId == userId)
       : false;
-    const { auther, ...rest } = post;
     return {
-      auther: filterUser(auther),
       likesCount: post._count.likes,
       commentsCount: post._count.Comment,
       isLiked,
-      isAuther,
-      ...rest,
+      ...post,
     };
   });
 };
@@ -51,12 +47,10 @@ export const filterPostsWithOutAuther = (
     const isLiked = userId
       ? post.likes.some((like) => like.autherId == userId)
       : false;
-    const isAuther = post.autherId && post.autherId == userId;
     return {
       likesCount: post._count.likes,
       commentsCount: post._count.Comment,
       isLiked,
-      isAuther,
       ...post,
     };
   });

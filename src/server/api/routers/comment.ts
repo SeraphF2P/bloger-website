@@ -1,6 +1,7 @@
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { filterUser } from "@/utils/data-filters";
 import { postingRateLimit } from "@/utils/ratelimit";
+import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -28,9 +29,6 @@ export const commentRouter = createTRPCRouter({
           ? { id: cursor.id, createdAt: cursor.createdAt }
           : undefined,
         orderBy: [{ id: "desc" }, { createdAt: "desc" }],
-        include: {
-          auther: true,
-        },
       });
       let nextCursor;
       if (data.length > limit) {
@@ -42,12 +40,16 @@ export const commentRouter = createTRPCRouter({
           };
         }
       }
-
+      const authers = await clerkClient.users.getUserList({
+        userId: data.map((comment) => comment.autherId),
+      });
       const comments = data.map((comment) => {
+        const auther = authers.find((user) => user.id === comment.autherId);
+        if (!auther) throw new TRPCError({ code: "NOT_FOUND" });
         return {
           id: comment.id,
           content: comment.content,
-          auther: filterUser(comment.auther),
+          auther: filterUser(auther),
         };
       });
 

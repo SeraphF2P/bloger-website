@@ -11,24 +11,14 @@ datasource db {
   relationMode = "prisma"
 }
 
-model User {
+model Friend {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
 
-  gender          String  @default("male")
-  firstName       String?
-  lastName        String?
-  username        String  @unique @default("new user")
-  profileImageUrl String?
+  userId String    @unique
+  friends  String  
 
-  posts   Post[]
-  Likes   Like[]
-  Comment Comment[]
-
-  friends     User[] @relation(name: "friendship")
-  friendsWith User[] @relation(name: "friendship")
-
-  @@unique([id, username])
+  @@unique([id, userId])
 }
 
 model Post {
@@ -37,7 +27,6 @@ model Post {
   
   content   String   @db.LongText
 
-  auther   User   @relation(fields: [autherId], references: [id], onDelete: Cascade)
   autherId String
 
   title     String
@@ -53,7 +42,7 @@ model Like {
   Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
 
-  auther   User   @relation(fields: [autherId], references: [id], onDelete: Cascade)
+  
   autherId String
 
   @@id([postId, autherId])
@@ -68,7 +57,6 @@ model Comment {
   Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
 
-  auther   User   @relation(fields: [autherId], references: [id], onDelete: Cascade)
   autherId String
 
   content String @db.LongText

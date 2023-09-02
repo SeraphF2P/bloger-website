@@ -10,17 +10,17 @@ const NotSignedIn = () => {
     <>
       {open == true && isSignedIn == false && (
         <section className="fixed flex justify-center items-center  inset-0 z-50 bg-theme">
-          <div className=" flex flex-col h-[382px] max-w-xs w-full items-center gap-2">
+          <div className=" flex flex-col h-[382px]  items-center  gap-2">
             <SignIn
               appearance={{
                 elements: {
                   headerTitle: "text-revert-theme",
                   headerSubtitle: "text-revert-theme",
-                  card: " max-w-xs w-full bg-gray-100 dark:bg-gray-700 ",
+                  card: "w-[320px] bg-gray-100 dark:bg-gray-700 ",
                   footerActionText: "text-revert-theme",
-                  socialButtonsBlockButton: variants({ variant: "fill" }),
-                  socialButtons: "",
-                  avatarImage: "/male-avatar.webp",
+                  socialButtonsIconButton: variants({
+                    variant: "outline",
+                  }),
                 },
               }}
             />

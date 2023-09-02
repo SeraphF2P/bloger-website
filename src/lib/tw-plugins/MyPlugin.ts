@@ -9,12 +9,16 @@ export const MyPlugin = plugin(
         "--revert-theme": "226,232,240", //? slate["200"]
         "--theme-shadow": "245,245,245", //?
         "--primary": "167,139,250", //?violet["400"]
+        "--alert": "200,50,50",
+        "--success": "50,200,50",
       },
       ".light": {
         "--theme": "226,232,240", //? slate["200"]
         "--revert-theme": "30,41,59", //? slate["800"]
         "--theme-shadow": "0,0,0", //?
         "--primary": "139,92,246", //?violet["500"]
+        "--alert": "200,50,50",
+        "--success": "50,200,50",
       },
     });
     addBase({
@@ -66,8 +70,9 @@ export const MyPlugin = plugin(
           primary: "rgb(var(--primary),<alpha-value>)",
           variant: "rgb(var(--variant,0,0,0),<alpha-value>)",
         },
+
         boxShadow: {
-          lightness: "inset 0px 0px 200px 0px rgb(255,255,255,0.4)",
+          overlay: "inset 0 0 200px 0 rgba(255,255,255,0)",
         },
         boxShadowColor: {
           dynamic: "rgb(var(--theme-shadow),<alpha-value>)",

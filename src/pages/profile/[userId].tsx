@@ -63,26 +63,27 @@ function PostsSection({ auther }: { auther: User }) {
 function AddFriend({ autherId }: { autherId: string }) {
   const ctx = api.useContext();
   const { user } = useUser();
+
   const addFriend = api.user.toggleFriend.useMutation({
-    // onSuccess: ({ addedFriend }) => {
-    //   ctx.user.getUserProfile.setData({ userId: autherId }, (oldData) => {
-    //     if (oldData == null) return;
-    //     return {
-    //       ...oldData,
-    //       isFriend: addedFriend,
-    //     };
-    //   });
-    // },
+    onSuccess: ({ addedFriend }) => {
+      ctx.user.getUserProfile.setData(autherId, (oldData) => {
+        if (oldData == undefined) return oldData;
+        return {
+          ...oldData,
+          isFriend: addedFriend,
+        };
+      });
+    },
     onError: () => {
       toast({ message: "some thing went wrong", type: "error" });
     },
   });
-  if (user?.id == autherId) return null;
+  if (!user || user?.id == autherId) return null;
   return (
     <Btn
       disabled={addFriend.isLoading}
       onClick={() => addFriend.mutate(autherId)}
-      className="  px-4 py-2 "
+      className="      px-4 py-2 "
     >
       add friend
     </Btn>
@@ -118,9 +119,9 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
           <div className="  flex gap-2  justify-center w-full p-2">
             <Btn variant="outline" className="  px-4 py-2 ">
               friends list
-              {/* <pre>{auther.friends}</pre> */}
             </Btn>
             <AddFriend autherId={auther.id} />
+            {auther.isFriend && <p>you are friends</p>}
           </div>
         </div>
         <PostsSection auther={auther} />
