@@ -13,9 +13,14 @@ export const userRouter = createTRPCRouter({
         where: {
           userId,
         },
+        select: {
+          friends: true,
+        },
       });
-      const friends = friendList?.friends as unknown as string[] | null;
-      const isFriend = friends?.some((friend) => friend == userId) || false;
+      const friends = JSON.parse(friendList?.friends || "") as unknown as
+        | { userId: string }[]
+        | [];
+      const isFriend = friends.some((f) => f.userId == userId) || false;
       return {
         ...filterUser(user),
         friends,
@@ -76,23 +81,31 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      const usersfriends = (userFriendTable?.friends || []) as unknown as
-        | string[]
+      const usersfriends = JSON.parse(
+        userFriendTable?.friends || ""
+      ) as unknown as
+        | {
+            userId: string;
+          }[]
         | [];
-      const autherfriends = (autherFriendTable?.friends || []) as unknown as
-        | string[]
+      const autherfriends = JSON.parse(
+        autherFriendTable?.friends || ""
+      ) as unknown as
+        | {
+            userId: string;
+          }[]
         | [];
       let addedFriend = false;
       function toggleFriend({
         friends,
         friendId,
       }: {
-        friends: string[] | [];
+        friends: { userId: string }[] | [];
         friendId: string;
       }) {
         let friendList;
         if (friends) {
-          const index = friends.findIndex((f) => f == friendId);
+          const index = friends.findIndex((f) => f.userId == friendId);
           if (index != -1) {
             friendList = [
               ...friends.slice(0, index),
@@ -100,11 +113,11 @@ export const userRouter = createTRPCRouter({
             ];
             addedFriend = false;
           } else {
-            friendList = [...friends, friendId];
+            friendList = [...friends, { userId: friendId }];
             addedFriend = true;
           }
         }
-        return friendList;
+        return JSON.stringify(friendList);
       }
       const createFriendship = ctx.prisma.friend.upsert({
         where: {
@@ -112,7 +125,7 @@ export const userRouter = createTRPCRouter({
         },
         create: {
           userId: ctx.userId,
-          friends: [autherId],
+          friends: JSON.stringify([{ userId: autherId }]),
         },
         update: {
           friends: toggleFriend({ friends: usersfriends, friendId: autherId }),
@@ -124,7 +137,7 @@ export const userRouter = createTRPCRouter({
         },
         create: {
           userId: autherId,
-          friends: [ctx.userId],
+          friends: JSON.stringify([{ userId: ctx.userId }]),
         },
         update: {
           friends: toggleFriend({
