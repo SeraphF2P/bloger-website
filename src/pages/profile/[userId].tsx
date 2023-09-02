@@ -67,7 +67,7 @@ function AddFriend({ autherId }: { autherId: string }) {
   const addFriend = api.user.toggleFriend.useMutation({
     onSuccess: ({ addedFriend }) => {
       ctx.user.getUserProfile.setData(autherId, (oldData) => {
-        if (oldData == undefined) return oldData;
+        if (oldData == null) return;
         return {
           ...oldData,
           isFriend: addedFriend,

@@ -1,7 +1,5 @@
 import { getInfinitePosts } from "../../../utils/getInfinitePosts";
-import { filterUser } from "@/utils/data-filters";
 import { postingRateLimit } from "@/utils/ratelimit";
-import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {

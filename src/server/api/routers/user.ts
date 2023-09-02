@@ -14,7 +14,7 @@ export const userRouter = createTRPCRouter({
           userId,
         },
       });
-      const friends = friendList?.friends as string[] | null;
+      const friends = friendList?.friends as unknown as string[] | null;
       const isFriend = friends?.some((friend) => friend == userId) || false;
       return {
         ...filterUser(user),
@@ -78,7 +78,7 @@ export const userRouter = createTRPCRouter({
 
       const usersfriends = (userFriendTable?.friends || []) as string[] | [];
       const autherfriends = (autherFriendTable?.friends || []) as string[] | [];
-      let addedFriend;
+      let addedFriend = false;
       function toggleFriend({
         friends,
         friendId,
