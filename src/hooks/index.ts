@@ -1,4 +1,3 @@
-
 import useEventListener from "./useEventListener";
 
-export {  useEventListener };
+export { useEventListener };

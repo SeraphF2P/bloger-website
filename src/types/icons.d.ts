@@ -1,5 +1,4 @@
-import type  {SVGProps,SVGSVGElement} from "react";
-
+import type { SVGProps, SVGSVGElement } from "react";
 
 declare module "@/components/Icons" {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -7,4 +6,3 @@ declare module "@/components/Icons" {
     [key: SVGProps<SVGSVGElement>];
   }
 }
-

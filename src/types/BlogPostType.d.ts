@@ -1,6 +1,6 @@
-import type { filterPostsWithOutAuther } from "@/utils/data-filters";
+import type { filterPosts } from "@/utils/data-filters";
 
-type Post = ReturnType<typeof filterPostsWithOutAuther>[number];
+type Post = ReturnType<typeof filterPosts>[number];
 
 declare global {
   interface BlogPostType extends Post {

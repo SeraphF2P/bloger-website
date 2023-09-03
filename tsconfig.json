@@ -1,46 +1,47 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "~/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/ui": ["./src/components/ui/index.ts"],
-      "@/hooks": ["./src/hooks/index.ts"],
-      "@/config/*": ["./src/config/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/prisma/*": ["./prisma/client.js/*"],
-      "@/server/*": ["./src/server/*"],
-      "@/style/*": ["./src/style/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/myFormik": ["./src/lib/myFormik/index.ts"],
-      "@/authantication": ["./src/features/authantication/index.ts"]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "./src/types/**/*.d.ts"
-  ],
-  "exclude": ["node_modules"]
+	"compilerOptions": {
+		"target": "es5",
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"allowJs": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"module": "esnext",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"jsx": "preserve",
+		"incremental": true,
+		"plugins": [
+			{
+				"name": "next"
+			}
+		],
+		"paths": {
+			"~/*": ["./src/*"],
+			"@/components/*": ["./src/components/*"],
+			"@/ui": ["./src/components/ui/index.ts"],
+			"@/hooks": ["./src/hooks/index.ts"],
+			"@/config/*": ["./src/config/*"],
+			"@/lib/*": ["./src/lib/*"],
+			"@/utils/*": ["./src/utils/*"],
+			"@/prisma/*": ["./prisma/client.js/*"],
+			"@/server/*": ["./src/server/*"],
+			"@/style/*": ["./src/style/*"],
+			"@/types/*": ["./src/types/*"],
+			"@/myFormik": ["./src/lib/myFormik/index.ts"],
+			"@/authantication": ["./src/features/authantication/index.ts"]
+		}
+	},
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		".next/types/**/*.ts",
+		"./src/types/**/*.d.ts",
+		"./prettier.config.cts"
+	],
+	"exclude": ["node_modules"]
 }

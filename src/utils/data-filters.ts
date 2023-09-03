@@ -14,44 +14,40 @@ export const filterUser = (user: ClerkUser) => {
   return userInfo;
 };
 interface UnfilterPostWithOutAuther extends Post {
-  likes: Like[];
+  likes:Like[],
+ 
   _count: {
     likes: number;
     Comment: number;
   };
-}
+} 
 interface UnfilterPostWithAuther extends UnfilterPostWithOutAuther {
-  auther: AutherType;
-}
-export const filterPostsWithAuther = (
+  auther:AutherType,
+} 
+export const filterPosts = (
   posts: UnfilterPostWithAuther[],
-  userId: string | null
-) => {
-  return posts.map((post) => {
-    const isLiked = userId
-      ? post.likes.some((like) => like.autherId == userId)
-      : false;
-    return {
-      likesCount: post._count.likes,
-      commentsCount: post._count.Comment,
-      isLiked,
-      ...post,
-    };
-  });
-};
-export const filterPostsWithOutAuther = (
-  posts: UnfilterPostWithOutAuther[],
-  userId: string | null
 ) => {
   const data = posts.map((post) => {
-    const isLiked = userId
-      ? post.likes.some((like) => like.autherId == userId)
-      : false;
+  
     return {
       likesCount: post._count.likes,
       commentsCount: post._count.Comment,
-      isLiked,
-      ...post,
+      isLiked:post.likes.length > 0 ,
+      ...post
+    };
+  });
+  return data;
+};
+export const filterProfilePosts = (
+  posts: UnfilterPostWithOutAuther[],
+) => {
+  const data = posts.map((post) => {
+  
+    return {
+      likesCount: post._count.likes,
+      commentsCount: post._count.Comment,
+      isLiked:post.likes.length > 0 ,
+      ...post
     };
   });
   return data;

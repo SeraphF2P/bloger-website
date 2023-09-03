@@ -1,8 +1,10 @@
-import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { filterUser } from "@/utils/data-filters";
 import { getInfiniteProfilePosts } from "@/utils/getInfinitePosts";
+import { toggleValueByKey } from "@/utils/index";
 import { clerkClient } from "@clerk/nextjs/server";
+import type{ Friend } from "@prisma/client";
 import { z } from "zod";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
   getUserProfile: publicProcedure
@@ -17,14 +19,10 @@ export const userRouter = createTRPCRouter({
           friends: true,
         },
       });
-      const friends = JSON.parse(friendList?.friends || "") as unknown as
-        | { userId: string }[]
-        | [];
-      const isFriend = friends.some((f) => f.userId == userId) || false;
+      const friends:Friend["friends"] = friendList?.friends || "[]" ;
       return {
         ...filterUser(user),
-        friends,
-        isFriend,
+        friends :JSON.parse(friends) as {userId:string}[]|[],
       };
     }),
   getUserPosts: publicProcedure
@@ -45,7 +43,6 @@ export const userRouter = createTRPCRouter({
         ctx,
         cursor,
         limit,
-        userId,
         whereClause: { autherId: userId },
       });
     }),
@@ -81,44 +78,9 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      const usersfriends = JSON.parse(
-        userFriendTable?.friends || ""
-      ) as unknown as
-        | {
-            userId: string;
-          }[]
-        | [];
-      const autherfriends = JSON.parse(
-        autherFriendTable?.friends || ""
-      ) as unknown as
-        | {
-            userId: string;
-          }[]
-        | [];
-      let addedFriend = false;
-      function toggleFriend({
-        friends,
-        friendId,
-      }: {
-        friends: { userId: string }[] | [];
-        friendId: string;
-      }) {
-        let friendList;
-        if (friends) {
-          const index = friends.findIndex((f) => f.userId == friendId);
-          if (index != -1) {
-            friendList = [
-              ...friends.slice(0, index),
-              ...friends.slice(index + 1),
-            ];
-            addedFriend = false;
-          } else {
-            friendList = [...friends, { userId: friendId }];
-            addedFriend = true;
-          }
-        }
-        return JSON.stringify(friendList);
-      }
+      const usersfriends = JSON.parse(userFriendTable?.friends || "[]") as {userId:string}[]|[]
+      const autherfriends = JSON.parse(autherFriendTable?.friends || "[]") as {userId:string}[]|[]
+
       const createFriendship = ctx.prisma.friend.upsert({
         where: {
           userId: ctx.userId,
@@ -128,7 +90,10 @@ export const userRouter = createTRPCRouter({
           friends: JSON.stringify([{ userId: autherId }]),
         },
         update: {
-          friends: toggleFriend({ friends: usersfriends, friendId: autherId }),
+          friends: JSON.stringify(toggleValueByKey<{userId:string}>( 
+            usersfriends, 
+            "userId",
+            {userId:autherId} )),
         },
       });
       const createFriendshipBack = ctx.prisma.friend.upsert({
@@ -140,17 +105,15 @@ export const userRouter = createTRPCRouter({
           friends: JSON.stringify([{ userId: ctx.userId }]),
         },
         update: {
-          friends: toggleFriend({
-            friends: autherfriends,
-            friendId: ctx.userId,
-          }),
+          friends: JSON.stringify(toggleValueByKey<{userId:string}>(
+            autherfriends,
+            "userId",
+            {userId:ctx.userId},
+          ),)
         },
       });
       await ctx.prisma.$transaction([createFriendship, createFriendshipBack]);
       void ctx.revalidate?.(`/profile/${ctx.userId}`);
       void ctx.revalidate?.(`/profile/${autherId}`);
-      return {
-        addedFriend,
-      };
     }),
 });
