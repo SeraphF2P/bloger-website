@@ -1,7 +1,6 @@
-import { toggleValueByKey } from "../../utils";
 import { BlogPost, ScrollEndIndecator } from "@/components/index";
 import { toast } from "@/lib/myToast";
-import { Btn, Container, Icons, Loading } from "@/ui";
+import { Btn, Container, Icons, Loading, Modale, NextImage } from "@/ui";
 import { api, type RouterOutputs } from "@/utils/api";
 import { ssgHelper } from "@/utils/ssgHelper";
 import { useUser } from "@clerk/nextjs";
@@ -14,6 +13,7 @@ import Error from "next/error";
 import Head from "next/head";
 import Image from "next/image";
 import type { FC } from "react";
+import { useState } from "react";
 
 type User = RouterOutputs["user"]["getUserProfile"];
 function PostsSection({ auther }: { auther: User }) {
@@ -62,50 +62,72 @@ function PostsSection({ auther }: { auther: User }) {
 	);
 }
 function AddFriend({ autherId }: { autherId: string }) {
-	const ctx = api.useContext();
-	const { user } = useUser();
-
-	const addFriend = api.user.toggleFriend.useMutation({
-		onSuccess: () => {
-			ctx.user.getUserProfile.setData(autherId, (oldData) => {
-				if (oldData == null) return;
-				const friends = toggleValueByKey<{ userId: string }>(
-					oldData.friends,
-					"userId",
-					{
-						userId: user?.id || "",
-					}
-				);
-				console.log("friends", friends);
-				return {
-					...oldData,
-					friends,
-				};
-			});
+	const auth = useUser();
+	const [isSent, setIsSent] = useState(false);
+	const friendRequest = api.notification.create.useMutation({
+		onMutate: () => {
+			setIsSent((prev) => !prev);
 		},
 		onError: () => {
+			setIsSent((prev) => !prev);
 			toast({ message: "some thing went wrong", type: "error" });
 		},
 	});
-	if (!user || user?.id == autherId) return null;
+	if (!auth.user || auth.user?.id == autherId) return null;
 	return (
 		<Btn
-			disabled={addFriend.isLoading}
-			onClick={() => addFriend.mutate(autherId)}
-			className="      px-4 py-2 "
+			disabled={friendRequest.isLoading}
+			onClick={() =>
+				friendRequest.mutate({
+					from: auth.user.id,
+					to: autherId,
+					type: "friendrequest",
+				})
+			}
+			className="px-4 py-2 "
 		>
-			add friend
+			{isSent ? "cancel request" : "send friend request"}
 		</Btn>
 	);
 }
+// function FriendList({ friends }: { friends: AutherType[] }) {
+// 	return (
+// 		<Modale>
+// 			<Modale.Btn variant="outline" className="  px-4 py-2 ">
+// 				friends list
+// 			</Modale.Btn>
+// 			<Modale.Content className="translate-y-full p-2 [--fadein-duration:0.7s] z-50 relative bg-theme dark:bg-theme backdrop-blur-sm mn:max-w-screen-mn w-full shadow mx-4 h-full">
+// 				{friends &&
+// 					friends.map((friend) => {
+// 						return (
+// 							<div
+// 								className=" flex p-2 rounded-sm bg-slate-50/10 backdrop-blur w-full gap-2 items-center "
+// 								key={friend.id}
+// 							>
+// 								<NextImage
+// 									className=" h-20 w-20"
+// 									src={friend.profileImageUrl}
+// 									alt={friend.username}
+// 								/>
+// 								<div>
+// 									<h2>{friend.username}</h2>
+// 								</div>
+// 							</div>
+// 						);
+// 					})}
+// 			</Modale.Content>
+// 		</Modale>
+// 	);
+// }
 const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	userId,
 }) => {
-	const { user } = useUser();
+	const auth = useUser();
 	const { data: auther } = api.user.getUserProfile.useQuery(userId);
 	if (!auther) return <Error statusCode={404} withDarkMode />;
 
-	const isFriend = auther.friends.some((f) => f.userId == user?.id);
+	const isFriend = auther.friends.some((f) => f.id == auth.user?.id);
+	const isUserAuther = auth.isSignedIn && auther.id == auth.user?.id;
 	return (
 		<>
 			<Head>
@@ -128,11 +150,12 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 				<div className=" w-full p-2  text-center">
 					<h1>{auther.username}</h1>
 					<div className="  flex gap-2  justify-center w-full p-2">
-						<Btn variant="outline" className="  px-4 py-2 ">
-							friends list
-						</Btn>
-						<AddFriend autherId={auther.id} />
-						{isFriend && <p>you are friends</p>}
+						{/* <FriendList friends={auther.friends} /> */}
+						{isUserAuther ? null : isFriend ? (
+							<Btn>defriend</Btn>
+						) : (
+							<AddFriend autherId={auther.id} />
+						)}
 					</div>
 				</div>
 				<PostsSection auther={auther} />

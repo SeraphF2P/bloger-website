@@ -17,7 +17,7 @@ const Home: NextPage = () => {
 		return (
 			<Container>
 				<Loading.SkeletonPage
-					className="pt-24 flex-col  w-full items-center flex gap-4"
+					className="flex-col  w-full items-center flex gap-4"
 					count={4}
 				/>
 			</Container>

@@ -7,7 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { AnimatePresence, motion as m } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState, type FC } from "react";
+import { useLayoutEffect, useMemo, useState, type FC } from "react";
 
 const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 	const ctx = api.useContext();
@@ -31,6 +31,12 @@ const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 		}
 	);
 	const [isLiked, setIsLiked] = useState(props.isLiked);
+	const [likesCount, setLikesCount] = useState(props.likesCount);
+	useLayoutEffect(() => {
+		setIsLiked(props.isLiked);
+		setLikesCount(props.likesCount);
+	}, [props.isLiked, props.likesCount]);
+
 	return (
 		<div
 			key={props.id}
@@ -65,22 +71,21 @@ const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 			<div className="   min-h-[100px] bg-theme p-4 ">
 				<p>{props.content}</p>
 			</div>
-			<LikesSec
-				key={`${isLiked ? "liked" : "notliked"}`}
-				isLiked
-				isSignedIn
-				likesCount={props.likesCount}
-			/>
+			<LikesSec isLiked isSignedIn likesCount={likesCount} />
 			<div className="   flex items-center justify-between">
 				<LikeBtn
 					auth={auth}
 					postId={props.id}
-					setIsLiked={() => setIsLiked((prev: boolean) => !prev)}
+					autherId={auther.id}
+					setIsLiked={() => {
+						setIsLiked((prev: boolean) => !prev);
+						setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+					}}
 					isLiked={isLiked}
 				/>
 				<CommentsSec
 					postId={props.id}
-					likesCount={props.likesCount}
+					likesCount={likesCount}
 					variant="ghost"
 					className=" flex justify-center items-center gap-1 flex-grow p-2 text-lg font-semibold "
 				>
@@ -107,10 +112,13 @@ export default BlogPost;
 function LikeBtn({
 	isLiked,
 	postId,
+	autherId,
+	auth,
 	setIsLiked,
 }: {
 	isLiked: boolean;
 	postId: string;
+	autherId: string;
 	auth: ReturnType<typeof useUser>;
 	setIsLiked: () => void;
 }) {
@@ -118,6 +126,8 @@ function LikeBtn({
 	const { mutate: like } = api.post.like.useMutation({
 		onMutate: () => {
 			setIsLiked();
+		},
+		onSettled: () => {
 			const modifier = isLiked ? -1 : 1;
 			ctx.post.getAll.setData({}, (oldData) => {
 				if (oldData == null) return;
@@ -134,6 +144,23 @@ function LikeBtn({
 					}),
 				};
 			});
+			if (auth.isSignedIn && auth.user.id == autherId) {
+				ctx.user.getUserPosts.setData({ userId: autherId }, (oldData) => {
+					if (oldData == null) return;
+					return {
+						nextCursor: oldData.nextCursor,
+						posts: oldData.posts.map((post) => {
+							if (post.id != postId) return post;
+							const { likesCount, isLiked, ...rest } = post;
+							return {
+								likesCount: likesCount + modifier,
+								isLiked: !isLiked,
+								...rest,
+							};
+						}),
+					};
+				});
+			}
 		},
 		onError: (err) => {
 			setIsLiked();

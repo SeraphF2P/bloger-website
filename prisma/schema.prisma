@@ -10,15 +10,31 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
+enum NotificationType {
+  friendrequest
+  friendrequestconfirmed
+  newlike
+  newcomment
+}
+
+
+model Notification {
+id Int   @id @default(autoincrement()) 
+createdAt DateTime @default(now())
+
+from String
+to String
+onPost String?
+
+type  NotificationType  
+}
 
 model Friend {
-  id        String   @id @default(cuid())
+   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
   userId String    @unique
   friends  String  
-
-  @@unique([id, userId])
 }
 
 model Post {

@@ -1,8 +1,9 @@
 import { filterUser } from "@/utils/data-filters";
 import { getInfiniteProfilePosts } from "@/utils/getInfinitePosts";
 import { toggleValueByKey } from "@/utils/index";
+import type { User } from "@clerk/nextjs/dist/api";
 import { clerkClient } from "@clerk/nextjs/server";
-import type{ Friend } from "@prisma/client";
+import type { Friend } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 
@@ -19,10 +20,17 @@ export const userRouter = createTRPCRouter({
           friends: true,
         },
       });
-      const friends:Friend["friends"] = friendList?.friends || "[]" ;
+      const friendsJson:Friend["friends"] = friendList?.friends || "[]" ;
+      const friendsArray =JSON.parse(friendsJson) as {userId:string}[]|[]
+      let friends:User[] = [];
+      if(friendsArray != null && friendsArray.length > 0){
+         friends = await clerkClient.users.getUserList({
+        userId:friendsArray.map(f=>f.userId)
+      })
+      }
       return {
         ...filterUser(user),
-        friends :JSON.parse(friends) as {userId:string}[]|[],
+        friends:friends.map(f=>filterUser(f)), 
       };
     }),
   getUserPosts: publicProcedure
@@ -58,6 +66,7 @@ export const userRouter = createTRPCRouter({
     });
     return drafts || [];
   }),
+
   toggleFriend: privateProcedure
     .input(z.string().min(1))
     .mutation(async ({ ctx, input: autherId }) => {
@@ -112,7 +121,7 @@ export const userRouter = createTRPCRouter({
           ),)
         },
       });
-      await ctx.prisma.$transaction([createFriendship, createFriendshipBack]);
+      await ctx.prisma.$transaction([createFriendship,createFriendshipBack])
       void ctx.revalidate?.(`/profile/${ctx.userId}`);
       void ctx.revalidate?.(`/profile/${autherId}`);
     }),
