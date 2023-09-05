@@ -10,16 +10,26 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 export const userRouter = createTRPCRouter({
   getUserProfile: publicProcedure
     .input(z.string())
-    .query(async ({ ctx, input: userId }) => {
-      const user = await clerkClient.users.getUser(userId);
+    .query(async ({ ctx, input: autherId }) => {
+      const user = await clerkClient.users.getUser(autherId);
       const friendList = await ctx.prisma.friend.findUnique({
         where: {
-          userId,
+          userId:autherId
         },
         select: {
           friends: true,
         },
       });
+      let friendRequestNotification
+      if(ctx.userId){
+          friendRequestNotification = await ctx.prisma.notification.findFirst({
+          where:{
+            from:autherId,
+            to:ctx.userId,
+            type:"friendrequest"
+          }
+        })
+      }
       const friendsJson:Friend["friends"] = friendList?.friends || "[]" ;
       const friendsArray =JSON.parse(friendsJson) as {userId:string}[]|[]
       let friends:User[] = [];
@@ -31,6 +41,7 @@ export const userRouter = createTRPCRouter({
       return {
         ...filterUser(user),
         friends:friends.map(f=>filterUser(f)), 
+        friendRequestNotification:friendRequestNotification
       };
     }),
   getUserPosts: publicProcedure
@@ -67,7 +78,7 @@ export const userRouter = createTRPCRouter({
     return drafts || [];
   }),
 
-  toggleFriend: privateProcedure
+  ConfirmFriendRequest: privateProcedure
     .input(z.string().min(1))
     .mutation(async ({ ctx, input: autherId }) => {
       const userFriendTable = await ctx.prisma.friend.findUnique({
@@ -121,7 +132,16 @@ export const userRouter = createTRPCRouter({
           ),)
         },
       });
-      await ctx.prisma.$transaction([createFriendship,createFriendshipBack])
+      const notify = ctx.prisma.notification.create({
+        data:{
+          from:ctx.userId,
+          to:autherId,
+          type:"friendrequestconfirmed",
+        }
+      })
+      
+      await ctx.prisma.$transaction([createFriendship,createFriendshipBack,notify])
+
       void ctx.revalidate?.(`/profile/${ctx.userId}`);
       void ctx.revalidate?.(`/profile/${autherId}`);
     }),

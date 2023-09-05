@@ -1,14 +1,17 @@
-import { toast } from "@/lib/myToast";
-import { Btn, Container, NextImage } from "@/ui";
-import { type RouterOutputs, api } from "@/utils/api";
-import { toggleValueByKey } from "@/utils/index";
-import { useUser } from "@clerk/nextjs";
+import { Container, Icons, NextImage } from "@/ui";
+import { api, type RouterOutputs } from "@/utils/api";
 import type { NotificationType } from "@prisma/client";
 import { type NextPage } from "next";
-import { useState } from "react";
+import Link from "next/link";
 
 const Notification: NextPage = () => {
-	const { data: notification, isLoading } = api.notification.get.useQuery();
+	const ctx = api.useContext();
+	const { data: notification } = api.notification.get.useQuery(undefined, {
+		onSuccess: () => {
+			void ctx.notification.count.setData(undefined, 0);
+		},
+	});
+
 	return (
 		<Container className="gap-1">
 			{notification?.map((note) => (
@@ -32,43 +35,32 @@ const Message = ({
 	};
 	return <>{con[type]}</>;
 };
-function AddFriend({ autherId }: { autherId: string }) {
-	const auth = useUser();
-	const [isConfirmed, setIsConfirmed] = useState(false);
-	const friendRequest = api.user.toggleFriend.useMutation({
-		onMutate: () => {
-			setIsConfirmed((prev) => !prev);
-		},
-		onError: () => {
-			setIsConfirmed((prev) => !prev);
-			toast({ message: "some thing went wrong", type: "error" });
-		},
-	});
-	if (!auth.user || auth.user?.id == autherId) return null;
-	return (
-		<Btn
-			disabled={friendRequest.isLoading}
-			onClick={() => friendRequest.mutate(autherId)}
-			className="px-4 py-2 "
-		>
-			{isConfirmed ? "accepted" : "confirm"}
-		</Btn>
-	);
-}
+
 const Alert = ({
-	notifyFrom,
 	type,
+	notifyFrom,
 }: RouterOutputs["notification"]["get"][number]) => {
 	return (
-		<div className=" flex items-center p-2 shadow shadow-dynamic w-full h-24">
-			<NextImage
-				className=" w-20 h-20"
-				src={notifyFrom.profileImageUrl}
-				alt={notifyFrom.username}
-			/>
+		<div className="cursor-default  flex items-center p-2 border-revert-theme/70 border w-full h-24">
+			<div className=" relative">
+				<NextImage
+					className=" w-20 h-20"
+					src={notifyFrom.profileImageUrl}
+					alt={notifyFrom.username}
+				/>
+				<Link
+					className=" absolute inset-0"
+					href={"/profile/" + notifyFrom.id}
+				/>
+			</div>
 			<div className=" flex-1  flex p-2    h-full">
 				<Message userName={notifyFrom.username} type={type} />
-				{type == "friendrequest" && <AddFriend autherId={notifyFrom.id} />}
+			</div>
+			<div className="  rounded-sm flex justify-center items-center p-2">
+				<Icons.NotificationIcons
+					className=" fill-primary w-12 h-12"
+					type={type}
+				/>
 			</div>
 		</div>
 	);

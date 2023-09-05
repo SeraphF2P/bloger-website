@@ -85,13 +85,17 @@ export const postRouter = createTRPCRouter({
       });
     }),
   like: privateProcedure
-    .input(z.string().min(1))
-    .mutation(async ({ ctx, input }) => {
+    .input(z.object({
+      autherId:z.string(),
+      postId:z.string()
+    }))
+    .mutation(async ({ ctx, input:{autherId,postId} }) => {
+      
       const isLiked = await ctx.prisma.like.findUnique({
         where: {
           postId_autherId: {
             autherId: ctx.userId,
-            postId: input,
+            postId,
           },
         },
       });
@@ -100,7 +104,7 @@ export const postRouter = createTRPCRouter({
           where: {
             postId_autherId: {
               autherId: ctx.userId,
-              postId: input,
+              postId,
             },
           },
         });
@@ -108,9 +112,18 @@ export const postRouter = createTRPCRouter({
         await ctx.prisma.like.create({
           data: {
             autherId: ctx.userId,
-            postId: input,
+            postId,
           },
         });
-      }
+     if(autherId != ctx.userId) {
+        await ctx.prisma.notification.create({
+          data:{
+            from:ctx.userId,
+            to:autherId,
+            onPost:postId,
+            type:"newlike"
+          }
+        })
+      }}
     }),
 });

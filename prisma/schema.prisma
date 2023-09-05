@@ -19,14 +19,17 @@ enum NotificationType {
 
 
 model Notification {
-id Int   @id @default(autoincrement()) 
+id String   @id @default(uuid()) 
 createdAt DateTime @default(now())
 
 from String
 to String
 onPost String?
 
+seen Boolean @default(false)
 type  NotificationType  
+
+
 }
 
 model Friend {
@@ -34,7 +37,7 @@ model Friend {
   createdAt DateTime @default(now())
 
   userId String    @unique
-  friends  String  
+  friends  String  // ? json [{userId:string}]
 }
 
 model Post {

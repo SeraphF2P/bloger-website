@@ -61,6 +61,7 @@ export const commentRouter = createTRPCRouter({
   createComment: privateProcedure
     .input(
       z.object({
+         autherId:z.string(),
         postId: z.string().min(1),
         content: z
           .string()
@@ -68,16 +69,31 @@ export const commentRouter = createTRPCRouter({
           .max(500, "content cannot exceed 500 characters"),
       })
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input:{autherId,content,postId} }) => {
       const { success } = await postingRateLimit.limit(ctx.userId);
       if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
 
       await ctx.prisma.comment.create({
         data: {
           autherId: ctx.userId,
-          postId: input.postId,
-          content: input.content,
+          postId,
+          content,
         },
       });
+      
+
+if(autherId != ctx.userId) {
+        await ctx.prisma.notification.create({
+          data:{
+            from:ctx.userId,
+            to:autherId,
+            onPost:postId,
+            type:"newcomment"
+          }
+        })
+      }
+
+
+
     }),
 });

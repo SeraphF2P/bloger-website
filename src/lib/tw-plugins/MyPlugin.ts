@@ -69,6 +69,8 @@ export const MyPlugin = plugin(
           "revert-theme": "rgb(var(--revert-theme),<alpha-value>)",
           primary: "rgb(var(--primary),<alpha-value>)",
           variant: "rgb(var(--variant,0,0,0),<alpha-value>)",
+          alert: "rgb(var(--alert),<alpha-value>)",
+          success: "rgb(var(--success),<alpha-value>)",
         },
 
         boxShadow: {

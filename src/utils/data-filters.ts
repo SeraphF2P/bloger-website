@@ -28,11 +28,24 @@ export const filterPosts = (
   posts: UnfilterPostWithAuther[],
 ) => {
   const data = posts.map((post) => {
-  
+    const likesCount=post._count.likes
+    const isLiked=post.likes.length > 0
+  let likeSectionCaption 
+		if (likesCount > 0) {
+			if (isLiked && likesCount == 1) {
+          likeSectionCaption= "you"
+        }else if(isLiked && likesCount > 1){
+          likeSectionCaption= `you and ${likesCount - 1} other liked this post`
+        }else {
+				likeSectionCaption= `${likesCount} people have liked this post`;
+			}
+		}
+	
     return {
-      likesCount: post._count.likes,
+      likesCount,
       commentsCount: post._count.Comment,
-      isLiked:post.likes.length > 0 ,
+      isLiked ,
+      likeSectionCaption,
       ...post
     };
   });
@@ -42,11 +55,23 @@ export const filterProfilePosts = (
   posts: UnfilterPostWithOutAuther[],
 ) => {
   const data = posts.map((post) => {
-  
+   const likesCount=post._count.likes
+    const isLiked=post.likes.length > 0
+  let likeSectionCaption 
+		if (likesCount > 0) {
+			if (isLiked && likesCount == 1) {
+          likeSectionCaption= "you"
+        }else if(isLiked && likesCount > 1){
+          likeSectionCaption= `you and ${likesCount - 1} other liked this post`
+        }else {
+				likeSectionCaption= `${likesCount} people have liked this post`;
+			}
+		}
     return {
-      likesCount: post._count.likes,
+      likesCount,
       commentsCount: post._count.Comment,
-      isLiked:post.likes.length > 0 ,
+      isLiked,
+      likeSectionCaption,
       ...post
     };
   });

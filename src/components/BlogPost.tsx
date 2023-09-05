@@ -7,7 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { AnimatePresence, motion as m } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useLayoutEffect, useMemo, useState, type FC } from "react";
+import { useLayoutEffect, useState, type FC } from "react";
 
 const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 	const ctx = api.useContext();
@@ -71,7 +71,7 @@ const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 			<div className="   min-h-[100px] bg-theme p-4 ">
 				<p>{props.content}</p>
 			</div>
-			<LikesSec isLiked isSignedIn likesCount={likesCount} />
+			<LikesSec likeSectionCaption={props.likeSectionCaption} />
 			<div className="   flex items-center justify-between">
 				<LikeBtn
 					auth={auth}
@@ -85,6 +85,7 @@ const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 				/>
 				<CommentsSec
 					postId={props.id}
+					autherId={props.autherId}
 					likesCount={likesCount}
 					variant="ghost"
 					className=" flex justify-center items-center gap-1 flex-grow p-2 text-lg font-semibold "
@@ -175,7 +176,7 @@ function LikeBtn({
 	return (
 		<Btn
 			onClick={() => {
-				like(postId);
+				like({ postId, autherId });
 			}}
 			className=" flex justify-center items-center  flex-grow  p-2 text-lg font-semibold "
 			variant="ghost"
@@ -227,24 +228,14 @@ function LikeBtn({
 	);
 }
 type LikeSecPropsType = {
-	likesCount: number;
-	isSignedIn: boolean;
-	isLiked: boolean;
+	likeSectionCaption?: string;
 };
-function LikesSec({ likesCount, isSignedIn, isLiked }: LikeSecPropsType) {
-	const validateLikes = useMemo(() => {
-		if (likesCount > 0) {
-			if (isSignedIn && isLiked) {
-				if (likesCount == 1) return "you";
-				return `you and ${likesCount - 1} other liked this post`;
-			} else {
-				return `${likesCount} people have liked this post`;
-			}
-		}
-	}, [isLiked, isSignedIn, likesCount]);
+function LikesSec({ likeSectionCaption }: LikeSecPropsType) {
 	return (
 		<div className=" relative h-6 text-sm text-revert-theme">
-			<span className="  px-2">{validateLikes}</span>
+			{likeSectionCaption && (
+				<span className="  px-2">{likeSectionCaption}</span>
+			)}
 			<hr className=" border-revert-theme/20 absolute top-full  left-4 right-4 " />
 		</div>
 	);
