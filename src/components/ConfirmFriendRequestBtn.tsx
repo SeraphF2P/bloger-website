@@ -3,19 +3,17 @@ import { Btn } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 
-function ConfirmFriendRequestBtn({
-	autherId,
-	NotificationId,
-}: {
-	autherId: string;
-	NotificationId: string;
-}) {
+function ConfirmFriendRequestBtn({ autherId }: { autherId: string }) {
 	const auth = useUser();
 	const notify = api.notification.delete.useMutation();
-
 	const ConfirmFriendRequest = api.user.ConfirmFriendRequest.useMutation({
 		onSuccess: () => {
-			notify.mutate({ id: NotificationId });
+			notify.mutate({
+				id: `${autherId}-${auth.user?.id || ""}`,
+				from: autherId,
+				to: auth.user?.id || "",
+				type: "friendrequest",
+			});
 		},
 		onError: () => {
 			toast({ message: "some thing went wrong", type: "error" });

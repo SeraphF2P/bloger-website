@@ -11,21 +11,21 @@ import { NotSignedIn } from "@/components/index";
 import { api } from "~/utils/api";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  return (
-    <ErrorBoundary>
-      <ClerkProvider {...pageProps}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Toaster position="bottom-center" />
-          <Navbar />
-          <AnimatePresence>
-            <Component {...pageProps} />
-          </AnimatePresence>
-          <Analytics />
-          <NotSignedIn />
-        </ThemeProvider>
-      </ClerkProvider>
-    </ErrorBoundary>
-  );
+	return (
+		<ErrorBoundary>
+			<ClerkProvider {...pageProps}>
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+					<Toaster position="bottom-center" />
+					<Navbar />
+					<AnimatePresence>
+						<Component {...pageProps} />
+					</AnimatePresence>
+					<Analytics />
+					<NotSignedIn />
+				</ThemeProvider>
+			</ClerkProvider>
+		</ErrorBoundary>
+	);
 };
 
 export default api.withTRPC(MyApp);

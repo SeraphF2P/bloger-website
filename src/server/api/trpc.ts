@@ -25,9 +25,11 @@ import type { DefaultArgs } from "@prisma/client/runtime/library";
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import type { Redis } from "@upstash/redis/types/pkg/redis";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { prisma } from "~/server/db";
+import { redis } from "../redis";
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -38,6 +40,7 @@ import { prisma } from "~/server/db";
 export type createTRPCContextType = {
   prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
   userId: string | null;
+  redis: Redis,
   revalidate?:
     | ((
         urlPath: string,
@@ -58,6 +61,7 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
   return {
     prisma,
     userId,
+    redis,
     revalidateSSG: res.revalidate,
   };
 };

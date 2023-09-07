@@ -1,9 +1,10 @@
-import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { filterUser } from "@/utils/data-filters";
 import { postingRateLimit } from "@/utils/ratelimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import createNotification from "../../../utils/createNotification";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 
 export const commentRouter = createTRPCRouter({
   getComments: publicProcedure
@@ -82,18 +83,15 @@ export const commentRouter = createTRPCRouter({
       });
       
 
-if(autherId != ctx.userId) {
-        await ctx.prisma.notification.create({
-          data:{
-            from:ctx.userId,
-            to:autherId,
-            onPost:postId,
-            type:"newcomment"
-          }
+      if(autherId != ctx.userId) {
+        const notification  =createNotification({
+          from:ctx.userId,to:autherId,type:"newcomment",onPost:postId
         })
+        const resault =await Promise.allSettled([
+          ctx.redis.rpush(`notifications:${autherId}`,notification.id),
+          ctx.redis.json.set(`notifications:${notification.id}`,`$`,notification)
+        ])
+        console.log('resault', resault)
       }
-
-
-
-    }),
+   }),
 });

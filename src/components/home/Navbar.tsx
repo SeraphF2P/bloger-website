@@ -34,9 +34,7 @@ const ListLink = ({ children, href }: ListLink) => {
 const Navbar = () => {
 	const { user } = useUser();
 	const { asPath } = useRouter();
-	const notificationCount = api.notification.count.useQuery(undefined, {
-		staleTime: 1000,
-	});
+	const notificationCount = api.notification.count.useQuery();
 	const isThereNewNotification =
 		notificationCount.data != 0 && asPath != "/notification";
 

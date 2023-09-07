@@ -12,6 +12,12 @@ export const userRouter = createTRPCRouter({
     .input(z.string())
     .query(async ({ ctx, input: autherId }) => {
       const user = await clerkClient.users.getUser(autherId);
+      if(ctx.userId == null) return {
+        ...filterUser(user),
+        friends:[], 
+        hasAfriendRequest:false
+      };
+
       const friendList = await ctx.prisma.friend.findUnique({
         where: {
           userId:autherId
@@ -20,17 +26,12 @@ export const userRouter = createTRPCRouter({
           friends: true,
         },
       });
-      let friendRequestNotification
-      if(ctx.userId){
-          friendRequestNotification = await ctx.prisma.notification.findFirst({
-          where:{
-            from:autherId,
-            to:ctx.userId,
-            type:"friendrequest"
-          }
-        })
-      }
+
+      
+      const hasAfriendRequest = await ctx.redis.hgetall(`notifications:${autherId}:${ctx.userId || ""}:friendrequest:${autherId}-${ctx.userId || ""}`,)
+    
       const friendsJson:Friend["friends"] = friendList?.friends || "[]" ;
+
       const friendsArray =JSON.parse(friendsJson) as {userId:string}[]|[]
       let friends:User[] = [];
       if(friendsArray != null && friendsArray.length > 0){
@@ -41,7 +42,7 @@ export const userRouter = createTRPCRouter({
       return {
         ...filterUser(user),
         friends:friends.map(f=>filterUser(f)), 
-        friendRequestNotification:friendRequestNotification
+        hasAfriendRequest:!!hasAfriendRequest
       };
     }),
   getUserPosts: publicProcedure
@@ -145,4 +146,21 @@ export const userRouter = createTRPCRouter({
       void ctx.revalidate?.(`/profile/${ctx.userId}`);
       void ctx.revalidate?.(`/profile/${autherId}`);
     }),
-});
+  getFriends: privateProcedure
+    .query(async ({ ctx }) => {
+      const userFriendTable = (await ctx.prisma.friend.findUnique({
+        where: {
+          userId: ctx.userId,
+        },
+        select: {
+          friends: true,
+        },
+      })) 
+      const friends = JSON.parse(userFriendTable?.friends || "[]") as {userId:string}[] |[]
+
+      const friendsProfile = await clerkClient.users.getUserList({
+        userId:friends.map(user=>user.userId)
+      })
+      return friendsProfile.map(user=>filterUser(user))
+})
+})

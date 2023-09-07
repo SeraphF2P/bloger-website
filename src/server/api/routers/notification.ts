@@ -1,81 +1,83 @@
+import { noteTypeValidator } from "@/lib/zod-validetors";
 import { clerkClient } from "@clerk/nextjs/server";
-import { NotificationType, Prisma } from "@prisma/client";
 import { z } from "zod";
+import createNotification from "../../../utils/createNotification";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 
+
 export const notificationRouter = createTRPCRouter({
-  createOrDelete: privateProcedure
+   create: privateProcedure
     .input(z.object({
-      type:z.nativeEnum(NotificationType),
+      id:z.string().optional(),
       from:z.string(),
-      to:z.string()
+      to:z.string(),
+      type:noteTypeValidator,
     }))
     .mutation(async ({ ctx, input }) => {
-      const note =await ctx.prisma.notification.findFirst({
-        where:input
-      })
-      if(note){
-        await ctx.prisma.notification.delete({
-         where:{
-           id:note.id
-         }
-       })
-      }else{
-        await ctx.prisma.notification.create({
-            data:input
-          })
-      }
-      
+      const {id,...notify}   =createNotification(input)
+      const activeId = input.id ?? id
+      const status = await Promise.allSettled(
+         [
+          ctx.redis.rpush(`notifications:${input.from}:${input.to}:${input.type}`,activeId),
+          ctx.redis.hset(`notifications:${input.from}:${input.to}:${input.type}:${activeId}`, notify),
+        ]
+      )
+     return {...status}
     }),
   delete: privateProcedure
     .input(z.object({
       id:z.string(),
+      from:z.string(),
+      to:z.string(),
+      type:noteTypeValidator,
     }))
     .mutation(async ({ ctx, input }) => {
-        await ctx.prisma.notification.delete({
-         where:{
-           id:input.id
-         }
-       })
+    return await Promise.all([
+      ctx.redis.srem(`notification:${ctx.userId}:${input.type}:${input.id}`,input.id),
+      ctx.redis.hdel(`notification:${ctx.userId}:${input.type}:${input.id}`)
+    ])  
     }),
   update: privateProcedure
     .input(z.object({
       id:z.string(),
-      seen:z.boolean(),
+      to:z.string(),
+      type:noteTypeValidator,
+      data:z.object({
+       seen:z.boolean().optional(),
+       confirmed:z.boolean().optional(),
+     })
     }))
-    .mutation(async({ ctx, input }) => {
-      await ctx.prisma.notification.update({
-        where:{
-          id:input.id,
-        },
-        data:{
-         seen:input.seen
-        }
-      })
+    .mutation(async({ ctx, input:{id,to,type,data} }) => {
+      await ctx.redis.hmset(`notifications:${to}:${type}:${id}`,data)
     }),
   get: privateProcedure
     .query(async ({ ctx }) => {
-     const notification = await ctx.prisma.notification.findMany({
-      where:{
-          to:ctx.userId
-        },
-      orderBy:{
-       createdAt:"desc"
-      }
-      })
-      const notifiesFrom =await clerkClient.users.getUserList({userId:notification.map(note=>note.from)})
-      await ctx.prisma.notification.updateMany({
-        where:{
-        id:{
-         in:notification.map(note=>note.id)
-        },
-          seen:false,
-          to:ctx.userId,
-        },
-        data:{
-          seen:true
-        }
-      })
+      
+const noteIdList = await ctx.redis.lrange(`notifications:${ctx.userId}`,0,-1)
+
+     const notification= await Promise.all(
+      noteIdList.map( (id)=>{
+       return  ctx.redis.hgetall(`notifications:${ctx.userId}:${id}`)  as unknown as NotificationType
+      }),
+      
+    )
+    
+    
+   
+    if(notification == null) return [];
+
+     const userIds =notification.map(note=> note.from)
+
+     
+     const notifiesFrom =await clerkClient.users.getUserList({userId:userIds})
+
+  
+await Promise.all(
+  noteIdList.map(
+   async (id)=>{
+      await ctx.redis.hmset(`notifications:${ctx.userId}:${id}`,{"seen":true}) 
+    }))
+     
       return notification.map(note=>{
         const notifyFrom = notifiesFrom.find(user=>user.id == note.from)
         if(notifyFrom == null)throw new Error("some thing went wrong");
@@ -90,12 +92,15 @@ export const notificationRouter = createTRPCRouter({
       })
     }),
     count:privateProcedure.query(async({ctx})=>{
-return await ctx.prisma.notification.count({
-  where:{
-    to:ctx.userId,
-    seen:false
-  }
-})
+     const ids = await ctx.redis.lrange(`notifications:${ctx.userId}`,0,-1);
 
-    })
+     const notification= await Promise.all(
+      ids.map( (id)=>{
+       return  ctx.redis.hmget(`notifications:${ctx.userId}:${id}`,"seen")  as unknown as {seen:boolean}
+      })
+     )
+     const count =notification.filter(note=>note.seen == false).length
+     return count
+    }),
+   
 });

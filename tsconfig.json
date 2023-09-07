@@ -40,7 +40,7 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"./src/types/**/*.d.ts",
+		// "./src/types/**/*.d.ts",
 		"./prettier.config.cts"
 	],
 	"exclude": ["node_modules"]

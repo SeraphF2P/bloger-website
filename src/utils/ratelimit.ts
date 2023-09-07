@@ -1,8 +1,8 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { redis } from "../server/redis";
 
 export const postingRateLimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(1, "1 m"),
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(3, "1 m"),
   analytics: true,
 });

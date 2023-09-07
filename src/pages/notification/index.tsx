@@ -1,6 +1,5 @@
 import { Container, Icons, NextImage } from "@/ui";
 import { api, type RouterOutputs } from "@/utils/api";
-import type { NotificationType } from "@prisma/client";
 import { type NextPage } from "next";
 import Link from "next/link";
 
@@ -20,13 +19,7 @@ const Notification: NextPage = () => {
 		</Container>
 	);
 };
-const Message = ({
-	userName,
-	type,
-}: {
-	userName: string;
-	type: NotificationType;
-}) => {
+const Message = ({ userName, type }: { userName: string; type: NoteType }) => {
 	const con = {
 		friendrequest: `${userName} has send you a friend request`,
 		friendrequestconfirmed: `${userName} accepted your friend request`,

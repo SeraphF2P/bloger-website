@@ -66,35 +66,6 @@ function PostsSection({ auther }: { auther: User }) {
 	);
 }
 
-// function FriendList({ friends }: { friends: AutherType[] }) {
-// 	return (
-// 		<Modale>
-// 			<Modale.Btn variant="outline" className="  px-4 py-2 ">
-// 				friends list
-// 			</Modale.Btn>
-// 			<Modale.Content className="translate-y-full p-2 [--fadein-duration:0.7s] z-50 relative bg-theme dark:bg-theme backdrop-blur-sm mn:max-w-screen-mn w-full shadow mx-4 h-full">
-// 				{friends &&
-// 					friends.map((friend) => {
-// 						return (
-// 							<div
-// 								className=" flex p-2 rounded-sm bg-slate-50/10 backdrop-blur w-full gap-2 items-center "
-// 								key={friend.id}
-// 							>
-// 								<NextImage
-// 									className=" h-20 w-20"
-// 									src={friend.profileImageUrl}
-// 									alt={friend.username}
-// 								/>
-// 								<div>
-// 									<h2>{friend.username}</h2>
-// 								</div>
-// 							</div>
-// 						);
-// 					})}
-// 			</Modale.Content>
-// 		</Modale>
-// 	);
-// }
 const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	userId,
 }) => {
@@ -102,9 +73,10 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	const { data: auther } = api.user.getUserProfile.useQuery(userId);
 	if (!auther) return <Error statusCode={404} withDarkMode />;
 
-	const isFriend = auther.friends.some((f) => f.id == auth.user?.id);
+	const isFriend = auther.friends.some(
+		(f: { id: string }) => f.id == auth.user?.id
+	);
 	const isUserAuther = auth.isSignedIn && auther.id == auth.user?.id;
-
 	return (
 		<>
 			<Head>
@@ -129,11 +101,8 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 					<div className="  flex gap-2  justify-center w-full p-2">
 						{isUserAuther ? null : isFriend ? (
 							"friends"
-						) : !!auther.friendRequestNotification ? (
-							<ConfirmFriendRequestBtn
-								NotificationId={auther.friendRequestNotification.id}
-								autherId={auther.id}
-							/>
+						) : auther.hasAfriendRequest ? (
+							<ConfirmFriendRequestBtn autherId={auther.id} />
 						) : (
 							<AddFriend isFriend={isFriend} autherId={auther.id} />
 						)}

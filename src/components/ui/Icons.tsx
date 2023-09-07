@@ -13,12 +13,11 @@ import {
 	PaperAirplaneIcon,
 	PencilSquareIcon,
 	ServerIcon,
-	Square2StackIcon,
 	SunIcon,
+	UserGroupIcon,
 	UserIcon,
 	UsersIcon,
 	XCircleIcon,
-	UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import type { ReactNode, SVGProps } from "react";
 

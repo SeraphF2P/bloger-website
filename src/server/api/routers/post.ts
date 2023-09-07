@@ -1,7 +1,8 @@
-import { getInfinitePosts } from "../../../utils/getInfinitePosts";
+import { getInfinitePosts } from "@/utils/getInfinitePosts";
 import { postingRateLimit } from "@/utils/ratelimit";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { nanoid } from 'nanoid'
 import {
   createTRPCRouter,
   privateProcedure,
@@ -115,15 +116,23 @@ export const postRouter = createTRPCRouter({
             postId,
           },
         });
-     if(autherId != ctx.userId) {
-        await ctx.prisma.notification.create({
-          data:{
-            from:ctx.userId,
-            to:autherId,
-            onPost:postId,
-            type:"newlike"
-          }
-        })
-      }}
-    }),
+      }
+     if(autherId != ctx.userId && !isLiked) {
+      const id = nanoid();
+      const notification  ={
+         id,
+         createdAt: new Date(),
+         from:ctx.userId,
+         to:autherId,
+         onPost:postId,
+         seen:false,
+         type:"newlike"
+      } satisfies NotificationType
+     await Promise.allSettled([
+        ctx.redis.rpush(`notifications:${autherId}`,id),
+        ctx.redis.hset(`notifications:${autherId}:${id}`,notification)
+      ])
+    }
+  }
+    ),
 });
