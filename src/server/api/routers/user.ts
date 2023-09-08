@@ -28,7 +28,7 @@ export const userRouter = createTRPCRouter({
       });
 
       
-      const hasAfriendRequest = await ctx.redis.hgetall(`notifications:${autherId}:${ctx.userId || ""}:friendrequest:${autherId}-${ctx.userId || ""}`,)
+      const hasAfriendRequest = await ctx.redis.note.findMany({to:ctx.userId,type:"friendrequest"})
     
       const friendsJson:Friend["friends"] = friendList?.friends || "[]" ;
 
@@ -42,7 +42,7 @@ export const userRouter = createTRPCRouter({
       return {
         ...filterUser(user),
         friends:friends.map(f=>filterUser(f)), 
-        hasAfriendRequest:!!hasAfriendRequest
+        hasAfriendRequest:hasAfriendRequest.length > 0
       };
     }),
   getUserPosts: publicProcedure

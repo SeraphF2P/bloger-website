@@ -5,14 +5,13 @@ import { useUser } from "@clerk/nextjs";
 
 function ConfirmFriendRequestBtn({ autherId }: { autherId: string }) {
 	const auth = useUser();
-	const notify = api.notification.delete.useMutation();
+	const notify = api.notification.create.useMutation();
 	const ConfirmFriendRequest = api.user.ConfirmFriendRequest.useMutation({
 		onSuccess: () => {
 			notify.mutate({
-				id: `${autherId}-${auth.user?.id || ""}`,
-				from: autherId,
-				to: auth.user?.id || "",
-				type: "friendrequest",
+				to: autherId,
+				from: auth.user?.id || "",
+				type: "friendrequestconfirmed",
 			});
 		},
 		onError: () => {

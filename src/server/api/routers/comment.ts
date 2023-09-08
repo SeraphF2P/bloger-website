@@ -3,7 +3,6 @@ import { postingRateLimit } from "@/utils/ratelimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import createNotification from "../../../utils/createNotification";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 
 export const commentRouter = createTRPCRouter({
@@ -84,14 +83,13 @@ export const commentRouter = createTRPCRouter({
       
 
       if(autherId != ctx.userId) {
-        const notification  =createNotification({
-          from:ctx.userId,to:autherId,type:"newcomment",onPost:postId
-        })
-        const resault =await Promise.allSettled([
-          ctx.redis.rpush(`notifications:${autherId}`,notification.id),
-          ctx.redis.json.set(`notifications:${notification.id}`,`$`,notification)
-        ])
-        console.log('resault', resault)
+       
+       await ctx.redis.note.create({
+        from: ctx.userId,
+        to:autherId,
+        type:"newcomment",
+        onPost:postId
+       })
       }
    }),
 });

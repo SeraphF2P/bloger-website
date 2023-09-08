@@ -114,7 +114,6 @@ function LikeBtn({
 	isLiked,
 	postId,
 	autherId,
-	auth,
 	setIsLiked,
 }: {
 	isLiked: boolean;
@@ -123,53 +122,13 @@ function LikeBtn({
 	auth: ReturnType<typeof useUser>;
 	setIsLiked: () => void;
 }) {
-	const ctx = api.useContext();
 	const { mutate: like } = api.post.like.useMutation({
 		onMutate: () => {
 			setIsLiked();
 		},
-		onSettled: () => {
-			const modifier = isLiked ? -1 : 1;
-			ctx.post.getAll.setData({}, (oldData) => {
-				if (oldData == null) return;
-				return {
-					nextCursor: oldData.nextCursor,
-					posts: oldData.posts.map((post) => {
-						if (post.id != postId) return post;
-						const { likesCount, isLiked, ...rest } = post;
-						return {
-							likesCount: likesCount + modifier,
-							isLiked: !isLiked,
-							...rest,
-						};
-					}),
-				};
-			});
-			if (auth.isSignedIn && auth.user.id == autherId) {
-				ctx.user.getUserPosts.setData({ userId: autherId }, (oldData) => {
-					if (oldData == null) return;
-					return {
-						nextCursor: oldData.nextCursor,
-						posts: oldData.posts.map((post) => {
-							if (post.id != postId) return post;
-							const { likesCount, isLiked, ...rest } = post;
-							return {
-								likesCount: likesCount + modifier,
-								isLiked: !isLiked,
-								...rest,
-							};
-						}),
-					};
-				});
-			}
-		},
 		onError: (err) => {
 			setIsLiked();
-			console.log("err", err);
-			toast({
-				type: "error",
-				message: err.message,
-			});
+			toast({ message: err.message });
 		},
 	});
 

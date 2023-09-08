@@ -39,7 +39,6 @@ function AddFriend({ autherId }: { autherId: string; isFriend: boolean }) {
 					});
 				} else {
 					friendRequest.mutate({
-						id: `${auth.user.id}-${autherId}`,
 						from: auth.user.id,
 						to: autherId,
 						type: "friendrequest",

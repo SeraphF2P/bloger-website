@@ -32,34 +32,34 @@ const index: NextPage = ({}) => {
 	);
 };
 
-function FriendList({ friends }: { friends: AutherType[] }) {
-	return (
-		<Modale>
-			<Modale.Btn variant="outline" className="  px-4 py-2 ">
-				friends list
-			</Modale.Btn>
-			<Modale.Content className="translate-y-full p-2 [--fadein-duration:0.7s] z-50 relative bg-theme dark:bg-theme backdrop-blur-sm mn:max-w-screen-mn w-full shadow mx-4 h-full">
-				{friends &&
-					friends.map((friend) => {
-						return (
-							<div
-								className=" flex p-2 rounded-sm bg-slate-50/10 backdrop-blur w-full gap-2 items-center "
-								key={friend.id}
-							>
-								<NextImage
-									className=" h-20 w-20"
-									src={friend.profileImageUrl}
-									alt={friend.username}
-								/>
-								<div>
-									<h2>{friend.username}</h2>
-								</div>
-							</div>
-						);
-					})}
-			</Modale.Content>
-		</Modale>
-	);
-}
+// function FriendList({ friends }: { friends: AutherType[] }) {
+// 	return (
+// 		<Modale>
+// 			<Modale.Btn variant="outline" className="  px-4 py-2 ">
+// 				friends list
+// 			</Modale.Btn>
+// 			<Modale.Content className="translate-y-full p-2 [--fadein-duration:0.7s] z-50 relative bg-theme dark:bg-theme backdrop-blur-sm mn:max-w-screen-mn w-full shadow mx-4 h-full">
+// 				{friends &&
+// 					friends.map((friend) => {
+// 						return (
+// 							<div
+// 								className=" flex p-2 rounded-sm bg-slate-50/10 backdrop-blur w-full gap-2 items-center "
+// 								key={friend.id}
+// 							>
+// 								<NextImage
+// 									className=" h-20 w-20"
+// 									src={friend.profileImageUrl}
+// 									alt={friend.username}
+// 								/>
+// 								<div>
+// 									<h2>{friend.username}</h2>
+// 								</div>
+// 							</div>
+// 						);
+// 					})}
+// 			</Modale.Content>
+// 		</Modale>
+// 	);
+// }
 
 export default index;

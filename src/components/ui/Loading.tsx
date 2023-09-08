@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cva";
-import type { HTMLAttributes, PropsWithChildren } from "react";
+import { useMemo, type HTMLAttributes, type PropsWithChildren } from "react";
 import { RotatingLines } from "react-loader-spinner";
 
 type Div = HTMLAttributes<HTMLDivElement>;
@@ -38,7 +38,19 @@ const Spinner = (props: Div) => {
 		</div>
 	);
 };
-
+const Line = () => {
+	const widthRandomizer = useMemo(() => {
+		return 100 - Math.floor(Math.random() * 40);
+	}, []);
+	return (
+		<div
+			style={{
+				width: `${widthRandomizer}%`,
+			}}
+			className=" bg-gray-300/80 dark:bg-gray-700/70 w-full rounded-full  h-6"
+		/>
+	);
+};
 const SkeletonPage = ({ count, className }: Div & { count: number }) => {
 	const skeletons = Array.from({ length: count });
 	return (
@@ -51,9 +63,13 @@ const SkeletonPage = ({ count, className }: Div & { count: number }) => {
 };
 
 function SkelatonPost({ className, index = 0 }: Div & { index?: number }) {
-	const widthRandomizer = (100 - Math.floor(Math.random() * 30)) / 100;
-	const numOfline = Math.random() >= 0.5 ? 3 : 2;
-	const delay = index * 0.2;
+	const { delay, numOfline, widthRandomizer } = useMemo(() => {
+		return {
+			widthRandomizer: (100 - Math.floor(Math.random() * 30)) / 100,
+			numOfline: Math.random() >= 0.5 ? 3 : 2,
+			delay: index * 0.2,
+		};
+	}, [index]);
 	return (
 		<div
 			style={{
@@ -82,18 +98,9 @@ function SkelatonPost({ className, index = 0 }: Div & { index?: number }) {
 			<div className=" animate-pulse bg-gray-400/70 dark:bg-gray-500/70 space-y-2 p-4 rounded-md ">
 				{Array.from({
 					length: numOfline,
-				}).map((_, index) => {
-					const widthRandomizer = 100 - Math.floor(Math.random() * 40);
-					return (
-						<div
-							key={index}
-							style={{
-								width: `${widthRandomizer}%`,
-							}}
-							className=" bg-gray-300/80 dark:bg-gray-700/70 w-full rounded-full  h-6"
-						/>
-					);
-				})}
+				}).map((_, index) => (
+					<Line key={index} />
+				))}
 			</div>
 		</div>
 	);

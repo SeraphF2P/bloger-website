@@ -2,7 +2,6 @@ import { getInfinitePosts } from "@/utils/getInfinitePosts";
 import { postingRateLimit } from "@/utils/ratelimit";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { nanoid } from 'nanoid'
 import {
   createTRPCRouter,
   privateProcedure,
@@ -117,21 +116,14 @@ export const postRouter = createTRPCRouter({
           },
         });
       }
+      
      if(autherId != ctx.userId && !isLiked) {
-      const id = nanoid();
-      const notification  ={
-         id,
-         createdAt: new Date(),
-         from:ctx.userId,
-         to:autherId,
-         onPost:postId,
-         seen:false,
-         type:"newlike"
-      } satisfies NotificationType
-     await Promise.allSettled([
-        ctx.redis.rpush(`notifications:${autherId}`,id),
-        ctx.redis.hset(`notifications:${autherId}:${id}`,notification)
-      ])
+     await ctx.redis.note.create({
+      from:ctx.userId,
+      to:autherId,
+      type:"newlike",
+      onPost:postId
+     })
     }
   }
     ),

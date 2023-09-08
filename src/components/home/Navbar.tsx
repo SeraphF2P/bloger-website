@@ -5,6 +5,7 @@ import { motion as m } from "framer-motion";
 import Link, { type LinkProps } from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode } from "react";
+import React from "react";
 
 interface ListLink {
 	children: ReactNode;
@@ -33,10 +34,6 @@ const ListLink = ({ children, href }: ListLink) => {
 
 const Navbar = () => {
 	const { user } = useUser();
-	const { asPath } = useRouter();
-	const notificationCount = api.notification.count.useQuery();
-	const isThereNewNotification =
-		notificationCount.data != 0 && asPath != "/notification";
 
 	return (
 		<header className=" fixed z-40 top-0  left-1/2 -translate-x-1/2  flex w-full justify-center max-w-[420px]  ">
@@ -51,16 +48,7 @@ const Navbar = () => {
 					<Icons.userIcon />
 				</ListLink>
 				<ListLink href="/notification">
-					<Icons.notification
-						className={`${
-							isThereNewNotification ? "-rotate-[30deg]" : " rotate-0"
-						} transition-transform`}
-					/>
-					{isThereNewNotification && (
-						<div className=" pointer-events-none bg-red-500 flex justify-center  items-center rounded-full absolute top-2  right-2 aspect-square w-6 h-6">
-							{notificationCount.data}
-						</div>
-					)}
+					<Notification isSignedIn />
 				</ListLink>
 				<ListLink href="/chat">
 					<Icons.chat />
@@ -72,5 +60,26 @@ const Navbar = () => {
 		</header>
 	);
 };
-
 export default Navbar;
+
+function Notification({ isSignedIn = false }) {
+	const { asPath } = useRouter();
+	const notificationCount = api.notification.count.useQuery();
+	const isThereNewNotification =
+		notificationCount.data != 0 && asPath != "/notification";
+
+	return (
+		<>
+			<Icons.notification
+				className={`${
+					isThereNewNotification ? "-rotate-[30deg]" : " rotate-0"
+				} transition-transform`}
+			/>
+			{isThereNewNotification && isSignedIn && (
+				<div className=" pointer-events-none bg-red-500 flex justify-center  items-center rounded-full absolute top-2  right-2 aspect-square w-6 h-6">
+					{notificationCount.data}
+				</div>
+			)}
+		</>
+	);
+}
