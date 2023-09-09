@@ -47,16 +47,13 @@ export const notificationRouter = createTRPCRouter({
   get: privateProcedure
     .query(async ({ ctx }) => {
       
-      console.log('notification')
     const notification = await ctx.redis.note.findMany({
       to:ctx.userId,
       type:"friendrequest",
     })
-    console.log('notification', notification)
-   
     if(notification == null) return [];
 
-     const notifiesFrom =await clerkClient.users.getUserList({userId:notification.map(note=> note.from)})
+     const notifyFroms =await clerkClient.users.getUserList({userId:notification.map(note=> note.from)})
 
   const noteIdList = notification.map(note=>note.id)
 await Promise.all(
@@ -67,7 +64,7 @@ await Promise.all(
      
      
       return notification.map(note=>{
-        const notifyFrom = notifiesFrom.find(user=>user.id == note.from)
+        const notifyFrom = notifyFroms.find(user=>user.id == note.from)
         if(notifyFrom == null)throw new Error("some thing went wrong");
         return {
             notifyFrom:{

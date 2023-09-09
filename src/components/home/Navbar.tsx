@@ -64,9 +64,11 @@ export default Navbar;
 
 function Notification({ isSignedIn = false }) {
 	const { asPath } = useRouter();
-	const notificationCount = api.notification.count.useQuery();
+	const notificationCount = api.notification.count.useQuery(undefined, {
+		staleTime: 1000 * 60,
+	});
 	const isThereNewNotification =
-		notificationCount.data != 0 && asPath != "/notification";
+		(notificationCount.data || 0) != 0 && asPath != "/notification";
 
 	return (
 		<>

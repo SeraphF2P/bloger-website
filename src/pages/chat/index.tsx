@@ -1,10 +1,15 @@
 import { api } from "../../utils/api";
-import { Container, Modale, NextImage } from "@/ui";
+import { Container, NextImage } from "@/ui";
+import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
+import Error from "next/error";
 import Link from "next/link";
 
-const index: NextPage = ({}) => {
+const Chat: NextPage = () => {
+	const auth = useUser();
 	const getFriends = api.user.getFriends.useQuery();
+	if (!auth.isSignedIn)
+		return <Error withDarkMode title="unAutheraize" statusCode={401} />;
 	return (
 		<Container>
 			{getFriends.data &&
@@ -24,7 +29,10 @@ const index: NextPage = ({}) => {
 							<div className=" flex-1">
 								<h3>{friend.username}</h3>
 							</div>
-							<Link className=" absolute inset-0" href={"chat/" + friend.id} />
+							<Link
+								className=" absolute inset-0"
+								href={`chat/${auth.user.id}--${friend.id}`}
+							/>
 						</div>
 					);
 				})}
@@ -62,4 +70,4 @@ const index: NextPage = ({}) => {
 // 	);
 // }
 
-export default index;
+export default Chat;
