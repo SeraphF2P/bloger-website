@@ -1,9 +1,7 @@
+import AddComment from "./AddComment";
 import ScrollEndIndecator from "./ui/ScrollEndIndecator";
-import { toast } from "@/lib/myToast";
-import { Btn, Icons, Modale, NextImage, type BtnProps, Loading } from "@/ui";
+import { Icons, Loading, Modale, NextImage, type BtnProps } from "@/ui";
 import { api } from "@/utils/api";
-import { useUser } from "@clerk/nextjs";
-import { useForm } from "react-hook-form";
 
 // type CommentProps = RouterOutputs["comment"]["getComments"];
 interface CommentsSecPropsType extends BtnProps {
@@ -34,79 +32,6 @@ const CommentSection = ({
 				<AddComment postId={postId} autherId={autherId} />
 			</Modale.Content>
 		</Modale>
-	);
-};
-type formValuesType = {
-	postId: string;
-	content: string;
-	autherId: string;
-};
-const AddComment = ({
-	postId,
-	autherId,
-}: {
-	postId: string;
-	autherId: string;
-}) => {
-	const { isSignedIn } = useUser();
-	const ctx = api.useContext();
-	const { register, handleSubmit, resetField } = useForm<formValuesType>();
-	const { mutate, isLoading: isValidating } =
-		api.comment.createComment.useMutation({
-			onSuccess: () => {
-				resetField("content");
-				void ctx.comment.getComments.invalidate();
-			},
-			onError: (err) => {
-				toast({
-					type: "error",
-					message:
-						err.data?.zodError?.formErrors[0] ||
-						"somthing went wrong try check your internet connection and try again later",
-				});
-			},
-		});
-
-	const submitHandler = (data: formValuesType) => {
-		mutate(data);
-	};
-	return (
-		<div className="    absolute bottom-0 left-0  h-10   w-full bg-gray-100 dark:bg-gray-900">
-			{isSignedIn ? (
-				<form
-					// eslint-disable-next-line @typescript-eslint/no-misused-promises
-					onSubmit={handleSubmit(submitHandler)}
-					className=" flex w-full h-full   items-center"
-				>
-					<input
-						placeholder="write a comment..."
-						className=" form-input h-10 w-full"
-						type="text"
-						{...register("content", {
-							required: true,
-							minLength: {
-								message: "min comment is 1 charcter",
-								value: 1,
-							},
-						})}
-					/>
-					<input type="hidden" value={postId} {...register("postId")} />
-					<input type="hidden" value={autherId} {...register("autherId")} />
-					<Btn
-						disabled={isValidating}
-						type="submit"
-						shape="circle"
-						className=" m-2  h-8 w-8 "
-					>
-						<Icons.send className=" w-4 h-4 " />
-					</Btn>
-				</form>
-			) : (
-				<p className=" px-4 py-2">
-					you cannot comment on this post login or try again later
-				</p>
-			)}
-		</div>
 	);
 };
 

@@ -14,6 +14,7 @@ const Chat: NextPage = () => {
 		<Container>
 			{getFriends.data &&
 				getFriends.data.map((friend) => {
+					const chatId = [auth.user.id, friend.id].sort().join("--");
 					return (
 						<div
 							key={friend.id}
@@ -29,10 +30,7 @@ const Chat: NextPage = () => {
 							<div className=" flex-1">
 								<h3>{friend.username}</h3>
 							</div>
-							<Link
-								className=" absolute inset-0"
-								href={`chat/${auth.user.id}--${friend.id}`}
-							/>
+							<Link className=" absolute inset-0" href={`chat/${chatId}`} />
 						</div>
 					);
 				})}

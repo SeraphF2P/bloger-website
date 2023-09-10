@@ -3,6 +3,7 @@
 import AlertModal from "./AlertModal";
 import Btn, { type BtnProps } from "./Btn";
 import Container from "./Container";
+import { ContentInput } from "./ContentInput";
 import ErrorBoundary from "./ErrorBoundary";
 import Icons from "./Icons";
 import Loading from "./Loading";
@@ -23,4 +24,5 @@ export {
   ScrollBar,
   ErrorBoundary,
   ToggleBtn,
+  ContentInput
 };

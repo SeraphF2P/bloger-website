@@ -1,4 +1,5 @@
-export function debounce<cbType extends (...args: unknown[]) => void>(
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export function debounce<cbType extends (...args: any) => any>(
   callBack: cbType,
   delay = 1000
 ) {
