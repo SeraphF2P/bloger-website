@@ -30,7 +30,10 @@ export const ContentInput: FC<contentInputType> = ({
 				/>
 				<Btn
 					disabled={isValidating}
-					onClick={() => mutate(content)}
+					onClick={() => {
+						setContent("");
+						mutate(content);
+					}}
 					shape="circle"
 					className=" m-2  h-8 w-8 "
 				>

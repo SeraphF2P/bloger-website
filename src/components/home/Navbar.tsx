@@ -1,25 +1,24 @@
-import { api } from "../../utils/api";
 import { Icons } from "@/ui";
 import { useUser } from "@clerk/nextjs";
 import { motion as m } from "framer-motion";
-import Link, { type LinkProps } from "next/link";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode } from "react";
-import React from "react";
+import { api } from "../../utils/api";
 
 interface ListLink {
 	children: ReactNode;
-	href: LinkProps["href"];
+	href: string;
 }
 const ListLink = ({ children, href }: ListLink) => {
 	const { asPath } = useRouter();
-	const isActive = asPath === href;
+	const isActive = href != "/" ? asPath.includes(href) : asPath == "/";
 
 	return (
 		<li className={" relative   flex-[1_1_40px] p-4 "}>
 			{children}
 			<Link className=" absolute inset-0" href={href}></Link>
-			<span className="sr-only">{href.toString()}</span>
+			<span className="sr-only">{href}</span>
 
 			{isActive && (
 				<m.span

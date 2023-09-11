@@ -10,7 +10,13 @@ const config = {
   images: {
     domains: ['images.clerk.dev'],
   },
-
+  webpack: (config) => {
+    config.externals.push({
+      "utf-8-validate": "commonjs utf-8-validate",
+      bufferutil: "commonjs bufferutil",
+    })
+    return config
+  },
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
    * out.
