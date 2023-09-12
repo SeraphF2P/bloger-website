@@ -133,15 +133,13 @@ export const userRouter = createTRPCRouter({
           ),)
         },
       });
-      const notify = ctx.prisma.notification.create({
-        data:{
+      await ctx.redis.note.create({
           from:ctx.userId,
           to:autherId,
           type:"friendrequestconfirmed",
-        }
       })
       
-      await ctx.prisma.$transaction([createFriendship,createFriendshipBack,notify])
+      await ctx.prisma.$transaction([createFriendship,createFriendshipBack])
 
       void ctx.revalidate?.(`/profile/${ctx.userId}`);
       void ctx.revalidate?.(`/profile/${autherId}`);

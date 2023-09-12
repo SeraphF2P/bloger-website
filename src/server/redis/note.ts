@@ -1,7 +1,9 @@
 import { nanoid } from 'nanoid';
 import {  createRedisHelper,red as redis} from './index'
+import { pusherServer } from '../../lib/pusher';
+import { toPusherKey } from '../../utils';
 
-const helper = createRedisHelper("notification")
+const helper = createRedisHelper("note")
 
 export const note ={
   create: helper<Omit<Omit<NotificationType, "id">, "createdAt">,boolean>(async ({table,params})=>{
@@ -13,7 +15,10 @@ export const note ={
     
      const Promises = await Promise.allSettled([
         redis.rpush(`${table}:${params.to}`,id),
-        redis.hset(`${table}:${params.to}:${id}`,value)
+        redis.hset(`${table}:${params.to}:${id}`,value),
+        pusherServer.trigger(toPusherKey(`${table}:${params.to}`),`${table}`,{
+       note:value
+     })
      ])
     
      return Promises.every(prom=>prom.status == "fulfilled")

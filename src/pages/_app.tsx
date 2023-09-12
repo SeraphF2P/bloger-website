@@ -7,6 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { type AppType } from "next/app";
 import "~/styles/globals.css";
+import RealTimeContext from "../components/context/RealTimeNotificationContext";
 import { NotSignedIn } from "@/components/index";
 import { api } from "~/utils/api";
 
@@ -14,15 +15,17 @@ const MyApp: AppType = ({ Component, pageProps }) => {
 	return (
 		<ErrorBoundary>
 			<ClerkProvider {...pageProps}>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					<Toaster position="bottom-center" />
-					<Navbar />
-					<AnimatePresence>
-						<Component {...pageProps} />
-					</AnimatePresence>
-					<Analytics />
-					<NotSignedIn />
-				</ThemeProvider>
+				<RealTimeContext>
+					<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+						<Toaster position="bottom-center" />
+						<Navbar />
+						<AnimatePresence>
+							<Component {...pageProps} />
+						</AnimatePresence>
+						<Analytics />
+						<NotSignedIn />
+					</ThemeProvider>
+				</RealTimeContext>
 			</ClerkProvider>
 		</ErrorBoundary>
 	);

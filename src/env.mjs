@@ -11,6 +11,9 @@ const server = z.object({
   CLERK_SECRET_KEY: z.string().min(1),
   UPSTASH_REDIS_REST_URL: z.string().min(1),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+  PUSHER_APP_ID: z.string().min(1),
+  NEXT_PUBLIC_PUSHER_APP_KEY: z.string().min(1),
+  PUSHER_APP_SECRET: z.string().min(1),
 });
 
 /**
@@ -35,6 +38,9 @@ const processEnv = {
   UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
   NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  PUSHER_APP_ID: process.env.PUSHER_APP_ID,
+  NEXT_PUBLIC_PUSHER_APP_KEY: process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
+  PUSHER_APP_SECRET: process.env.PUSHER_APP_SECRET,
 };
 
 // Don't touch the part below

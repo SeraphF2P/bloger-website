@@ -19,8 +19,10 @@ const validateGETReq = z.object({
    if(!validData) return res.status(400)
      const {chatId,content} = validData
      if(chatId.includes(userId) ==  null)  return res.status(401);
+     const [user1,user2]= chatId.split("--")
      const {success} = await redis.chat.post({content,autherId: userId,chatId})
-
+      console.log(userId == user1 ?user2:user1)
+     
      res.status(200).json({ success });
   }
   if(req.method === "GET"){

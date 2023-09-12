@@ -124,6 +124,7 @@ export const postRouter = createTRPCRouter({
       type:"newlike",
       onPost:postId
      })
+     
     }
   }
     ),

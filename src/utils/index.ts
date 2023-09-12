@@ -16,3 +16,7 @@ return [...array,value]
   return [...array.slice(0,index),...array.slice(index + 1)]
 }
 }
+
+export const toPusherKey = (val:string)=>{
+return val.replace(":", "--")
+}

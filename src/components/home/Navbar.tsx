@@ -1,10 +1,10 @@
+import { useRealTimeData } from "../context/RealTimeNotificationContext";
 import { Icons } from "@/ui";
 import { useUser } from "@clerk/nextjs";
 import { motion as m } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import type { ReactNode } from "react";
-import { api } from "../../utils/api";
+import { useLayoutEffect, type ReactNode } from "react";
 
 interface ListLink {
 	children: ReactNode;
@@ -63,12 +63,13 @@ export default Navbar;
 
 function Notification({ isSignedIn = false }) {
 	const { asPath } = useRouter();
-	const notificationCount = api.notification.count.useQuery(undefined, {
-		staleTime: 1000 * 60,
-	});
-	const isThereNewNotification =
-		(notificationCount.data || 0) != 0 && asPath != "/notification";
-
+	const { notificationsCount, setNotificationsCount } = useRealTimeData();
+	const isThereNewNotification = notificationsCount > 0;
+	useLayoutEffect(() => {
+		if (asPath == "/notification") {
+			setNotificationsCount(0);
+		}
+	}, [asPath, setNotificationsCount]);
 	return (
 		<>
 			<Icons.notification
@@ -78,7 +79,7 @@ function Notification({ isSignedIn = false }) {
 			/>
 			{isThereNewNotification && isSignedIn && (
 				<div className=" pointer-events-none bg-red-500 flex justify-center  items-center rounded-full absolute top-2  right-2 aspect-square w-6 h-6">
-					{notificationCount.data}
+					{notificationsCount}
 				</div>
 			)}
 		</>

@@ -1,5 +1,7 @@
 import { nanoid } from "nanoid"
 import { createRedisHelper, red as redis } from "."
+import { pusherServer } from "../../lib/pusher"
+import { toPusherKey } from "../../utils"
 
 
 const helper = createRedisHelper("chat")
@@ -12,7 +14,8 @@ const helper = createRedisHelper("chat")
     }
     const [ids,hashs] = await Promise.allSettled([
       redis.rpush(`${table}:${params.chatId}`,id),
-      redis.hset(`${table}:${params.chatId}:${id}`,message)
+      redis.hset(`${table}:${params.chatId}:${id}`,message),
+      pusherServer.trigger(toPusherKey(`${table}:${params.chatId}`),"resiveMessage",message)
     ])
   const success = ids.status == "fulfilled" && hashs.status == "fulfilled"
    return {success,message}

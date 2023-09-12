@@ -18,6 +18,7 @@ export const notificationRouter = createTRPCRouter({
         to:input.to,
         type:input.type,
       })
+
       
      return status
     }),
