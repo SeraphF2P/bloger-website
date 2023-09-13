@@ -4,7 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { motion as m } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useLayoutEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 
 interface ListLink {
 	children: ReactNode;
@@ -65,7 +65,7 @@ function Notification({ isSignedIn = false }) {
 	const { asPath } = useRouter();
 	const { notificationsCount, setNotificationsCount } = useRealTimeData();
 	const isThereNewNotification = notificationsCount > 0;
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (asPath == "/notification") {
 			setNotificationsCount(0);
 		}

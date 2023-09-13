@@ -1,7 +1,7 @@
 import { toPusherKey } from "../../utils";
 import axiosClient from "@/lib/axiosClient";
 import { cn } from "@/lib/cva";
-import { Container, ContentInput, NextImage } from "@/ui";
+import { Container, ContentInput, Loading, NextImage } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -20,25 +20,21 @@ const ChatPage: NextPage = () => {
 	const [user1, user2] = chatId.split("--");
 	const chatPartnerId = user1 != auth.user?.id ? user1 : user2;
 
-	const { data: messages } = useQuery({
+	const { data: messages, isLoading } = useQuery({
 		queryFn: async () => {
 			return await axiosClient.get<ChatMSGType[] | []>(`chat?chatId=${chatId}`);
 		},
 	});
-	const [inComingMessage, setinComingMessage] = useState<ChatMSGType[]>(
-		messages?.data.reverse() || []
-	);
-
+	const oldMessages = messages?.data || [];
+	const [allMessages, setAllMessages] = useState<ChatMSGType[]>(oldMessages);
 	const [lastMessageIds, setLastMessageIds] = useState<{
 		user: string;
 		chatPartner: string;
 	}>({
 		user:
-			inComingMessage.findLast((msg) => msg.autherId === auth.user?.id)?.id ||
-			"",
+			oldMessages.findLast((msg) => msg.autherId === auth.user?.id)?.id || "",
 		chatPartner:
-			inComingMessage.findLast((msg) => msg.autherId === chatPartnerId)?.id ||
-			"",
+			oldMessages.findLast((msg) => msg.autherId === chatPartnerId)?.id || "",
 	});
 
 	const sendMessage = useMutation({
@@ -52,7 +48,7 @@ const ChatPage: NextPage = () => {
 	useEffect(() => {
 		if (!auth.user) return;
 		const resiveMessage = (message: ChatMSGType) => {
-			setinComingMessage((prev) => [message, ...prev]);
+			setAllMessages((prev) => [message, ...prev]);
 			setLastMessageIds((prev) => {
 				if (message.autherId == auth.user?.id) {
 					return {
@@ -61,7 +57,7 @@ const ChatPage: NextPage = () => {
 					};
 				} else {
 					return {
-						user: auth.user.id,
+						user: prev.user,
 						chatPartner: message.id,
 					};
 				}
@@ -74,10 +70,8 @@ const ChatPage: NextPage = () => {
 			}
 		);
 		try {
-			console.log("pusherClient");
 			pusherClient.subscribe(toPusherKey(`chat:${chatId}`));
 			pusherClient.bind("resiveMessage", resiveMessage);
-			console.log(pusherClient.connection);
 			return () => {
 				pusherClient.unsubscribe(toPusherKey(`chat:${chatId}`));
 				pusherClient.unbind("resiveMessage", resiveMessage);
@@ -87,19 +81,19 @@ const ChatPage: NextPage = () => {
 		}
 	}, [auth.user, chatId]);
 
-	const { data: chatPartnerProfile } =
+	const { data: chatPartnerProfile, isLoading: isLoadingChatPartnerProfile } =
 		api.user.getUserProfile.useQuery(chatPartnerId);
-	if (!chatPartnerProfile) return <Error statusCode={400} withDarkMode />;
 
+	if (isLoading || isLoadingChatPartnerProfile)
+		return <Loading.SkeletonPage count={4} />;
+	if (!chatPartnerProfile) return <Error statusCode={400} withDarkMode />;
 	if (!auth.user || !chatId.includes(auth.user.id))
 		return <Error statusCode={401} withDarkMode />;
-	if (!inComingMessage) return <>sadasda</>;
-
 	return (
 		<Container className="p-0 pt-[70px] pb-8 ">
 			<section className="p-4 gap-2 flex-col-reverse  flex    overflow-y-scroll  remove-scroll-bar ">
-				{inComingMessage &&
-					inComingMessage.map((msg) => {
+				{allMessages &&
+					allMessages.map((msg) => {
 						const isUser = auth.user.id == msg.autherId;
 						const isLastMessage =
 							lastMessageIds.user == msg.id ||

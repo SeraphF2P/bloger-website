@@ -2,14 +2,15 @@ import { toPusherKey } from "../../utils";
 import { useUser } from "@clerk/nextjs";
 import PusherClient from "pusher-js";
 import {
-	Dispatch,
+	type Dispatch,
+	type FC,
+	PropsWithChildren,
 	SetStateAction,
 	createContext,
 	useContext,
 	useEffect,
 	useState,
 } from "react";
-import { FC, PropsWithChildren } from "react";
 
 type ContextType = {
 	notificationsCount: number;

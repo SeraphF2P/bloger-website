@@ -1,22 +1,11 @@
 -- CreateTable
-CREATE TABLE `Notification` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `userId` VARCHAR(191) NOT NULL,
-    `type` ENUM('friendrequest', 'friendrequestconfirmed', 'newlike', 'newcomment') NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Friend` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `userId` VARCHAR(191) NOT NULL,
     `friends` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Friend_userId_key`(`userId`),
-    UNIQUE INDEX `Friend_id_userId_key`(`id`, `userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -24,7 +13,7 @@ CREATE TABLE `Friend` (
 CREATE TABLE `Post` (
     `id` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `content` LONGTEXT NOT NULL,
+    `content` VARCHAR(500) NOT NULL,
     `autherId` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `published` BOOLEAN NOT NULL DEFAULT false,
@@ -50,7 +39,7 @@ CREATE TABLE `Comment` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `postId` VARCHAR(191) NOT NULL,
     `autherId` VARCHAR(191) NOT NULL,
-    `content` LONGTEXT NOT NULL,
+    `content` VARCHAR(500) NOT NULL,
 
     INDEX `Comment_postId_idx`(`postId`),
     INDEX `Comment_autherId_idx`(`autherId`),
