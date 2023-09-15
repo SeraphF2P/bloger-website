@@ -1,10 +1,10 @@
-import { useRealTimeData } from "../context/RealTimeNotificationContext";
-import { Icons } from "@/ui";
+import { usePusher } from "../../context/PusherContext";
+import { Icons, NotificationDot } from "@/ui";
 import { useUser } from "@clerk/nextjs";
 import { motion as m } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { type ReactNode, useEffect } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 interface ListLink {
 	children: ReactNode;
@@ -33,7 +33,7 @@ const ListLink = ({ children, href }: ListLink) => {
 
 const Navbar = () => {
 	const { user } = useUser();
-
+	const { asPath } = useRouter();
 	return (
 		<header className=" fixed z-40 top-0  left-1/2 -translate-x-1/2  flex w-full justify-center max-w-[420px]  ">
 			<ul className=" flex relative w-full bg-theme text-revert-theme  items-center justify-between  ">
@@ -47,10 +47,16 @@ const Navbar = () => {
 					<Icons.userIcon />
 				</ListLink>
 				<ListLink href="/notification">
-					<Notification isSignedIn />
+					<Notification
+						userId={user?.id || ""}
+						isActivePath={asPath == "/notification"}
+					/>
 				</ListLink>
 				<ListLink href="/chat">
-					<Icons.chat />
+					<ChatNotification
+						userId={user?.id || ""}
+						isActivePath={asPath == "/chat"}
+					/>
 				</ListLink>
 				<ListLink href="/setting">
 					<Icons.settings />
@@ -61,15 +67,31 @@ const Navbar = () => {
 };
 export default Navbar;
 
-function Notification({ isSignedIn = false }) {
-	const { asPath } = useRouter();
-	const { notificationsCount, setNotificationsCount } = useRealTimeData();
-	const isThereNewNotification = notificationsCount > 0;
+function Notification({
+	userId,
+	isActivePath,
+}: {
+	userId: string;
+	isActivePath: boolean;
+}) {
+	const [msgnotesCount, setMsgNotesCount] = useState(0);
+	const isThereNewNotification = msgnotesCount > 0;
+
+	usePusher({
+		key: `note:${userId}`,
+		event: "note",
+		cb: () => {
+			console.log("asdad");
+			setMsgNotesCount((prev) => prev + 1);
+		},
+	});
+
 	useEffect(() => {
-		if (asPath == "/notification") {
-			setNotificationsCount(0);
+		if (isActivePath) {
+			setMsgNotesCount(0);
 		}
-	}, [asPath, setNotificationsCount]);
+	}, [isActivePath, setMsgNotesCount]);
+
 	return (
 		<>
 			<Icons.notification
@@ -77,11 +99,38 @@ function Notification({ isSignedIn = false }) {
 					isThereNewNotification ? "-rotate-[30deg]" : " rotate-0"
 				} transition-transform`}
 			/>
-			{isThereNewNotification && isSignedIn && (
-				<div className=" pointer-events-none bg-red-500 flex justify-center  items-center rounded-full absolute top-2  right-2 aspect-square w-6 h-6">
-					{notificationsCount}
-				</div>
+			{isThereNewNotification && userId && (
+				<NotificationDot count={msgnotesCount} />
 			)}
+		</>
+	);
+}
+function ChatNotification({
+	userId,
+	isActivePath,
+}: {
+	userId: string;
+	isActivePath: boolean;
+}) {
+	const [msgnotesCount, setMsgNotesCount] = useState(0);
+
+	usePusher({
+		key: `chat:${userId}`,
+		event: "messageNotifications",
+		cb: () => {
+			setMsgNotesCount((prev) => prev + 1);
+		},
+	});
+	const isThereNewMsg = msgnotesCount > 0;
+	useEffect(() => {
+		if (isActivePath) {
+			setMsgNotesCount(0);
+		}
+	}, [isActivePath, setMsgNotesCount]);
+	return (
+		<>
+			<Icons.chat className={`${isThereNewMsg ? "animate-buzz" : ""} `} />
+			{isThereNewMsg && userId && <NotificationDot count={msgnotesCount} />}
 		</>
 	);
 }

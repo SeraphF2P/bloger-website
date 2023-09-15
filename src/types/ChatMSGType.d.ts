@@ -6,6 +6,7 @@ declare global {
     autherId:string,
     createdAt:Date,
     content:string,
+    seen:boolean,
   }
 }
 export {}

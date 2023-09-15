@@ -100,6 +100,8 @@ export const MyPlugin = plugin(
             "fadein var(--fadein-duration,0.3s) forwards  var(--fadein-delay,0s)",
           fadeout:
             "fadeout var(--fadeout-duration,0.3s) forwards var(--fadeout-delay,0s)",
+          buzz:
+            "buzz 2s infinite linear  ",
         },
         keyframes: {
           reset: {
@@ -126,9 +128,23 @@ export const MyPlugin = plugin(
                 "translate(var(--fade-translate-x,0) , var(--fade-translate-y,0)) rotate(var(--fade-rotate)) skewX(var(--fade-skew-x,0)) skewY(var(--fade-skew-y,0)) scaleX(var(--fade-scale-x,1)) scaleY(var(--fade-scale-y,1));",
             },
           },
-        },
+          buzz: {
+            "0%,20%,40%,60%,80%,100%": { 
+              transform:
+                "rotate(0deg) ",
+            },
+            "10%,50%": {
+              transform:
+                "rotate(-12.5deg) ",
+            },
+            "30%,70%": {
+              transform:
+                "rotate(12.5deg)",
+            },
+          },
+         
       },
     },
-  }
-);
+  },
+});
 export default MyPlugin;

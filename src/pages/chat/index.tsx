@@ -1,9 +1,13 @@
+import { usePusher } from "../../context/PusherContext";
+import axiosClient from "../../lib/axiosClient";
 import { api } from "../../utils/api";
-import { Container, NextImage } from "@/ui";
+import { Container, NextImage, NotificationDot } from "@/ui";
 import { useUser } from "@clerk/nextjs";
+import { useQuery } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import Error from "next/error";
 import Link from "next/link";
+import { useState } from "react";
 
 const Chat: NextPage = () => {
 	const auth = useUser();
@@ -16,56 +20,65 @@ const Chat: NextPage = () => {
 				getFriends.data.map((friend) => {
 					const chatId = [auth.user.id, friend.id].sort().join("--");
 					return (
-						<div
-							key={friend.id}
-							className=" relative flex items-center p-2 gap-2 bg-revert-theme/10  h-24 w-full"
-						>
-							<NextImage
-								sizes="80px, 80px"
-								className=" w-20 h-20 rounded-full overflow-hidden"
-								src={friend.profileImageUrl}
-								alt={friend.username}
-							/>
-
-							<div className=" flex-1">
-								<h3>{friend.username}</h3>
-							</div>
-							<Link className=" absolute inset-0" href={`chat/${chatId}`} />
-						</div>
+						<ChatProfile
+							userId={auth.user.id}
+							key={chatId}
+							{...friend}
+							chatId={chatId}
+						/>
 					);
 				})}
 		</Container>
 	);
 };
-
-// function FriendList({ friends }: { friends: AutherType[] }) {
-// 	return (
-// 		<Modale>
-// 			<Modale.Btn variant="outline" className="  px-4 py-2 ">
-// 				friends list
-// 			</Modale.Btn>
-// 			<Modale.Content className="translate-y-full p-2 [--fadein-duration:0.7s] z-50 relative bg-theme dark:bg-theme backdrop-blur-sm mn:max-w-screen-mn w-full shadow mx-4 h-full">
-// 				{friends &&
-// 					friends.map((friend) => {
-// 						return (
-// 							<div
-// 								className=" flex p-2 rounded-sm bg-slate-50/10 backdrop-blur w-full gap-2 items-center "
-// 								key={friend.id}
-// 							>
-// 								<NextImage
-// 									className=" h-20 w-20"
-// 									src={friend.profileImageUrl}
-// 									alt={friend.username}
-// 								/>
-// 								<div>
-// 									<h2>{friend.username}</h2>
-// 								</div>
-// 							</div>
-// 						);
-// 					})}
-// 			</Modale.Content>
-// 		</Modale>
-// 	);
-// }
-
+const ChatProfile = ({
+	chatId,
+	userId,
+	...friend
+}: { chatId: string; userId: string } & AutherType) => {
+	type chatInfo = {
+		count: number;
+		lastMsg: ChatMSGType | null;
+	};
+	const { data } = useQuery<{
+		data: chatInfo;
+	}>({
+		queryFn: async () => {
+			return await axiosClient(`chat/count?chatId=${chatId}`);
+		},
+	});
+	const [info, setInfo] = useState<chatInfo>(
+		data?.data || {
+			count: 0,
+			lastMsg: null,
+		}
+	);
+	usePusher({
+		key: `chat:${userId}:${chatId}`,
+		event: `chatNotification`,
+		cb: (msg: ChatMSGType) => {
+			setInfo((prev) => {
+				return { count: prev.count + 1, lastMsg: msg };
+			});
+		},
+	});
+	if (!data) return null;
+	const { count, lastMsg } = info;
+	return (
+		<div className=" relative flex items-center p-2 gap-2 bg-revert-theme/10  h-24 w-full">
+			<NextImage
+				sizes="80px, 80px"
+				className=" w-20 h-20 rounded-full overflow-hidden"
+				src={friend.profileImageUrl}
+				alt={friend.username}
+			/>
+			<NotificationDot count={count} />
+			<div className=" flex-1">
+				<h3>{friend.username}</h3>
+				<p>{lastMsg?.content || ""}</p>
+			</div>
+			<Link className=" absolute inset-0" href={`chat/${chatId}`} />
+		</div>
+	);
+};
 export default Chat;

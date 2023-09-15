@@ -1,4 +1,6 @@
 import { Navbar } from "@/components/home";
+import { NotSignedIn } from "@/components/index";
+import PusherContext from "@/context/PusherContext";
 import { Toaster } from "@/lib/myToast/toast";
 import { ErrorBoundary } from "@/ui";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -7,15 +9,13 @@ import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { type AppType } from "next/app";
 import "~/styles/globals.css";
-import RealTimeContext from "../components/context/RealTimeNotificationContext";
-import { NotSignedIn } from "@/components/index";
 import { api } from "~/utils/api";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
 	return (
 		<ErrorBoundary>
 			<ClerkProvider {...pageProps}>
-				<RealTimeContext>
+				<PusherContext>
 					<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 						<Toaster position="bottom-center" />
 						<Navbar />
@@ -25,7 +25,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
 						<Analytics />
 						<NotSignedIn />
 					</ThemeProvider>
-				</RealTimeContext>
+				</PusherContext>
 			</ClerkProvider>
 		</ErrorBoundary>
 	);

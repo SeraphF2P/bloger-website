@@ -9,6 +9,7 @@ import Icons from "./Icons";
 import Loading from "./Loading";
 import Modale from "./Modale";
 import NextImage from "./NextImage";
+import NotificationDot from "./NotificationDot";
 import ScrollBar from "./ScrollBar";
 import ToggleBtn from "./ToggleBtn";
 
@@ -24,5 +25,6 @@ export {
   ScrollBar,
   ErrorBoundary,
   ToggleBtn,
-  ContentInput
+  ContentInput,
+  NotificationDot
 };

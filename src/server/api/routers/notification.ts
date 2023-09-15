@@ -81,6 +81,7 @@ await Promise.all(
      return await ctx.redis.note.count({
       to:ctx.userId
      })
+     
     }),
    
 });

@@ -1,7 +1,7 @@
-import { toPusherKey } from "../../utils";
+import { usePusher } from "../../context/PusherContext";
 import axiosClient from "@/lib/axiosClient";
 import { cn } from "@/lib/cva";
-import { Container, ContentInput, Loading, NextImage } from "@/ui";
+import { Container, ContentInput, NextImage } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -10,8 +10,7 @@ import type { NextPage } from "next";
 import Error from "next/error";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import PusherClient from "pusher-js";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const ChatPage: NextPage = () => {
 	const auth = useUser();
@@ -21,11 +20,13 @@ const ChatPage: NextPage = () => {
 	const chatPartnerId = user1 != auth.user?.id ? user1 : user2;
 
 	const { data: messages, isLoading } = useQuery({
+		queryKey: [chatId],
 		queryFn: async () => {
 			return await axiosClient.get<ChatMSGType[] | []>(`chat?chatId=${chatId}`);
 		},
 	});
 	const oldMessages = messages?.data || [];
+	console.log(oldMessages);
 	const [allMessages, setAllMessages] = useState<ChatMSGType[]>(oldMessages);
 	const [lastMessageIds, setLastMessageIds] = useState<{
 		user: string;
@@ -45,9 +46,10 @@ const ChatPage: NextPage = () => {
 			console.log(err);
 		},
 	});
-	useEffect(() => {
-		if (!auth.user) return;
-		const resiveMessage = (message: ChatMSGType) => {
+	usePusher({
+		key: `chat:${chatId}`,
+		event: "resiveMessage",
+		cb: (message: ChatMSGType) => {
 			setAllMessages((prev) => [message, ...prev]);
 			setLastMessageIds((prev) => {
 				if (message.autherId == auth.user?.id) {
@@ -62,30 +64,12 @@ const ChatPage: NextPage = () => {
 					};
 				}
 			});
-		};
-		const pusherClient = new PusherClient(
-			process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
-			{
-				cluster: "eu",
-			}
-		);
-		try {
-			pusherClient.subscribe(toPusherKey(`chat:${chatId}`));
-			pusherClient.bind("resiveMessage", resiveMessage);
-			return () => {
-				pusherClient.unsubscribe(toPusherKey(`chat:${chatId}`));
-				pusherClient.unbind("resiveMessage", resiveMessage);
-			};
-		} catch (error) {
-			console.log(error);
-		}
-	}, [auth.user, chatId]);
+		},
+	});
 
-	const { data: chatPartnerProfile, isLoading: isLoadingChatPartnerProfile } =
+	const { data: chatPartnerProfile } =
 		api.user.getUserProfile.useQuery(chatPartnerId);
 
-	if (isLoading || isLoadingChatPartnerProfile)
-		return <Loading.SkeletonPage count={4} />;
 	if (!chatPartnerProfile) return <Error statusCode={400} withDarkMode />;
 	if (!auth.user || !chatId.includes(auth.user.id))
 		return <Error statusCode={401} withDarkMode />;
@@ -93,6 +77,7 @@ const ChatPage: NextPage = () => {
 		<Container className="p-0 pt-[70px] pb-8 ">
 			<section className="p-4 gap-2 flex-col-reverse  flex    overflow-y-scroll  remove-scroll-bar ">
 				{allMessages &&
+					!isLoading &&
 					allMessages.map((msg) => {
 						const isUser = auth.user.id == msg.autherId;
 						const isLastMessage =
