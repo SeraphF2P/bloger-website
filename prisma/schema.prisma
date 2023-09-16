@@ -11,15 +11,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-
-model Friend {
-   id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-
-  userId String    @unique
-  friends  String  // ? json [{userId:string}]
-}
-
 model Post {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @updatedAt()

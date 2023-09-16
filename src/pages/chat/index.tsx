@@ -1,9 +1,8 @@
 import { usePusher } from "../../context/PusherContext";
-import axiosClient from "../../lib/axiosClient";
+import { toChatId } from "../../utils";
 import { api } from "../../utils/api";
 import { Container, NextImage, NotificationDot } from "@/ui";
 import { useUser } from "@clerk/nextjs";
-import { useQuery } from "@tanstack/react-query";
 import { type NextPage } from "next";
 import Error from "next/error";
 import Link from "next/link";
@@ -11,20 +10,21 @@ import { useState } from "react";
 
 const Chat: NextPage = () => {
 	const auth = useUser();
-	const getFriends = api.user.getFriends.useQuery();
-	if (!auth.isSignedIn)
-		return <Error withDarkMode title="unAutheraize" statusCode={401} />;
+	const { data } = api.friend.getAllChat.useQuery();
+
+	if (!auth.isSignedIn) return <Error withDarkMode statusCode={401} />;
 	return (
 		<Container>
-			{getFriends.data &&
-				getFriends.data.map((friend) => {
-					const chatId = [auth.user.id, friend.id].sort().join("--");
+			{data &&
+				data.map(({ chatPartner, lastMsg }) => {
+					const chatId = toChatId(auth.user.id, chatPartner.id);
 					return (
 						<ChatProfile
 							userId={auth.user.id}
 							key={chatId}
-							{...friend}
+							{...chatPartner}
 							chatId={chatId}
+							lastMsg={lastMsg}
 						/>
 					);
 				})}
@@ -34,36 +34,32 @@ const Chat: NextPage = () => {
 const ChatProfile = ({
 	chatId,
 	userId,
+	lastMsg,
 	...friend
-}: { chatId: string; userId: string } & AutherType) => {
+}: {
+	chatId: string;
+	userId: string;
+	lastMsg: ChatMSGType | undefined;
+} & AutherType) => {
 	type chatInfo = {
 		count: number;
-		lastMsg: ChatMSGType | null;
+		lastMsg: ChatMSGType | undefined;
 	};
-	const { data } = useQuery<{
-		data: chatInfo;
-	}>({
-		queryFn: async () => {
-			return await axiosClient(`chat/count?chatId=${chatId}`);
-		},
+
+	const [info, setInfo] = useState<chatInfo>({
+		count: 0,
+		lastMsg,
 	});
-	const [info, setInfo] = useState<chatInfo>(
-		data?.data || {
-			count: 0,
-			lastMsg: null,
-		}
-	);
 	usePusher({
-		key: `chat:${userId}:${chatId}`,
+		key: `chat:${chatId}:${userId}`,
 		event: `chatNotification`,
 		cb: (msg: ChatMSGType) => {
 			setInfo((prev) => {
+				console.log(msg);
 				return { count: prev.count + 1, lastMsg: msg };
 			});
 		},
 	});
-	if (!data) return null;
-	const { count, lastMsg } = info;
 	return (
 		<div className=" relative flex items-center p-2 gap-2 bg-revert-theme/10  h-24 w-full">
 			<NextImage
@@ -72,10 +68,10 @@ const ChatProfile = ({
 				src={friend.profileImageUrl}
 				alt={friend.username}
 			/>
-			<NotificationDot count={count} />
+			<NotificationDot count={info.count} />
 			<div className=" flex-1">
 				<h3>{friend.username}</h3>
-				<p>{lastMsg?.content || ""}</p>
+				<p>{info.lastMsg?.content || ""}</p>
 			</div>
 			<Link className=" absolute inset-0" href={`chat/${chatId}`} />
 		</div>

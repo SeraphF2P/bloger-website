@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid"
 import { createRedisHelper, red as redis } from "."
-import { pusherServer } from "../../lib/pusher"
-import { toPusherKey } from "../../utils"
+import { pusherServer } from "@/lib/pusher"
+import { toPusherKey } from "@/utils/index"
 
 
 const helper = createRedisHelper("chat")
@@ -17,12 +17,17 @@ const helper = createRedisHelper("chat")
     const [ids,hashs] = await Promise.allSettled([
       redis.rpush(`${table}:${params.chatId}`,msg.id),
       redis.hset(`${table}:${params.chatId}:${msg.id}`,msg),
-      pusherServer.trigger(toPusherKey(`${table}:${params.chatId}`),"resiveMessage",msg),
-      pusherServer.trigger(toPusherKey(`${table}:${chatPartner}`),"messageNotifications",msg),
-      pusherServer.trigger(toPusherKey(`${table}:${chatPartner}:${params.chatId}`),"chatNotification",msg),
     ])
+
   const success = ids.status == "fulfilled" && hashs.status == "fulfilled"
-   return {success,msg}
+  if(success) {
+    await Promise.all([
+      pusherServer.trigger(toPusherKey(`${table}:${params.chatId}`),"resiveMessage",msg),
+      pusherServer.trigger(toPusherKey(`${table}:${params.chatId}:${chatPartner}`),"chatNotification",msg),
+      pusherServer.trigger(toPusherKey(`${table}:${chatPartner}`),"messageNotifications",msg)
+    ])
+  } 
+  return {success,msg}
   }),
   get:helper<{chatId:string},ChatMSGType[] |[]>(async ({table,params})=>{
 
@@ -58,6 +63,21 @@ const ids = await redis.lrange(`${table}:${params.chatId}`,0,-1)
   count:0,
   lastMsg: null
  } 
+
+ }),
+ getAllChats:helper<{chatIds:string[]},ChatMSGType[]>( async({table,params})=>{
+
+  const ids = await Promise.all(params.chatIds.map(async(chatId)=>{
+    const id = (await redis.lrange(`${table}:${chatId}`,-1,-1))[0]
+   return {id,chatId}
+  })) 
+ console.log(ids)
+ const result =await Promise.all(ids.map( async({id,chatId})=>{
+     return  await redis.hgetall(`${table}:${chatId}:${id}`) as unknown as ChatMSGType
+    }))
+
+  console.log(result)
+  return result
 
  })
 }

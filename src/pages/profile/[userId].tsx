@@ -1,3 +1,4 @@
+import { variants } from "../../lib/cva";
 import {
 	AddFriend,
 	BlogPost,
@@ -17,6 +18,7 @@ import type {
 import Error from "next/error";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import type { FC } from "react";
 
 type User = RouterOutputs["user"]["getUserProfile"];
@@ -73,9 +75,6 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	const { data: auther } = api.user.getUserProfile.useQuery(userId);
 	if (!auther) return <Error statusCode={404} withDarkMode />;
 
-	const isFriend = auther.friends.some(
-		(f: { id: string }) => f.id == auth.user?.id
-	);
 	const isUserAuther = auth.isSignedIn && auther.id == auth.user?.id;
 	return (
 		<>
@@ -99,12 +98,20 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 				<div className=" w-full p-2  text-center">
 					<h1>{auther.username}</h1>
 					<div className="  flex gap-2  justify-center w-full p-2">
-						{isUserAuther ? null : isFriend ? (
-							"friends"
+						{isUserAuther ? null : auther.isFriend ? (
+							<Link
+								className={variants({
+									variant: "fill",
+									className: " capitalize px-4 py-2",
+								})}
+								href={`/chat/${[auther.id, auth.user?.id].sort().join("--")}`}
+							>
+								message
+							</Link>
 						) : auther.hasAfriendRequest ? (
 							<ConfirmFriendRequestBtn autherId={auther.id} />
 						) : (
-							<AddFriend isFriend={isFriend} autherId={auther.id} />
+							<AddFriend isFriend={auther.isFriend} autherId={auther.id} />
 						)}
 					</div>
 				</div>

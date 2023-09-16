@@ -1,7 +1,7 @@
 import Btn from "./Btn";
 import Icons from "./Icons";
-import { useState } from "react";
 import type { ChangeEvent, FC, ReactNode } from "react";
+import { useRef } from "react";
 
 type contentInputType = {
 	mutate: (content: string) => void;
@@ -13,27 +13,37 @@ export const ContentInput: FC<contentInputType> = ({
 	isValidating,
 	fallBack,
 }) => {
-	const [content, setContent] = useState("");
+	const ref = useRef<HTMLInputElement>(null);
+	let content = "";
 	const changeHandler = (fn: (val: string) => void) => {
 		return (e: ChangeEvent<HTMLInputElement>) => fn(e.target.value);
+	};
+	const submitHandeler = () => {
+		mutate(content);
+		if (ref.current) {
+			ref.current.value = "";
+			content = "";
+		}
 	};
 	return (
 		<div className="    absolute bottom-0 left-0  h-10   w-full bg-gray-100 dark:bg-gray-900">
 			<div className=" flex w-full h-full   items-center">
 				<input
+					ref={ref}
 					placeholder="write a comment..."
 					className=" form-input h-10 w-full"
 					type="text"
-					value={content}
-					onChange={changeHandler(setContent)}
+					onChange={changeHandler((val) => (content = val))}
 					min={1}
+					onKeyDown={(e) => {
+						if (e.key == "Enter") {
+							submitHandeler();
+						}
+					}}
 				/>
 				<Btn
 					disabled={isValidating}
-					onClick={() => {
-						setContent("");
-						mutate(content);
-					}}
+					onClick={submitHandeler}
 					shape="circle"
 					className=" m-2  h-8 w-8 "
 				>

@@ -20,3 +20,9 @@ return [...array,value]
 export const toPusherKey = (val:string)=>{
 return val.replace(":", "--")
 }
+export const toChatId = (user1:string,user2:string)=>{
+return [user1,user2].sort().join("--")
+}
+export const fromChatId = (chatId:string)=>{
+return chatId.split("--")
+}

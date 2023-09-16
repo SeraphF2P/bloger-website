@@ -5,15 +5,7 @@ import { useUser } from "@clerk/nextjs";
 
 function ConfirmFriendRequestBtn({ autherId }: { autherId: string }) {
 	const auth = useUser();
-	const notify = api.notification.create.useMutation();
-	const ConfirmFriendRequest = api.user.ConfirmFriendRequest.useMutation({
-		onSuccess: () => {
-			notify.mutate({
-				to: autherId,
-				from: auth.user?.id || "",
-				type: "friendrequestconfirmed",
-			});
-		},
+	const ConfirmFriendRequest = api.friend.ConfirmFriendRequest.useMutation({
 		onError: () => {
 			toast({ message: "some thing went wrong", type: "error" });
 		},

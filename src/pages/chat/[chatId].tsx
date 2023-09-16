@@ -1,33 +1,40 @@
-import { usePusher } from "../../context/PusherContext";
+import { usePusher } from "@/context/PusherContext";
 import axiosClient from "@/lib/axiosClient";
 import { cn } from "@/lib/cva";
 import { Container, ContentInput, NextImage } from "@/ui";
 import { api } from "@/utils/api";
+import { fromChatId } from "@/utils/index";
+import { ssgHelper } from "@/utils/ssgHelper";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion as m } from "framer-motion";
-import type { NextPage } from "next";
+import type { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Error from "next/error";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import { type FC, useState } from "react";
 
-const ChatPage: NextPage = () => {
+const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
+	chatId,
+	user1,
+	user2,
+}) => {
 	const auth = useUser();
-	const { asPath } = useRouter();
-	const chatId = asPath.slice(6);
-	const [user1, user2] = chatId.split("--");
 	const chatPartnerId = user1 != auth.user?.id ? user1 : user2;
+
+	const { data: chatPartnerProfile } =
+		api.user.getUserProfile.useQuery(chatPartnerId);
 
 	const { data: messages, isLoading } = useQuery({
 		queryKey: [chatId],
 		queryFn: async () => {
 			return await axiosClient.get<ChatMSGType[] | []>(`chat?chatId=${chatId}`);
 		},
+		keepPreviousData: true,
 	});
-	const oldMessages = messages?.data || [];
-	console.log(oldMessages);
+	const oldMessages = messages?.data ? [...messages.data] : [];
+
 	const [allMessages, setAllMessages] = useState<ChatMSGType[]>(oldMessages);
+	console.log(allMessages);
 	const [lastMessageIds, setLastMessageIds] = useState<{
 		user: string;
 		chatPartner: string;
@@ -50,7 +57,8 @@ const ChatPage: NextPage = () => {
 		key: `chat:${chatId}`,
 		event: "resiveMessage",
 		cb: (message: ChatMSGType) => {
-			setAllMessages((prev) => [message, ...prev]);
+			console.log(message);
+			setAllMessages((prev) => [...prev, message]);
 			setLastMessageIds((prev) => {
 				if (message.autherId == auth.user?.id) {
 					return {
@@ -67,9 +75,6 @@ const ChatPage: NextPage = () => {
 		},
 	});
 
-	const { data: chatPartnerProfile } =
-		api.user.getUserProfile.useQuery(chatPartnerId);
-
 	if (!chatPartnerProfile) return <Error statusCode={400} withDarkMode />;
 	if (!auth.user || !chatId.includes(auth.user.id))
 		return <Error statusCode={401} withDarkMode />;
@@ -78,7 +83,7 @@ const ChatPage: NextPage = () => {
 			<section className="p-4 gap-2 flex-col-reverse  flex    overflow-y-scroll  remove-scroll-bar ">
 				{allMessages &&
 					!isLoading &&
-					allMessages.map((msg) => {
+					allMessages.reverse().map((msg) => {
 						const isUser = auth.user.id == msg.autherId;
 						const isLastMessage =
 							lastMessageIds.user == msg.id ||
@@ -148,4 +153,35 @@ const ChatPage: NextPage = () => {
 	);
 };
 
+export const getStaticPaths = () => {
+	return {
+		paths: [],
+		fallback: "blocking",
+	};
+};
+export const getStaticProps = async (context: GetStaticPropsContext) => {
+	const chatId = context.params?.chatId;
+	if (typeof chatId != "string") {
+		return {
+			redirect: {
+				destination: "/",
+			},
+		};
+	}
+	const [user1, user2] = fromChatId(chatId);
+	const ssg = ssgHelper();
+	await Promise.all([
+		ssg.user.getUserProfile.prefetch(user1),
+		ssg.user.getUserProfile.prefetch(user2),
+	]);
+
+	return {
+		props: {
+			chatId,
+			user1,
+			user2,
+			trpcState: ssg.dehydrate(),
+		},
+	};
+};
 export default ChatPage;

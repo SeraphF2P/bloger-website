@@ -55,7 +55,7 @@ const Navbar = () => {
 				<ListLink href="/chat">
 					<ChatNotification
 						userId={user?.id || ""}
-						isActivePath={asPath == "/chat"}
+						isActivePath={asPath.startsWith("/chat")}
 					/>
 				</ListLink>
 				<ListLink href="/setting">
@@ -81,7 +81,6 @@ function Notification({
 		key: `note:${userId}`,
 		event: "note",
 		cb: () => {
-			console.log("asdad");
 			setMsgNotesCount((prev) => prev + 1);
 		},
 	});
