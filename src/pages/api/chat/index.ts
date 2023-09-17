@@ -14,13 +14,12 @@ const validateGETReq = z.object({
  export default async function handler(req: NextApiRequest, res: NextApiResponse) {
    const {userId,sessionId} = getAuth(req)
    if(!userId || !sessionId)  return res.status(401);
-  if(req.method === 'POST'){
-    const validData = validatePostReq.parse(req.body)
-   if(!validData) return res.status(400)
+   if(req.method === 'POST'){
+     const validData = validatePostReq.parse(req.body)
+     if(!validData) return res.status(400)
      const {chatId,content} = validData
-     if(chatId.includes(userId) ==  null)  return res.status(401);
-  
-     const {success} = await redis.chat.post({content,autherId: userId,chatId})
+    if(chatId.includes(userId) ==  null)  return res.status(401);
+     const {success} = await redis.chatapp.post({content,autherId: userId,chatId})
      
      res.status(200).json({ success });
   }
@@ -29,7 +28,7 @@ const validateGETReq = z.object({
    if(!validData) return res.status(400)
      const {chatId} = validData
      if(chatId.includes(userId) ==  null)  return res.status(401);
-       const msgs = await redis.chat.get({chatId})
+       const msgs = await redis.chatapp.get({chatId})
 
        res.status(200).json(msgs);
   }

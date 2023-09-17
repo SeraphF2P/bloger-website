@@ -1,3 +1,4 @@
+import { chatRouter } from "./routers/chat";
 import { commentRouter } from "./routers/comment";
 import { friendRouter } from "./routers/friend";
 import { notificationRouter } from "./routers/notification";
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   comment: commentRouter,
   notification: notificationRouter,
   friend: friendRouter,
+  chat:chatRouter
 });
 
 // export type definition of API

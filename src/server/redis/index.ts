@@ -1,6 +1,7 @@
 import { Redis } from '@upstash/redis';
 import { note } from './note';
 import chat from './chat';
+import chatapp from './chatApp';
 
 // export const revalidate = 0 // disable cache 
 
@@ -17,6 +18,7 @@ import chat from './chat';
 const redis = {
   note,
   chat,
+  chatapp,
   ...red
 }
 export default redis

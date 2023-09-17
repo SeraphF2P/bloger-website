@@ -114,7 +114,7 @@ function ChatNotification({
 	const [msgnotesCount, setMsgNotesCount] = useState(0);
 
 	usePusher({
-		key: `chat:${userId}`,
+		key: `chatapp:${userId}`,
 		event: "messageNotifications",
 		cb: () => {
 			setMsgNotesCount((prev) => prev + 1);
