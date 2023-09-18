@@ -11,6 +11,11 @@ import { api, type RouterOutputs } from "@/utils/api";
 import { ssgHelper } from "@/utils/ssgHelper";
 import { useUser } from "@clerk/nextjs";
 import type {
+	FetchNextPageOptions,
+	InfiniteData,
+	InfiniteQueryObserverResult,
+} from "@tanstack/react-query";
+import type {
 	GetStaticPaths,
 	GetStaticPropsContext,
 	InferGetStaticPropsType,
@@ -22,15 +27,22 @@ import Link from "next/link";
 import type { FC } from "react";
 
 type User = RouterOutputs["user"]["getUserProfile"];
-function PostsSection({ auther }: { auther: User }) {
-	const { data, isLoading, hasNextPage, fetchNextPage } =
-		api.user.getUserPosts.useInfiniteQuery(
-			{ userId: auther.id, limit: 5 },
-			{
-				getNextPageParam: (lastpage) => lastpage.nextCursor,
-				keepPreviousData: true,
-			}
-		);
+type PostPagesType = RouterOutputs["user"]["getUserPosts"];
+function PostsSection({
+	auther,
+	isLoading,
+	postPages,
+	hasNextPage,
+	fetchNextPage,
+}: {
+	auther: User;
+	isLoading: boolean;
+	postPages: InfiniteData<PostPagesType> | undefined;
+	hasNextPage: boolean | undefined;
+	fetchNextPage: (
+		options?: FetchNextPageOptions | undefined
+	) => Promise<InfiniteQueryObserverResult<PostPagesType>>;
+}) {
 	if (isLoading) {
 		return (
 			<Loading.SkeletonPage
@@ -39,7 +51,7 @@ function PostsSection({ auther }: { auther: User }) {
 			/>
 		);
 	}
-	const posts = data?.pages.flatMap((page) => page.posts);
+	const posts = postPages?.pages.flatMap((page) => page.posts);
 
 	if (!posts || posts?.length == 0) {
 		return (
@@ -72,10 +84,48 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	userId,
 }) => {
 	const auth = useUser();
-	const { data: auther } = api.user.getUserProfile.useQuery(userId);
+	const { data: auther, isFetched } = api.user.getUserProfile.useQuery(userId);
+	const {
+		data: postPages,
+		isLoading,
+		hasNextPage,
+		fetchNextPage,
+	} = api.user.getUserPosts.useInfiniteQuery(
+		{ userId, limit: 5 },
+		{
+			getNextPageParam: (lastpage) => lastpage.nextCursor,
+			keepPreviousData: true,
+		}
+	);
 	if (!auther) return <Error statusCode={404} withDarkMode />;
 
-	const isUserAuther = auth.isSignedIn && auther.id == auth.user?.id;
+	const MainBtn = () => {
+		const isUserAuther = auth.isSignedIn && auther.id == auth.user?.id;
+		const status = isUserAuther
+			? "isUserAuther"
+			: auther.isFriend
+			? "isFriend"
+			: auther.hasAfriendRequest
+			? "hasAfriendRequest"
+			: "AddFriend";
+		const config = {
+			isUserAuther: null,
+			isFriend: (
+				<Link
+					className={variants({
+						variant: "fill",
+						className: " capitalize px-4 py-2",
+					})}
+					href={`/chat/${[auther.id, auth.user?.id].sort().join("--")}`}
+				>
+					message
+				</Link>
+			),
+			hasAfriendRequest: <ConfirmFriendRequestBtn autherId={auther.id} />,
+			AddFriend: <AddFriend isFriend={auther.isFriend} autherId={auther.id} />,
+		};
+		return config[status];
+	};
 	return (
 		<>
 			<Head>
@@ -98,24 +148,16 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 				<div className=" w-full p-2  text-center">
 					<h1>{auther.username}</h1>
 					<div className="  flex gap-2  justify-center w-full p-2">
-						{isUserAuther ? null : auther.isFriend ? (
-							<Link
-								className={variants({
-									variant: "fill",
-									className: " capitalize px-4 py-2",
-								})}
-								href={`/chat/${[auther.id, auth.user?.id].sort().join("--")}`}
-							>
-								message
-							</Link>
-						) : auther.hasAfriendRequest ? (
-							<ConfirmFriendRequestBtn autherId={auther.id} />
-						) : (
-							<AddFriend isFriend={auther.isFriend} autherId={auther.id} />
-						)}
+						{isFetched && <MainBtn />}
 					</div>
 				</div>
-				<PostsSection auther={auther} />
+				<PostsSection
+					isLoading={isLoading}
+					hasNextPage={hasNextPage}
+					postPages={postPages}
+					fetchNextPage={fetchNextPage}
+					auther={auther}
+				/>
 			</Container>
 		</>
 	);

@@ -11,7 +11,7 @@ import { motion as m } from "framer-motion";
 import type { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Error from "next/error";
 import Image from "next/image";
-import { type FC, useState } from "react";
+import { useState, type FC } from "react";
 
 const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	chatId,
@@ -24,18 +24,16 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	const { data: chatPartnerProfile } =
 		api.user.getUserProfile.useQuery(chatPartnerId);
 
-	const { data: messages, isLoading } = useQuery({
+	const { data: messages, isFetched } = useQuery({
 		queryKey: [chatId],
 		queryFn: async () => {
 			return await axiosClient.get<ChatMSGType[] | []>(`chat?chatId=${chatId}`);
 		},
 	});
 	const oldMessages = messages?.data || [];
-	console.log(oldMessages);
 	const [allMessages, setAllMessages] = useState<ChatMSGType[]>(
 		[...oldMessages].reverse()
 	);
-	console.log(allMessages);
 	const [lastMessageIds, setLastMessageIds] = useState<{
 		user: string;
 		chatPartner: string;
@@ -74,13 +72,15 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 			});
 		},
 	});
+
 	if (!chatPartnerProfile) return <Error statusCode={400} withDarkMode />;
 	if (!auth.user || !chatId.includes(auth.user.id))
 		return <Error statusCode={401} withDarkMode />;
 	return (
 		<Container className="p-0 pt-[70px] pb-8 ">
 			<section className="p-4 gap-2 flex-col-reverse  flex    overflow-y-scroll  remove-scroll-bar ">
-				{!isLoading && allMessages && allMessages.length > 0
+				<TypingIndicator userId={auth.user.id} chatId={chatId} />
+				{isFetched && allMessages && allMessages.length > 0
 					? allMessages.map((msg) => {
 							const isUser = auth.user.id == msg.autherId;
 							const isLastMessage =
@@ -147,8 +147,49 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 			<ContentInput
 				isValidating={sendMessage.isLoading}
 				mutate={(val) => sendMessage.mutate(val)}
+				onHasValue={(hasValue) => {
+					axiosClient(
+						// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+						`chat/isTyping?${new URLSearchParams({
+							chatId,
+							chatPartnerId,
+							isTyping: hasValue.toString(),
+						})}`
+					).catch((err) => {
+						console.error(err);
+					});
+				}}
 			/>
 		</Container>
+	);
+};
+
+const TypingIndicator = ({
+	chatId,
+	userId,
+}: {
+	chatId: string;
+	userId: string;
+}) => {
+	const [isTyping, setisTyping] = useState(false);
+	usePusher({
+		key: `chatapp:${chatId}:${userId}`,
+		event: "isTyping",
+		cb: (val: boolean) => {
+			setisTyping(val);
+		},
+	});
+	if (!isTyping) return null;
+	return (
+		<div
+			className={cn(
+				"dark:bg-gray-400 bg-gray-600 p-2 self-start rounded-bl-none rounded-full max-w-min flex gap-1"
+			)}
+		>
+			<span className=" animate-[bounce_1s_infinite] relative top-0.5      bg-gray-400 dark:bg-gray-600 rounded-full h-4  w-4" />
+			<span className=" animate-[bounce_1s_infinite_0.2s] relative top-0.5 bg-gray-400 dark:bg-gray-600 rounded-full h-4  w-4" />
+			<span className=" animate-[bounce_1s_infinite_0.4s] relative top-0.5 bg-gray-400 dark:bg-gray-600 rounded-full h-4  w-4" />
+		</div>
 	);
 };
 
