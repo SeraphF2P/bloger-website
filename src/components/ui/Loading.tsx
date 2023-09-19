@@ -1,9 +1,14 @@
 import { cn } from "@/lib/cva";
-import { useMemo, type HTMLAttributes, type PropsWithChildren } from "react";
+import {
+	type ComponentProps,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	type PropsWithChildren,
+} from "react";
 import { RotatingLines } from "react-loader-spinner";
 
-type Div = HTMLAttributes<HTMLDivElement>;
-const Mesh = (props: Div) => {
+const Mesh = (props: ComponentProps<"div">) => {
 	return (
 		<div
 			className={cn(" grid  h-full w-full  bg-transparent", props.className)}
@@ -21,7 +26,7 @@ const Mesh = (props: Div) => {
 		</div>
 	);
 };
-const Spinner = (props: Div) => {
+const Spinner = (props: ComponentProps<"div">) => {
 	return (
 		<div
 			className={cn(" grid  h-full w-full  bg-transparent", props.className)}
@@ -38,20 +43,46 @@ const Spinner = (props: Div) => {
 		</div>
 	);
 };
-const Line = () => {
-	const widthRandomizer = useMemo(() => {
-		return 100 - Math.floor(Math.random() * 40);
+const Lines = () => {
+	const lineRefs = useRef<HTMLDivElement[]>([]);
+	useEffect(() => {
+		const lines = lineRefs.current;
+		lines.map((line, index) => {
+			line?.style.setProperty(
+				"--randomizer",
+				`${100 - Math.floor(Math.random() * 40)}%`
+			);
+			const random = Math.random() >= 0.5 ? 3 : 2;
+			line?.style.setProperty(
+				"--display",
+				`${random > index ? "block" : "hidden"}`
+			);
+		});
 	}, []);
+	const placeholderArray = Array.from({ length: 4 });
 	return (
-		<div
-			style={{
-				width: `${widthRandomizer}%`,
-			}}
-			className=" bg-gray-300/80 dark:bg-gray-700/70 w-full rounded-full  h-6"
-		/>
+		<>
+			{placeholderArray &&
+				placeholderArray.map((_, index) => {
+					return (
+						<div
+							key={index}
+							ref={(el) => el && lineRefs.current.push(el)}
+							style={{
+								display: "var(--display)",
+								width: `var(--randomizer)`,
+							}}
+							className=" bg-gray-300/80 dark:bg-gray-700/70 w-full rounded-full  h-6"
+						/>
+					);
+				})}
+		</>
 	);
 };
-const SkeletonPage = ({ count, className }: Div & { count: number }) => {
+const SkeletonPage = ({
+	count,
+	className,
+}: ComponentProps<"div"> & { count: number }) => {
 	const skeletons = Array.from({ length: count });
 	return (
 		<div className={className}>
@@ -62,19 +93,28 @@ const SkeletonPage = ({ count, className }: Div & { count: number }) => {
 	);
 };
 
-function SkelatonPost({ className, index = 0 }: Div & { index?: number }) {
-	const { delay, numOfline, widthRandomizer } = useMemo(() => {
-		return {
-			widthRandomizer: (100 - Math.floor(Math.random() * 30)) / 100,
-			numOfline: Math.random() >= 0.5 ? 3 : 2,
-			delay: index * 0.2,
-		};
+function SkelatonPost({
+	className,
+	index = 0,
+}: ComponentProps<"div"> & { index?: number }) {
+	const skelatonRef = useRef<HTMLDivElement>(null);
+
+	useLayoutEffect(() => {
+		const skelaton = skelatonRef.current;
+		skelaton?.style.setProperty(
+			"--randomier",
+			`${(100 - Math.floor(Math.random() * 30)) / 100}`
+		);
+		skelaton?.style.setProperty("--stagger-delay-in", `${index * 0.2}s`);
+		skelaton?.style.setProperty("--stagger-delay-out", `${index * 0.2 + 1}s`);
 	}, [index]);
+
 	return (
 		<div
+			ref={skelatonRef}
 			style={{
-				animation: `fadein 1s linear infinite ${delay}s,
-        fadeout 1s linear infinite ${delay + 1}s`,
+				animation: `fadein 1s linear infinite var(--stagger-delay-in),
+        fadeout 1s linear infinite var(--stagger-delay-out)`,
 			}}
 			className={cn("-translate-y-16  space-y-2 w-full", className)}
 		>
@@ -83,24 +123,20 @@ function SkelatonPost({ className, index = 0 }: Div & { index?: number }) {
 				<div className="flex-1 flex pl-4   flex-col gap-2 items-start justify-center">
 					<div
 						style={{
-							width: `${widthRandomizer * 80}px`,
+							width: `calc(var(--randomier) * 80)px`,
 						}}
 						className=" bg-gray-400/70 dark:bg-gray-500/70    rounded-full  h-6"
 					/>
 					<div
 						style={{
-							width: `${widthRandomizer * 120}px`,
+							width: `calc(var(--randomier) * 120)px`,
 						}}
 						className=" bg-gray-400/70 dark:bg-gray-500/70    rounded-full  h-6"
 					/>
 				</div>
 			</div>
 			<div className=" animate-pulse bg-gray-400/70 dark:bg-gray-500/70 space-y-2 p-4 rounded-md ">
-				{Array.from({
-					length: numOfline,
-				}).map((_, index) => (
-					<Line key={index} />
-				))}
+				<Lines />
 			</div>
 		</div>
 	);
@@ -112,5 +148,4 @@ Loading.Spinner = Spinner;
 Loading.Mesh = Mesh;
 Loading.SkelatonPost = SkelatonPost;
 Loading.SkeletonPage = SkeletonPage;
-
 export default Loading;

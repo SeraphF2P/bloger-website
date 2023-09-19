@@ -146,6 +146,7 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
 			<ContentInput
 				isValidating={sendMessage.isLoading}
+				placeholder="write a message..."
 				mutate={(val) => sendMessage.mutate(val)}
 				onHasValue={(hasValue) => {
 					axiosClient(

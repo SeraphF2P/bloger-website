@@ -40,8 +40,8 @@ const Navbar = () => {
 				<ListLink href="/">
 					<Icons.news />
 				</ListLink>
-				<ListLink href="/drafts">
-					<Icons.drafts />
+				<ListLink href="/search">
+					<Icons.search />
 				</ListLink>
 				<ListLink href={"/profile" + `${user ? `/${user?.id}` : ""}`}>
 					<Icons.userIcon />

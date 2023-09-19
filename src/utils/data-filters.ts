@@ -8,7 +8,7 @@ export const filterUser = (user: ClerkUser) => {
     gender: gender,
     firstName: firstName,
     lastName: lastName,
-    username: username || `${firstName || "user"} ${lastName || ""}`,
+    username: `@${username || ""}` || `${firstName || "user"} ${lastName || ""}`,
     profileImageUrl: profileImageUrl ?? "/male-avatar.webp",
   };
   return userInfo;

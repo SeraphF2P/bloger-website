@@ -7,6 +7,6 @@ import type { Config } from "tailwindcss";
 const config = {
   darkMode: ["class"],
   content: [],
-  plugins: [MyPlugin, twScrollbar({ nocompatible: true }), typography, forms],
+  plugins: [MyPlugin, twScrollbar({ nocompatible: true }), typography, forms({strategy:"class"})],
 } satisfies Config;
 export default config;

@@ -29,3 +29,25 @@ body::-webkit-scrollbar,
 #root::-webkit-scrollbar {
 	display: none;
 }
+.crystal {
+	background: linear-gradient(
+			45deg,
+			rgba(var(--primary), 0.5) 10%,
+			rgba(var(--primary), 0.1) 10%
+		),
+		linear-gradient(
+			65deg,
+			rgba(var(--primary), 0.1) 70%,
+			rgba(var(--primary), 0.5) 70%
+		),
+		linear-gradient(
+			15deg,
+			rgba(var(--primary), 0.5) 80%,
+			rgba(var(--primary), 0.1) 80%
+		),
+		linear-gradient(
+			25deg,
+			rgba(var(--primary), 0.5) 30%,
+			rgba(var(--primary), 0.1) 30%
+		);
+}

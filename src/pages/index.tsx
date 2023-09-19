@@ -1,3 +1,4 @@
+import { CreatePost } from "@/components/home";
 import { BlogPost, ScrollEndIndecator } from "@/components/index";
 import { toast } from "@/lib/myToast";
 import { Container, Loading } from "@/ui";
@@ -38,6 +39,7 @@ const Home: NextPage = () => {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 			<Container className="text-revert-theme flex flex-col gap-4">
+				<CreatePost />
 				{posts.map((props): JSX.Element => {
 					return <BlogPost key={props.id} {...props} />;
 				})}

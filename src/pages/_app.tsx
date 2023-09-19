@@ -16,7 +16,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
 		<ErrorBoundary>
 			<ClerkProvider {...pageProps}>
 				<PusherContext>
-					<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+					<ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
 						<Toaster position="bottom-center" />
 						<Navbar />
 						<AnimatePresence>

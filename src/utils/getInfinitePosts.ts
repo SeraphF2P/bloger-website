@@ -15,7 +15,7 @@ export async function getInfinitePosts({
   cursor,
   ctx,
 }: {
-  whereClause: Prisma.PostWhereInput;
+  whereClause?: Prisma.PostWhereInput;
   limit: number;
   cursor: { id: string; createdAt: Date } | undefined;
   ctx: createTRPCContextType;
@@ -68,7 +68,7 @@ export async function getInfiniteProfilePosts({
   cursor,
   ctx,
 }: {
-  whereClause: Prisma.PostWhereInput;
+  whereClause?: Prisma.PostWhereInput;
   limit: number;
   cursor: { id: string; createdAt: Date } | undefined;
   ctx: createTRPCContextType;

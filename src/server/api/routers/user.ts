@@ -53,18 +53,23 @@ export const userRouter = createTRPCRouter({
         whereClause: { autherId: userId },
       });
     }),
-  getUserDrafts: privateProcedure.query(async ({ ctx }) => {
-    const drafts = await ctx.prisma.post.findMany({
-      where: {
-        autherId: ctx.userId,
-        published: false,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    return drafts || [];
-  }),
-
-
+searchUser:privateProcedure.input(z.string().min(1).max(30)).mutation(async({input})=>{
+  const users =await clerkClient.users.getUserList({query:`${input}`});
+  
+  return users.map(user => filterUser(user))
+}),
+checkForDuplicateUser:privateProcedure.input(z.string().min(1).max(30)).mutation(async({ctx,input})=>{
+  const usersWithThisUserName =await clerkClient.users.getUserList({query:`${input}`});
+    return {
+      userAlreadyExists:usersWithThisUserName && usersWithThisUserName.length >0
+    }
+}) ,
+update:privateProcedure.input(z.string().min(1).max(30)).mutation(async({ctx,input})=>{
+  try {
+    await clerkClient.users.updateUser(ctx.userId,{username:input});
+    return {success:true}
+  } catch (error) {
+    return new Error( "user with this username alredy exist",{cause:400})
+  }
+}) 
 })

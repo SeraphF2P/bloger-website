@@ -1,13 +1,13 @@
+import { api } from "../../utils/api";
 import { SignInUI } from "@/components/index";
 import { ThemeToggler } from "@/components/setting";
-import { Container } from "@/ui";
+import { Container, ContentInput, NextImage } from "@/ui";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
-import Image from "next/image";
 
 const Setting: NextPage = ({}) => {
 	const { user, isSignedIn } = useUser();
-
+	const { mutate } = api.user.update.useMutation();
 	return (
 		<Container>
 			<h1 className=" w-full p-4 text-center">Setting</h1>
@@ -16,15 +16,15 @@ const Setting: NextPage = ({}) => {
 					{!isSignedIn && <SignInUI />}
 					{isSignedIn && <SignOutButton />}
 				</div>
-				<div className=" relative h-20 w-20 overflow-hidden rounded-full bg-green-400 ">
-					<Image
-						fill
-						className=" absolute inset-0"
-						src={isSignedIn ? user.profileImageUrl : "/male-avatar.webp"}
-						alt={`${user?.username || ""} profile image`}
-					/>
-				</div>
+				<NextImage
+					className=" relative h-20 w-20 overflow-hidden rounded-full bg-green-400 "
+					fill
+					sizes="80px 80px"
+					src={isSignedIn ? user.profileImageUrl : "/male-avatar.webp"}
+					alt={`${user?.username || ""} profile image`}
+				/>
 			</div>
+			{/* <ContentInput isValidating={false} mutate={mutate} /> */}
 			<ThemeToggler />
 		</Container>
 	);

@@ -25,52 +25,23 @@ export const postRouter = createTRPCRouter({
       return await getInfinitePosts({
         ctx,
         cursor,
-        limit,
-        whereClause: {
-          published: true,
-        },
+        limit
       });
     }),
-  createDraft: privateProcedure
-    .input(
-      z.object({
-        title: z
-          .string()
-          .min(1, "title field can't be emty")
-          .max(30, "title cannot exceed 30 characters"),
-        content: z
-          .string()
-          .min(1, "content field can't be emty")
-          .max(500, "content cannot exceed 500 characters"),
-      })
-    )
+ 
+  publish: privateProcedure
+    .input(z.object({
+      title:z.string().min(3),
+      content:z.string().min(3)
+    }))
     .mutation(async ({ ctx, input }) => {
-      const { success } = await postingRateLimit.limit(ctx.userId);
+        const { success } = await postingRateLimit.limit(ctx.userId);
       if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
-      const drafts = await ctx.prisma.post.count({
-        where: {
-          autherId: ctx.userId,
-        },
-      });
-      if (drafts > 4)
-        throw new Error("Too many drafts emty some space then try again");
       await ctx.prisma.post.create({
         data: {
           title: input.title,
           content: input.content,
           autherId: ctx.userId,
-        },
-      });
-    }),
-  publish: privateProcedure
-    .input(z.string().min(1))
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.post.update({
-        data: {
-          published: true,
-        },
-        where: {
-          id: input,
         },
       });
       void ctx.revalidate?.(`/profile/${ctx.userId}`);

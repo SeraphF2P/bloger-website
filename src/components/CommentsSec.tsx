@@ -2,6 +2,7 @@ import AddComment from "./AddComment";
 import ScrollEndIndecator from "./ui/ScrollEndIndecator";
 import { Icons, Loading, Modale, NextImage, type BtnProps } from "@/ui";
 import { api } from "@/utils/api";
+import { useLayoutEffect, useRef } from "react";
 
 // type CommentProps = RouterOutputs["comment"]["getComments"];
 interface CommentsSecPropsType extends BtnProps {
@@ -67,11 +68,7 @@ const Comments = ({ postId }: { postId: string }) => {
 						/>
 						<h3>{auther.username}</h3>
 					</div>
-					<div className=" m-2">
-						<p className=" line-clamp-4 rounded bg-revert-theme/10 p-2">
-							{content}
-						</p>
-					</div>
+					<ExtendableContent content={content} />
 				</div>
 			))}
 			<ScrollEndIndecator
@@ -84,5 +81,31 @@ const Comments = ({ postId }: { postId: string }) => {
 		</section>
 	);
 };
-
+const ExtendableContent = ({ content }: { content: string }) => {
+	const paragraphRef = useRef<HTMLParagraphElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+	useLayoutEffect(() => {
+		const pTag = paragraphRef.current;
+		const inputTag = inputRef.current;
+		if (!pTag || !inputTag) return;
+		if (pTag.scrollHeight - pTag.offsetHeight <= 0) {
+			inputTag.style.display = "none";
+		}
+	}, []);
+	return (
+		<div className=" flex flex-col-reverse m-2">
+			<input
+				ref={inputRef}
+				className=" peer whitespace-nowrap max-w-min hover:bg-primary/30 transition-colors before:content-['see_more'] before:checked:content-['see_less'] cursor-pointer px-4 py-2 rounded appearance-none  "
+				type="checkbox"
+			/>
+			<p
+				ref={paragraphRef}
+				className=" peer-checked:max-h-none  overflow-hidden max-h-[calc(1em_*_4_+_16px)] max-w-[65ch] break-words rounded bg-revert-theme/10 p-2"
+			>
+				{content}
+			</p>
+		</div>
+	);
+};
 export default CommentSection;

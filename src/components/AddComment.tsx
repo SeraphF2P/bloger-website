@@ -31,6 +31,7 @@ const AddComment = ({
 		<ContentInput
 			mutate={(content) => mutate({ content, postId, autherId })}
 			isValidating={isValidating}
+			placeholder="write a comment..."
 			fallBack={
 				<>
 					{isSignedIn && (

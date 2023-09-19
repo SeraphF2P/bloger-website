@@ -145,10 +145,11 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 						</div>
 					</div>
 				</section>
-				<div className=" w-full p-2  text-center">
-					<h1>{auther.username}</h1>
+				<div className=" w-full p-2 flex flex-col gap-2  text-center">
+					<h1>{`${auther.firstName || ""} ${auther.lastName || ""}`}</h1>
+					<p>{auther.username}</p>
 					<div className="  flex gap-2  justify-center w-full p-2">
-						{isFetched && <MainBtn />}
+						{isFetched && !isLoading && <MainBtn />}
 					</div>
 				</div>
 				<PostsSection
