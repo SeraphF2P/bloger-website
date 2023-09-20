@@ -11,6 +11,7 @@ import Modale from "./Modale";
 import NextImage from "./NextImage";
 import NotificationDot from "./NotificationDot";
 import ScrollBar from "./ScrollBar";
+import StyledToggleBtn from "./StyledToggleBtn";
 import ToggleBtn from "./ToggleBtn";
 
 export {
@@ -26,5 +27,6 @@ export {
   ErrorBoundary,
   ToggleBtn,
   ContentInput,
-  NotificationDot
+  NotificationDot,
+  StyledToggleBtn
 };

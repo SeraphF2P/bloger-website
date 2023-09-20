@@ -2,7 +2,7 @@ import { filterUser } from "@/utils/data-filters";
 import { getInfiniteProfilePosts } from "@/utils/getInfinitePosts";
 import { clerkClient } from "@clerk/nextjs/server";
 import { z } from "zod";
-import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
   getUserProfile: publicProcedure
@@ -53,23 +53,5 @@ export const userRouter = createTRPCRouter({
         whereClause: { autherId: userId },
       });
     }),
-searchUser:privateProcedure.input(z.string().min(1).max(30)).mutation(async({input})=>{
-  const users =await clerkClient.users.getUserList({query:`${input}`});
-  
-  return users.map(user => filterUser(user))
-}),
-checkForDuplicateUser:privateProcedure.input(z.string().min(1).max(30)).mutation(async({ctx,input})=>{
-  const usersWithThisUserName =await clerkClient.users.getUserList({query:`${input}`});
-    return {
-      userAlreadyExists:usersWithThisUserName && usersWithThisUserName.length >0
-    }
-}) ,
-update:privateProcedure.input(z.string().min(1).max(30)).mutation(async({ctx,input})=>{
-  try {
-    await clerkClient.users.updateUser(ctx.userId,{username:input});
-    return {success:true}
-  } catch (error) {
-    return new Error( "user with this username alredy exist",{cause:400})
-  }
-}) 
+
 })

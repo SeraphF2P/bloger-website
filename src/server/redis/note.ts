@@ -5,7 +5,7 @@ import { toPusherKey } from '@/utils/index';
 
 const helper = createRedisHelper("note")
 
-export const note ={
+const note ={
   create: helper<Omit<Omit<NotificationType, "id">, "createdAt">,boolean>(async ({table,params})=>{
 
       const id = params.type == "friendrequest" ? `${params.from}-${params.to}`:nanoid();
@@ -50,3 +50,4 @@ return  notes.filter((note) => note.seen == false).length;
 
 
 }
+export default note

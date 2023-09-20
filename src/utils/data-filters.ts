@@ -15,7 +15,6 @@ export const filterUser = (user: ClerkUser) => {
 };
 interface UnfilterPostWithOutAuther extends Post {
   likes:Like[],
- 
   _count: {
     likes: number;
     Comment: number;

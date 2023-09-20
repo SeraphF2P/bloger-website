@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import { note } from './note';
+import note  from './note';
 import chat from './chat';
 import chatapp from './chatApp';
 

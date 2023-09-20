@@ -11,6 +11,7 @@ interface contentInputType extends ComponentProps<"input"> {
 	fallBack?: ReactNode;
 	resetOnSubmit?: ReactNode;
 }
+let content = "";
 export const ContentInput: FC<contentInputType> = ({
 	mutate,
 	isValidating,
@@ -20,17 +21,18 @@ export const ContentInput: FC<contentInputType> = ({
 	...props
 }) => {
 	const ref = useRef<HTMLInputElement>(null);
-	let content = "";
 	const changeHandler = (fn: (val: string) => void) => {
 		return (e: ChangeEvent<HTMLInputElement>) => fn(e.target.value);
 	};
 	const submitHandeler = () => {
+		console.log(content);
 		mutate(content);
 		if (ref.current && resetOnSubmit) {
 			ref.current.value = "";
 			content = "";
 		}
 	};
+	console.log(content);
 	const { className, ...rest } = props;
 	return (
 		<div className={cn("absolute bottom-0 left-0  h-10  w-full ", className)}>
