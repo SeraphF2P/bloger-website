@@ -1,3 +1,4 @@
+import { BlogPost } from "../../components";
 import { api } from "../../utils/api";
 import {
 	Container,
@@ -33,6 +34,7 @@ const Search: NextPage = () => {
 		filter: filterType;
 		content: string;
 	}) => {
+		if (content == "") return;
 		router.replace(`?search-filter=${filter}&search-content=${content}`);
 		mutate({ filter, content });
 	};
@@ -61,7 +63,7 @@ const Search: NextPage = () => {
 					]}
 				/>
 			</div>
-			<section className=" flex flex-col gap-4  relative ">
+			<section className=" flex flex-col gap-4 min-h-full pb-24  relative ">
 				{isValidating && <Loading.Mesh />}
 				{filter == "user" &&
 					data?.users &&
@@ -89,12 +91,11 @@ const Search: NextPage = () => {
 					data?.posts &&
 					data?.posts.map((post) => {
 						return (
-							<div
+							<BlogPost
 								key={post.id}
-								className=" bg-sky-500 relative flex-shrink-0 flex flex-col gap-2 items-center justify-center rounded h-60"
-							>
-								{post.id}
-							</div>
+								{...post}
+								// className=" bg-sky-500 relative flex-shrink-0 flex flex-col gap-2 items-center justify-center rounded h-60"
+							/>
 						);
 					})}
 			</section>

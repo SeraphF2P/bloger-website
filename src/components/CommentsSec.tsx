@@ -1,7 +1,15 @@
-import AddComment from "./AddComment";
+import { toast } from "../lib/myToast";
 import ScrollEndIndecator from "./ui/ScrollEndIndecator";
-import { Icons, Loading, Modale, NextImage, type BtnProps } from "@/ui";
+import {
+	Icons,
+	Loading,
+	Modale,
+	NextImage,
+	type BtnProps,
+	ContentInput,
+} from "@/ui";
 import { api } from "@/utils/api";
+import { useUser } from "@clerk/nextjs";
 import { useLayoutEffect, useRef } from "react";
 
 // type CommentProps = RouterOutputs["comment"]["getComments"];
@@ -20,12 +28,12 @@ const CommentSection = ({
 	return (
 		<Modale>
 			<Modale.Btn {...props} />
-			<Modale.Content className="translate-y-full [--fadein-duration:0.7s] z-50 relative bg-theme dark:bg-theme backdrop-blur-sm mn:max-w-screen-mn w-full shadow mx-4 h-full">
+			<Modale.Content className="translate-y-full [--fadein-duration:0.7s] z-50 relative bg-theme dark:bg-theme backdrop-blur-sm  max-w-[420px] w-full shadow  h-full">
 				<div className=" flex justify-between sticky top-0 border-0 border-b-[1px] border-revert-theme w-full h-10">
 					<div className=" flex justify-center items-center px-4">
 						{likesCount} likes on this post
 					</div>
-					<Modale.Close className=" w-16 h-full ">
+					<Modale.Close variant="ghost" className=" w-16 h-full ">
 						<Icons.arrowRight className="w-6 h-6 " />
 					</Modale.Close>
 				</div>
@@ -106,6 +114,46 @@ const ExtendableContent = ({ content }: { content: string }) => {
 				{content}
 			</p>
 		</div>
+	);
+};
+const AddComment = ({
+	postId,
+	autherId,
+}: {
+	postId: string;
+	autherId: string;
+}) => {
+	const { isSignedIn } = useUser();
+	const ctx = api.useContext();
+	const { mutate, isLoading: isValidating } =
+		api.comment.createComment.useMutation({
+			onSuccess: () => {
+				void ctx.comment.getComments.invalidate();
+			},
+			onError: (err) => {
+				toast({
+					type: "error",
+					message:
+						err.data?.zodError?.formErrors[0] ||
+						"somthing went wrong try check your internet connection and try again later",
+				});
+			},
+		});
+
+	return (
+		<ContentInput
+			mutate={(content) => mutate({ content, postId, autherId })}
+			isValidating={isValidating}
+			placeholder="write a comment..."
+			className="absolute bottom-0 left-0  h-12  w-full "
+			fallBack={
+				!isSignedIn && (
+					<p className=" bg-theme px-4 py-2">
+						you cannot comment on this post login or try again later
+					</p>
+				)
+			}
+		/>
 	);
 };
 export default CommentSection;

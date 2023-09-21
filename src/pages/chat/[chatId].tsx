@@ -148,6 +148,7 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 				isValidating={sendMessage.isLoading}
 				placeholder="write a message..."
 				mutate={(val) => sendMessage.mutate(val)}
+				className="absolute bottom-0 left-0  h-12  w-full "
 				onHasValue={(hasValue) => {
 					axiosClient(
 						// eslint-disable-next-line @typescript-eslint/restrict-template-expressions

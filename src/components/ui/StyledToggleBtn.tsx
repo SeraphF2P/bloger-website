@@ -25,28 +25,28 @@ export default function ThemeToggle({
 				toggleValues.map((opt) => {
 					const isActive = activeVal == opt.name;
 					return (
-						<Btn
-							key={opt.name}
-							className={cn(
-								`relative rounded-none flex w-full items-center justify-center p-2 `,
-								{
-									" text-yellow-300 dark:text-yellow-400": isActive,
-								}
-							)}
-							onClick={() => {
-								toggleHandler(opt.name);
-							}}
-						>
-							{opt.component}
-
+						<div key={opt.name} className={`relative w-full`}>
+							<Btn
+								className={cn(
+									`relative rounded-none flex w-full items-center justify-center p-2 `,
+									{
+										" text-yellow-300 dark:text-yellow-400": isActive,
+									}
+								)}
+								onClick={() => {
+									toggleHandler(opt.name);
+								}}
+							>
+								{opt.component}
+								<span className=" sr-only">{opt.name}</span>
+							</Btn>
 							{isActive && (
 								<m.span
 									layoutId="active-theme-border"
 									className=" absolute inset-0 z-10  border-2 border-revert-theme pointer-events-none"
 								/>
 							)}
-							<span className=" sr-only">{opt.name}</span>
-						</Btn>
+						</div>
 					);
 				})}
 		</div>

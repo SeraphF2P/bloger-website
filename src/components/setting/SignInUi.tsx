@@ -6,9 +6,10 @@ const SignInUi = ({}) => {
 	return (
 		<Modale>
 			<Modale.Btn variant="none">sign in</Modale.Btn>
-			<Modale.Content>
+			<Modale.Content className="">
 				<SignIn
 					appearance={{
+						variables: { colorPrimary: "rgb(139,92,246)" },
 						elements: {
 							headerTitle: "text-revert-theme",
 							headerSubtitle: "text-revert-theme",
@@ -16,7 +17,12 @@ const SignInUi = ({}) => {
 							footerActionText: "text-revert-theme",
 							socialButtonsIconButton: variants({
 								variant: "outline",
+								className: "bg-primary/30",
 							}),
+							formFieldLabel: "text-revert-theme",
+							formFieldRow__identifier: "text-revert-theme",
+							dividerLine: " bg-revert-theme",
+							dividerText: "text-revert-theme",
 						},
 					}}
 				/>

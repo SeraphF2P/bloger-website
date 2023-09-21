@@ -25,51 +25,52 @@ export const ContentInput: FC<contentInputType> = ({
 		return (e: ChangeEvent<HTMLInputElement>) => fn(e.target.value);
 	};
 	const submitHandeler = () => {
-		console.log(content);
 		mutate(content);
 		if (ref.current && resetOnSubmit) {
 			ref.current.value = "";
 			content = "";
 		}
 	};
-	console.log(content);
 	const { className, ...rest } = props;
 	return (
-		<div className={cn("absolute bottom-0 left-0  h-10  w-full ", className)}>
-			<div className=" flex w-full h-full items-center">
-				<input
-					ref={ref}
-					className=" form-input h-10 w-full"
-					type="text"
-					onChange={changeHandler((val: string) => {
-						content = val;
-						if (onHasValue == undefined) return;
+		<div className={cn(" relative h-12  w-full ", className)}>
+			{fallBack ? (
+				fallBack
+			) : (
+				<div className="form-input  p-0 flex w-full h-full items-center">
+					<input
+						ref={ref}
+						className=" py-2 bg-transparent px-3 h-full w-full"
+						type="text"
+						onChange={changeHandler((val: string) => {
+							content = val;
+							if (onHasValue == undefined) return;
 
-						if (content.length == 1) {
-							onHasValue(true);
-						}
-						if (content == "") {
-							onHasValue(false);
-						}
-					})}
-					min={1}
-					onKeyDown={(e) => {
-						if (e.key == "Enter") {
-							submitHandeler();
-						}
-					}}
-					{...rest}
-				/>
-				<Btn
-					disabled={isValidating}
-					onClick={submitHandeler}
-					shape="circle"
-					className=" m-2  h-8 w-8 "
-				>
-					<Icons.send className=" w-4 h-4 " />
-				</Btn>
-			</div>
-			{fallBack}
+							if (content.length == 1) {
+								onHasValue(true);
+							}
+							if (content == "") {
+								onHasValue(false);
+							}
+						})}
+						min={1}
+						onKeyDown={(e) => {
+							if (e.key == "Enter") {
+								submitHandeler();
+							}
+						}}
+						{...rest}
+					/>
+					<Btn
+						disabled={isValidating}
+						onClick={submitHandeler}
+						shape="circle"
+						className=" m-2  h-10 w-10 "
+					>
+						<Icons.send className=" w-6 h-6 " />
+					</Btn>
+				</div>
+			)}
 		</div>
 	);
 };

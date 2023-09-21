@@ -3,7 +3,7 @@ import {
 	Bars4Icon,
 	BellIcon,
 	BookmarkSquareIcon,
-	ChatBubbleOvalLeftEllipsisIcon,
+	ChatBubbleLeftRightIcon,
 	ChatBubbleOvalLeftIcon,
 	FaceSmileIcon,
 	HeartIcon,
@@ -18,6 +18,8 @@ import {
 	UserIcon,
 	UsersIcon,
 	XCircleIcon,
+	Cog6ToothIcon,
+	InboxIcon,
 } from "@heroicons/react/24/outline";
 import type { ReactNode, SVGProps } from "react";
 
@@ -79,7 +81,7 @@ Icons.moon = MoonIcon;
 Icons.system = ServerIcon;
 Icons.googleColored = googleColored;
 Icons.userIcon = UserIcon;
-Icons.settings = Bars4Icon;
+Icons.burgermenu = Bars4Icon;
 Icons.news = NewspaperIcon;
 Icons.usersIcon = UsersIcon;
 Icons.drafts = PencilSquareIcon;
@@ -91,7 +93,8 @@ Icons.chatbubble = ChatBubbleOvalLeftIcon;
 Icons.arrowRight = ArrowRightIcon;
 Icons.send = PaperAirplaneIcon;
 Icons.notification = BellIcon;
-Icons.chat = ChatBubbleOvalLeftEllipsisIcon;
+Icons.chat = ChatBubbleLeftRightIcon;
 Icons.NotificationIcons = NotificationIcons;
+Icons.gear = Cog6ToothIcon;
 
 export default Icons;

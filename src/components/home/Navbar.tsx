@@ -59,7 +59,7 @@ const Navbar = () => {
 					/>
 				</ListLink>
 				<ListLink href="/setting">
-					<Icons.settings />
+					<Icons.burgermenu />
 				</ListLink>
 			</ul>
 		</header>

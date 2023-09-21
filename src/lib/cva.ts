@@ -8,16 +8,16 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 export const variants = cva(
-  ` flex transition-[box-shadow,colors] justify-center items-center tracking-wider cursor-pointer text-revert-theme 
+  ` relative flex transition-[box-shadow,colors] justify-center items-center tracking-wider cursor-pointer text-revert-theme 
    [--variant:--primary] `,
   {
     variants: {
       variant: {
-        fill: " bg-variant hover:!shadow-dynamic/40 shadow-overlay  transition-[box-shadow,colors] duration-700  ",
+        fill: " bg-variant hover:!shadow-[rgb(var(--theme),0.4)] shadow-overlay  transition-[box-shadow,colors] duration-700  ",
         outline:
           " ring-solid transition-[box-shadow,colors] duration-700  ring-2 ring-variant hover:bg-variant active:bg-variant     ",
         ghost:
-          "  hover:bg-[rgb(var(--variant),0.8)]   active:bg-variant hover:text-theme  ",
+          "  hover:bg-variant/80   active:bg-variant   ",
         none: "",
       },
       shape: {

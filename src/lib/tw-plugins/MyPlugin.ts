@@ -8,7 +8,7 @@ export const MyPlugin = plugin(
         "--theme": "30,41,59", //? slate["800"]
         "--revert-theme": "226,232,240", //? slate["200"]
         "--theme-shadow": "245,245,245", //?
-        "--primary": "167,139,250", //?violet["400"]
+        "--primary": "139,92,246", //?violet["500"]
         "--alert": "200,50,50",
         "--success": "50,200,50",
       },
@@ -16,7 +16,7 @@ export const MyPlugin = plugin(
         "--theme": "226,232,240", //? slate["200"]
         "--revert-theme": "30,41,59", //? slate["800"]
         "--theme-shadow": "0,0,0", //?
-        "--primary": "139,92,246", //?violet["500"]
+        "--primary": "167,139,250", //?violet["400"]
         "--alert": "200,50,50",
         "--success": "50,200,50",
       },
