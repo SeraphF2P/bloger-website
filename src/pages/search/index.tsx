@@ -40,7 +40,7 @@ const Search: NextPage = () => {
 	};
 
 	return (
-		<Container className="pb-0">
+		<Container className="pb-0 min-h-screen">
 			<div className=" flex flex-col gap-4">
 				<ContentInput
 					className=" relative w-full"

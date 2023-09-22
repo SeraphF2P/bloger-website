@@ -1,5 +1,6 @@
-import SignInUi from "./SignInUi";
+import ClerkSignIn from "./ClerkSignIn";
+
 import ThemeToggler from "./ThemeToggler";
 import UserProfilePage from "./UserProfilePage";
 
-export { ThemeToggler,SignInUi,UserProfilePage };
+export { ThemeToggler,UserProfilePage,ClerkSignIn };

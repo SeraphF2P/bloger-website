@@ -8,15 +8,15 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: true,
   images: {
-    domains: ['images.clerk.dev'],
+    domains: ['images.clerk.dev', 'www.gravatar.com'],
   },
-  webpack: (config) => {
-    config.externals.push({
-      "utf-8-validate": "commonjs utf-8-validate",
-      bufferutil: "commonjs bufferutil",
-    })
-    return config
-  },
+  // webpack: (config) => {
+  //   config.externals.push({
+  //     "utf-8-validate": "commonjs utf-8-validate",
+  //     bufferutil: "commonjs bufferutil",
+  //   })
+  //   return config
+  // },
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
    * out.

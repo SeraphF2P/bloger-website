@@ -4,11 +4,11 @@ import type { Like, Post } from "@prisma/client";
 export const filterUser = (user: ClerkUser) => {
   const { gender, id, firstName, lastName, profileImageUrl, username } = user;
   const userInfo = {
-    id: id,
-    gender: gender,
-    firstName: firstName,
-    lastName: lastName,
-    username: `@${username || ""}` || `${firstName || "user"} ${lastName || ""}`,
+    id,
+    gender,
+    firstName,
+    lastName,
+    username: `@${username || ""}` ,
     profileImageUrl: profileImageUrl ?? "/male-avatar.webp",
   };
   return userInfo;

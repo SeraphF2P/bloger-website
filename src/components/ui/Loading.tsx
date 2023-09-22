@@ -2,7 +2,6 @@ import { cn } from "@/lib/cva";
 import {
 	type ComponentProps,
 	useEffect,
-	useLayoutEffect,
 	useRef,
 	type PropsWithChildren,
 } from "react";
@@ -99,7 +98,7 @@ function SkelatonPost({
 }: ComponentProps<"div"> & { index?: number }) {
 	const skelatonRef = useRef<HTMLDivElement>(null);
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		const skelaton = skelatonRef.current;
 		skelaton?.style.setProperty(
 			"--randomier",

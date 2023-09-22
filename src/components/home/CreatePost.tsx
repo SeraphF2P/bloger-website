@@ -11,6 +11,7 @@ type formValuesType = { title: string; content: string };
 
 const CreateDraft = () => {
 	const auth = useUser();
+
 	const [open, setopen] = useState(false);
 	const { register, handleSubmit, reset } = useForm<formValuesType>({
 		defaultValues: {
@@ -21,7 +22,9 @@ const CreateDraft = () => {
 	const { mutate, isLoading: isValidating } = api.post.publish.useMutation({
 		onSuccess: () => {
 			reset();
-			toast({ type: "success", message: "new draft has been created" });
+			localStorage.setItem("draft-title", "");
+			localStorage.setItem("draft-content", ""),
+				toast({ type: "success", message: "new draft has been created" });
 		},
 		onError: (e) => {
 			const errorMessage = e.data?.zodError?.fieldErrors[0] || [
@@ -46,7 +49,7 @@ const CreateDraft = () => {
 	if (!auth.isSignedIn) return null;
 	return (
 		<Modale open={open} onOpenChange={setopen}>
-			<Modale.Btn className="  rounded px-8 py-4 gap-x-4 text-xl capitalize md:left-[60%]">
+			<Modale.Btn className="  rounded px-8 py-4 gap-x-4 text-xl capitalize ">
 				write a new post
 				<Icons.drafts className=" w-10 h-10" />
 			</Modale.Btn>
@@ -59,7 +62,7 @@ const CreateDraft = () => {
 						className=" space-y-4 "
 					>
 						<input
-							className=" placeholder:text-revert-theme bg-slate-100  dark:bg-gray-900 w-full rounded border-0 "
+							className=" form-input placeholder:text-revert-theme bg-slate-100  dark:bg-gray-900 w-full rounded border-0 "
 							type="text"
 							placeholder="title"
 							{...register("title", {
@@ -79,7 +82,7 @@ const CreateDraft = () => {
 							})}
 						/>
 						<textarea
-							className=" placeholder:text-revert-theme min-h-[240px]  resize-none w-full rounded border-0 bg-slate-100  dark:bg-gray-900 "
+							className=" form-textarea placeholder:text-revert-theme min-h-[240px]  resize-none w-full rounded border-0 bg-slate-100  dark:bg-gray-900 "
 							placeholder="content"
 							{...register("content", {
 								onChange: changeHandler((val) =>

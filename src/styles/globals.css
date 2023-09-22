@@ -2,11 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-.form-control {
-	@apply relative flex w-full flex-col pb-6;
-}
-.form-control label {
-	@apply sr-only;
+* > * {
+	@apply transition-colors ease-linear;
 }
 .form-input {
 	@apply bg-theme   text-revert-theme placeholder-revert-theme/70 shadow focus:ring-2 valid:focus:ring-sky-600 invalid:focus:border-transparent invalid:focus:ring-red-400;
@@ -19,7 +16,6 @@ html,
 body,
 #root {
 	height: 100vh;
-
 	scroll-behavior: smooth;
 	-ms-overflow-style: none;
 	scrollbar-width: none;

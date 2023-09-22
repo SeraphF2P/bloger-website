@@ -25,9 +25,9 @@ export const variants = cva(
         circle: "rounded-full aspect-square",
         rect: "rounded-sm",
       },
-      disable: {
+      deActivated: {
         default:
-          " disabled:text-gray-500   disabled:bg-btn-muted disabled:ring-btn-muted ",
+          " disabled:text-gray-700   disabled:bg-gray-500 disabled:ring-gray-500 ",
         skelaton:
           "disabled:text-gray-400 disabled:ring-4 disabled:bg-gray-400 disabled:active:bg-transparent",
         link: "text-gray-400 ring-gray-400 active:bg-transparent hover:scale-100 cursor-auto",
@@ -36,7 +36,7 @@ export const variants = cva(
     defaultVariants: {
       variant: "fill",
       shape: "rect",
-      disable: "default",
+      deActivated: "default",
     },
   }
 );

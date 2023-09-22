@@ -37,7 +37,7 @@ const Navbar = () => {
 	return (
 		<header className=" fixed z-40 top-0  left-1/2 -translate-x-1/2  flex w-full justify-center max-w-[420px]  ">
 			<ul className=" flex relative w-full bg-theme text-revert-theme  items-center justify-between  ">
-				<ListLink href="/">
+				<ListLink href="/home">
 					<Icons.news />
 				</ListLink>
 				<ListLink href="/search">

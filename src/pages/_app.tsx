@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/home";
-import { NotSignedIn } from "@/components/index";
 import PusherContext from "@/context/PusherContext";
 import { Toaster } from "@/lib/myToast/toast";
 import { ErrorBoundary } from "@/ui";
@@ -23,7 +22,6 @@ const MyApp: AppType = ({ Component, pageProps }) => {
 							<Component {...pageProps} />
 						</AnimatePresence>
 						<Analytics />
-						<NotSignedIn />
 					</ThemeProvider>
 				</PusherContext>
 			</ClerkProvider>

@@ -1,9 +1,8 @@
-import AddFriend from "./AddFriend";
 import BlogPost from "./BlogPost";
 import CommentsSec from "./CommentsSec";
-import ConfirmFriendRequestBtn from "./ConfirmFriendRequestBtn";
-import NotSignedIn from "./NotSignedIn";
+import NoContent from "./NoContent";
+
 
 import ScrollEndIndecator from "./ui/ScrollEndIndecator";
 
-export { BlogPost, CommentsSec, NotSignedIn, ScrollEndIndecator,AddFriend ,ConfirmFriendRequestBtn};
+export {NoContent, BlogPost, CommentsSec, ScrollEndIndecator };

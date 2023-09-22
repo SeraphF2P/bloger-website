@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "../../lib/cva";
+import { cn } from "@/lib/cva";
 import { Btn } from "@/ui";
 import { motion as m } from "framer-motion";
-import { ReactNode, useState } from "react";
+import { type ReactNode, useId, useState } from "react";
 
 export default function ThemeToggle({
 	defaultValue,
@@ -14,6 +14,7 @@ export default function ThemeToggle({
 	toggleValues: { name: string; component: ReactNode }[];
 	fn: (val?: any) => void;
 }) {
+	const id = useId();
 	const [activeVal, setToggled] = useState(defaultValue);
 	const toggleHandler = (val: string) => {
 		setToggled(val);
@@ -42,7 +43,7 @@ export default function ThemeToggle({
 							</Btn>
 							{isActive && (
 								<m.span
-									layoutId="active-theme-border"
+									layoutId={"active-theme-border" + id}
 									className=" absolute inset-0 z-10  border-2 border-revert-theme pointer-events-none"
 								/>
 							)}

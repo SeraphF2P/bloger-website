@@ -1,30 +1,23 @@
-import { variants } from "../../lib/cva";
-import {
-	AddFriend,
-	BlogPost,
-	ConfirmFriendRequestBtn,
-	ScrollEndIndecator,
-} from "@/components/index";
+import { BlogPost, NoContent, ScrollEndIndecator } from "@/components/index";
 import { toast } from "@/lib/myToast";
-import { Container, Icons, Loading } from "@/ui";
+import { Container, Loading, NextImage } from "@/ui";
 import { api, type RouterOutputs } from "@/utils/api";
 import { ssgHelper } from "@/utils/ssgHelper";
 import { useUser } from "@clerk/nextjs";
 import type {
-	FetchNextPageOptions,
-	InfiniteData,
-	InfiniteQueryObserverResult,
+  FetchNextPageOptions,
+  InfiniteData,
+  InfiniteQueryObserverResult,
 } from "@tanstack/react-query";
 import type {
-	GetStaticPaths,
-	GetStaticPropsContext,
-	InferGetStaticPropsType,
+  GetStaticPaths,
+  GetStaticPropsContext,
+  InferGetStaticPropsType,
 } from "next";
 import Error from "next/error";
 import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
 import type { FC } from "react";
+import { FriendshipHandlerBtn } from "../../components/profile";
 
 type User = RouterOutputs["user"]["getUserProfile"];
 type PostPagesType = RouterOutputs["user"]["getUserPosts"];
@@ -43,24 +36,17 @@ function PostsSection({
 		options?: FetchNextPageOptions | undefined
 	) => Promise<InfiniteQueryObserverResult<PostPagesType>>;
 }) {
-	if (isLoading) {
+	if (isLoading)
 		return (
 			<Loading.SkeletonPage
 				count={4}
 				className=" flex w-full flex-col gap-8  p-2"
 			/>
 		);
-	}
+
 	const posts = postPages?.pages.flatMap((page) => page.posts);
 
-	if (!posts || posts?.length == 0) {
-		return (
-			<div className=" min-h-40 flex  w-full flex-col items-center justify-center rounded bg-slate-300 p-8 dark:bg-slate-500">
-				<Icons.error className=" w-40  " />
-				<h3 className=" capitalize">user dont have any post</h3>
-			</div>
-		);
-	}
+	if (!posts || posts?.length == 0) return <NoContent />;
 
 	return (
 		<>
@@ -91,7 +77,7 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 		hasNextPage,
 		fetchNextPage,
 	} = api.user.getUserPosts.useInfiniteQuery(
-		{ userId, limit: 5 },
+		{ userId },
 		{
 			getNextPageParam: (lastpage) => lastpage.nextCursor,
 			keepPreviousData: true,
@@ -99,33 +85,6 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	);
 	if (!auther) return <Error statusCode={404} withDarkMode />;
 
-	const MainBtn = () => {
-		const isUserAuther = auth.isSignedIn && auther.id == auth.user?.id;
-		const status = isUserAuther
-			? "isUserAuther"
-			: auther.isFriend
-			? "isFriend"
-			: auther.hasAfriendRequest
-			? "hasAfriendRequest"
-			: "AddFriend";
-		const config = {
-			isUserAuther: null,
-			isFriend: (
-				<Link
-					className={variants({
-						variant: "fill",
-						className: " capitalize px-4 py-2",
-					})}
-					href={`/chat/${[auther.id, auth.user?.id].sort().join("--")}`}
-				>
-					message
-				</Link>
-			),
-			hasAfriendRequest: <ConfirmFriendRequestBtn autherId={auther.id} />,
-			AddFriend: <AddFriend isFriend={auther.isFriend} autherId={auther.id} />,
-		};
-		return config[status];
-	};
 	return (
 		<>
 			<Head>
@@ -135,21 +94,28 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 			</Head>
 			<Container>
 				<section className=" pb-[51px] ">
-					<div className="  h-40 w-full bg-primary   relative">
-						<div className=" absolute  -bottom-1/3 left-1/2 h-36 w-36 -translate-x-1/2 overflow-hidden rounded-full ">
-							<Image
-								fill
-								src={auther.profileImageUrl}
-								alt={`${auther.username}'s profile picture`}
-							/>
-						</div>
+					<div className="  h-40 w-full bg-primary relative">
+						<NextImage
+							className=" absolute border-2 border-revert-theme  -bottom-1/3 left-1/2 h-36 w-36 -translate-x-1/2 overflow-hidden rounded-full "
+							sizes="144px 144px"
+							src={auther.profileImageUrl}
+							alt={`${auther.username}'s profile picture`}
+						/>
 					</div>
 				</section>
 				<div className=" w-full p-2 flex flex-col gap-2  text-center">
 					<h1>{`${auther.firstName || ""} ${auther.lastName || ""}`}</h1>
 					<p>{auther.username}</p>
 					<div className="  flex gap-2  justify-center w-full p-2">
-						{isFetched && !isLoading && <MainBtn />}
+						{isFetched && !isLoading && (
+							<FriendshipHandlerBtn
+								userId={auth.user?.id || ""}
+								autherId={auther.id}
+								isFriend={auther.isFriend}
+								isSignedIn={auth.isSignedIn || false}
+								hasAfriendRequest={auther.hasAfriendRequest}
+							/>
+						)}
 					</div>
 				</div>
 				<PostsSection
