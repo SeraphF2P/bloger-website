@@ -1,7 +1,7 @@
 import { getInfinitePosts } from "@/utils/getInfinitePosts";
 import { postingRateLimit } from "@/utils/ratelimit";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { ZodError, z } from "zod";
 import {
   createTRPCRouter,
   privateProcedure,
@@ -49,7 +49,7 @@ export const postRouter = createTRPCRouter({
   delete: privateProcedure
     .input(z.string().min(1))
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.post.delete({
+     await ctx.prisma.post.delete({
         where: {
           id: input,
         },
@@ -61,42 +61,45 @@ export const postRouter = createTRPCRouter({
       postId:z.string()
     }))
     .mutation(async ({ ctx, input:{autherId,postId} }) => {
-      
-      const isLiked = await ctx.prisma.like.findUnique({
-        where: {
-          postId_autherId: {
-            autherId: ctx.userId,
-            postId,
-          },
-        },
-      });
-      if (isLiked) {
-        await ctx.prisma.like.delete({
-          where: {
-            postId_autherId: {
-              autherId: ctx.userId,
-              postId,
-            },
-          },
-        });
-      } else {
-        await ctx.prisma.like.create({
-          data: {
-            autherId: ctx.userId,
-            postId,
-          },
-        });
-      }
-      
-     if(autherId != ctx.userId && !isLiked) {
-     await ctx.redis.note.create({
-      from:ctx.userId,
-      to:autherId,
-      type:"newlike",
-      onPost:postId
-     })
-     
-    }
+    
+         const isLiked = await ctx.prisma.like.findUnique({
+           where: {
+             postId_autherId: {
+               autherId: ctx.userId,
+               postId,
+             },
+           },
+         });
+         let success
+         if (isLiked) {
+         const deletedLike =   await ctx.prisma.like.delete({
+             where: {
+               postId_autherId: {
+                 autherId: ctx.userId,
+                 postId,
+               },
+             },
+           });
+           success = !!deletedLike
+         } else {
+          const userIsNotAuther = autherId != ctx.userId && !isLiked
+          const result =await Promise.allSettled([
+         await ctx.prisma.like.create({
+             data: {
+               autherId: ctx.userId,
+               postId,
+             },
+           }),
+          ...(userIsNotAuther?[await ctx.redis.note.create({
+          from:ctx.userId,
+          to:autherId,
+          type:"newlike",
+          onPost:postId
+          })]:[])
+          ])
+           success = result.every(res=>res.status == "fulfilled")
+         }
+         return success
   }
     ),
 });

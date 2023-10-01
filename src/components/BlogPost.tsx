@@ -4,11 +4,30 @@ import { toast } from "@/lib/myToast";
 import { AlertModal, Btn, Icons } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
+import { TRPCClientError } from "@trpc/client";
 import { AnimatePresence, motion as m } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useLayoutEffect, useState, type FC } from "react";
+import { type FC } from "react";
+import { ZodError } from "zod";
 
+const createlikeSectionCaption = ({
+	isLiked,
+	likesCount,
+}: {
+	likesCount: number;
+	isLiked: boolean;
+}) => {
+	if (likesCount > 0) {
+		if (isLiked && likesCount == 1) {
+			return "you";
+		} else if (isLiked && likesCount > 1) {
+			return `you and ${likesCount - 1} other liked this post`;
+		} else {
+			return `${likesCount} people have liked this post`;
+		}
+	}
+};
 const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 	const ctx = api.useContext();
 	const auth = useUser();
@@ -30,13 +49,6 @@ const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 			},
 		}
 	);
-	const [isLiked, setIsLiked] = useState(props.isLiked);
-	const [likesCount, setLikesCount] = useState(props.likesCount);
-	useLayoutEffect(() => {
-		setIsLiked(props.isLiked);
-		setLikesCount(props.likesCount);
-	}, [props.isLiked, props.likesCount]);
-
 	return (
 		<div
 			key={props.id}
@@ -71,22 +83,23 @@ const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 			<div className="   min-h-[100px] bg-theme p-4 ">
 				<p>{props.content}</p>
 			</div>
-			<LikesSec likeSectionCaption={props.likeSectionCaption} />
+			<LikesSec
+				likeSectionCaption={createlikeSectionCaption({
+					isLiked: props.isLiked,
+					likesCount: props.likesCount,
+				})}
+			/>
 			<div className="   flex items-center justify-between">
 				<LikeBtn
 					auth={auth}
 					postId={props.id}
 					autherId={auther.id}
-					setIsLiked={() => {
-						setIsLiked((prev: boolean) => !prev);
-						setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
-					}}
-					isLiked={isLiked}
+					isLiked={props.isLiked}
 				/>
 				<CommentsSec
 					postId={props.id}
 					autherId={props.autherId}
-					likesCount={likesCount}
+					likesCount={props.likesCount}
 					variant="ghost"
 					className=" flex justify-center items-center gap-1 flex-grow p-2 text-lg font-semibold "
 				>
@@ -114,21 +127,48 @@ function LikeBtn({
 	isLiked,
 	postId,
 	autherId,
-	setIsLiked,
 }: {
 	isLiked: boolean;
 	postId: string;
 	autherId: string;
 	auth: ReturnType<typeof useUser>;
-	setIsLiked: () => void;
 }) {
+	const ctx = api.useContext();
+	const optimisticallyChangsLikedState = () => {
+		void ctx.post.getAll.setInfiniteData({}, (oldData) => {
+			if (!oldData) return;
+			return {
+				pageParams: oldData.pageParams,
+				pages: oldData.pages.map((page) => {
+					return {
+						nextCursor: page.nextCursor,
+						posts: page.posts.map((post) => {
+							if (post.id == postId) {
+								const { isLiked, likesCount, ...rest } = post;
+								return {
+									isLiked: !isLiked,
+									likesCount: isLiked ? likesCount - 1 : likesCount + 1,
+									...rest,
+								};
+							}
+							return post;
+						}),
+					};
+				}),
+			};
+		});
+	};
 	const { mutate: like } = api.post.like.useMutation({
-		onMutate: () => {
-			setIsLiked();
+		onMutate: optimisticallyChangsLikedState,
+		onSettled: (res) => {
+			if (res == false) {
+				optimisticallyChangsLikedState();
+				toast({ message: "somting went wrong", type: "error" });
+			}
 		},
-		onError: (err) => {
-			setIsLiked();
-			toast({ message: err.message });
+		onError: () => {
+			optimisticallyChangsLikedState();
+			toast({ message: "somting went wrong", type: "error" });
 		},
 	});
 
@@ -141,8 +181,9 @@ function LikeBtn({
 			variant="ghost"
 		>
 			<AnimatePresence initial={false} mode="popLayout">
-				{isLiked && (
+				{isLiked ? (
 					<m.span
+						key={"heart-icon-postId:" + postId}
 						initial={{
 							x: 8,
 							opacity: 0,
@@ -161,11 +202,9 @@ function LikeBtn({
 							className={`w-7 h-7 relative transition-transform fill-red-400 hover:scale-105 `}
 						/>
 					</m.span>
-				)}
-			</AnimatePresence>
-			<AnimatePresence initial={false} mode="popLayout">
-				{!isLiked && (
+				) : (
 					<m.span
+						key={"like-btn-postId:" + postId}
 						initial={{
 							x: -8,
 							opacity: 0,

@@ -1,3 +1,4 @@
+import { FriendshipHandlerBtn } from "../../components/profile";
 import { BlogPost, NoContent, ScrollEndIndecator } from "@/components/index";
 import { toast } from "@/lib/myToast";
 import { Container, Loading, NextImage } from "@/ui";
@@ -5,19 +6,18 @@ import { api, type RouterOutputs } from "@/utils/api";
 import { ssgHelper } from "@/utils/ssgHelper";
 import { useUser } from "@clerk/nextjs";
 import type {
-  FetchNextPageOptions,
-  InfiniteData,
-  InfiniteQueryObserverResult,
+	FetchNextPageOptions,
+	InfiniteData,
+	InfiniteQueryObserverResult,
 } from "@tanstack/react-query";
 import type {
-  GetStaticPaths,
-  GetStaticPropsContext,
-  InferGetStaticPropsType,
+	GetStaticPaths,
+	GetStaticPropsContext,
+	InferGetStaticPropsType,
 } from "next";
 import Error from "next/error";
 import Head from "next/head";
 import type { FC } from "react";
-import { FriendshipHandlerBtn } from "../../components/profile";
 
 type User = RouterOutputs["user"]["getUserProfile"];
 type PostPagesType = RouterOutputs["user"]["getUserPosts"];

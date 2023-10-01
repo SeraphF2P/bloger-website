@@ -29,22 +29,11 @@ export const filterPosts = (
   const data = posts.map((post) => {
     const likesCount=post._count.likes
     const isLiked=post.likes.length > 0
-  let likeSectionCaption 
-		if (likesCount > 0) {
-			if (isLiked && likesCount == 1) {
-          likeSectionCaption= "you"
-        }else if(isLiked && likesCount > 1){
-          likeSectionCaption= `you and ${likesCount - 1} other liked this post`
-        }else {
-				likeSectionCaption= `${likesCount} people have liked this post`;
-			}
-		}
 	
     return {
       likesCount,
       commentsCount: post._count.Comment,
       isLiked ,
-      likeSectionCaption,
       ...post
     };
   });
@@ -56,21 +45,10 @@ export const filterProfilePosts = (
   const data = posts.map((post) => {
    const likesCount=post._count.likes
     const isLiked=post.likes.length > 0
-  let likeSectionCaption 
-		if (likesCount > 0) {
-			if (isLiked && likesCount == 1) {
-          likeSectionCaption= "you"
-        }else if(isLiked && likesCount > 1){
-          likeSectionCaption= `you and ${likesCount - 1} other liked this post`
-        }else {
-				likeSectionCaption= `${likesCount} people have liked this post`;
-			}
-		}
     return {
       likesCount,
       commentsCount: post._count.Comment,
       isLiked,
-      likeSectionCaption,
       ...post
     };
   });
