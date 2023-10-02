@@ -81,7 +81,9 @@ function Notification({
 		key: `note:${userId}`,
 		event: "note",
 		cb: () => {
-			setMsgNotesCount((prev) => prev + 1);
+			if (isActivePath == false) {
+				setMsgNotesCount((prev) => prev + 1);
+			}
 		},
 	});
 
@@ -112,12 +114,14 @@ function ChatNotification({
 	isActivePath: boolean;
 }) {
 	const [msgnotesCount, setMsgNotesCount] = useState(0);
-
+	const { asPath } = useRouter();
 	usePusher({
 		key: `chatapp:${userId}`,
 		event: "messageNotifications",
-		cb: () => {
-			setMsgNotesCount((prev) => prev + 1);
+		cb: (msg) => {
+			if (asPath.endsWith(msg.chatId) == false) {
+				setMsgNotesCount((prev) => prev + 1);
+			}
 		},
 	});
 	const isThereNewMsg = msgnotesCount > 0;

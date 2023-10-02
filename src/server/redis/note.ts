@@ -11,14 +11,12 @@ const note ={
       const id = params.type == "friendrequest" ? `${params.from}-${params.to}`:nanoid();
       const createdAt =new Date()
     
-     const value  ={id,createdAt,seen:false,confirmed:false,...params} satisfies NotificationType
+     const note  ={id,createdAt,seen:false,confirmed:false,...params} satisfies NotificationType
     
      const Promises = await Promise.allSettled([
         redis.rpush(`${table}:${params.to}`,id),
-        redis.hset(`${table}:${params.to}:${id}`,value),
-        pusherServer.trigger(toPusherKey(`${table}:${params.to}`),`${table}`,{
-       note:value
-     })
+        redis.hset(`${table}:${params.to}:${id}`,note),
+        pusherServer.trigger(toPusherKey(`${table}:${params.to}`),`${table}`,{note})
      ])
     
      return Promises.every(prom=>prom.status == "fulfilled")

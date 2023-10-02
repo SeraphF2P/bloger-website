@@ -45,7 +45,7 @@ export const notificationRouter = createTRPCRouter({
     .mutation(async({ ctx, input }) => {
       await ctx.redis.note.update(input)
     }),
-  get: privateProcedure
+  getAll: privateProcedure
     .query(async ({ ctx }) => {
       
     const notification = await ctx.redis.note.findMany({

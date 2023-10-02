@@ -1,5 +1,6 @@
-import { usePusher } from "../../context/PusherContext";
-import { Container, NextImage, NotificationDot } from "@/ui";
+import { NoContent } from "@/components/index";
+import { usePusher } from "@/context/PusherContext";
+import { Container, Loading, NextImage, NotificationDot } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
@@ -9,11 +10,13 @@ import { useState } from "react";
 
 const Chat: NextPage = () => {
 	const auth = useUser();
-	const { data } = api.friend.getAllChat.useQuery();
+	const { data, isLoading } = api.friend.getAllChat.useQuery();
 
 	if (!auth.isSignedIn) return <Error withDarkMode statusCode={401} />;
 	return (
 		<Container>
+			{isLoading && <Loading.Mesh />}
+			{!!data && <NoContent />}
 			{data &&
 				data.map(({ chatPartner, chatId, msg }) => {
 					return (
@@ -58,8 +61,7 @@ const ChatProfile = ({
 			});
 		},
 	});
-	const lastMsgAuther =
-		lastMsg?.autherId == chatPartner.id ? chatPartner?.username : "you";
+	const lastMsgAuther = lastMsg?.autherId == chatPartner.id ? "" : "you :";
 	return (
 		<div className=" relative flex items-center p-2 gap-2 bg-revert-theme/10  h-24 w-full">
 			<NextImage
@@ -73,7 +75,7 @@ const ChatProfile = ({
 				<h3>{chatPartner.username}</h3>
 				<div>
 					<p className=" truncate">
-						{[lastMsgAuther, info.lastMsg?.content].join(" : ")}
+						{lastMsg && `${lastMsgAuther}${info.lastMsg?.content}`}
 					</p>
 				</div>
 			</div>
