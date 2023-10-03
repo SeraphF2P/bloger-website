@@ -14,15 +14,6 @@ const Home: NextPage = () => {
 				getNextPageParam: (lastPage) => lastPage.nextCursor,
 			}
 		);
-	if (isLoading)
-		return (
-			<Container>
-				<Loading.SkeletonPage
-					className="flex-col  w-full items-center flex gap-4"
-					count={4}
-				/>
-			</Container>
-		);
 	const posts = data?.pages.flatMap((page) => page.posts);
 	return (
 		<>
@@ -35,13 +26,22 @@ const Home: NextPage = () => {
 				<meta name="auther" content="jafer ali" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<Container className="text-revert-theme flex flex-col gap-4">
+
+			<Container>
 				<CreatePost />
-				{!posts || (posts.length == 0 && <NoContent />)}
-				{posts &&
+				{isLoading && (
+					<Loading.SkeletonPage
+						className=" relative top-8 w-full items-center flex flex-col gap-4"
+						count={4}
+					/>
+				)}
+				{posts ? (
 					posts.map((props): JSX.Element => {
 						return <BlogPost key={props.id} {...props} />;
-					})}
+					})
+				) : (
+					<NoContent />
+				)}
 				<ScrollEndIndecator
 					hasNextPage={hasNextPage || false}
 					fetchNextPage={fetchNextPage}

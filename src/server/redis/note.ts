@@ -22,11 +22,11 @@ const note ={
      return Promises.every(prom=>prom.status == "fulfilled")
 }),
  findMany:helper<{ to:string, type:NoteType},NotificationType[] |[]>(async({table,params})=>{
-    const noteIdList = await redis.lrange(`${table}:${params.to}`,0,-1)
+    const noteIdList = (await redis.lrange(`${table}:${params.to}`,0,-1)).reverse()
     return  await Promise.all(
       noteIdList.map(async (id:string)=>{
         return await redis.hgetall(`${table}:${params.to}:${id}`)  as unknown as NotificationType
-      }),)
+      }))
     })
 ,
  delete: helper<{id:string, to:string, type:NoteType},unknown>(async({table,params})=>{

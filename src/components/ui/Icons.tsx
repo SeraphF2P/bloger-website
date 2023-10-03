@@ -19,7 +19,7 @@ import {
 	UsersIcon,
 	XCircleIcon,
 	Cog6ToothIcon,
-	InboxIcon,
+	InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import type { ReactNode, SVGProps } from "react";
 
@@ -96,5 +96,6 @@ Icons.notification = BellIcon;
 Icons.chat = ChatBubbleLeftRightIcon;
 Icons.NotificationIcons = NotificationIcons;
 Icons.gear = Cog6ToothIcon;
+Icons.info = InformationCircleIcon;
 
 export default Icons;

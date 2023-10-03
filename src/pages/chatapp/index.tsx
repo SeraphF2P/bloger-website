@@ -1,23 +1,27 @@
 import { NoContent } from "@/components/index";
 import { usePusher } from "@/context/PusherContext";
-import { Container, Loading, NextImage, NotificationDot } from "@/ui";
+import {
+	Container,
+	ErrorPages,
+	Loading,
+	NextImage,
+	NotificationDot,
+} from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
-import Error from "next/error";
 import Link from "next/link";
 import { useState } from "react";
 
 const Chat: NextPage = () => {
 	const auth = useUser();
 	const { data, isLoading } = api.friend.getAllChat.useQuery();
-
-	if (!auth.isSignedIn) return <Error withDarkMode statusCode={401} />;
+	if (!auth.isSignedIn) return <ErrorPages status={404} />;
 	return (
 		<Container>
-			{isLoading && <Loading.Mesh />}
-			{!!data && <NoContent />}
-			{data &&
+			{isLoading ? (
+				<Loading.Mesh />
+			) : data && data.length > 0 ? (
 				data.map(({ chatPartner, chatId, msg }) => {
 					return (
 						<ChatProfile
@@ -28,7 +32,10 @@ const Chat: NextPage = () => {
 							lastMsg={msg}
 						/>
 					);
-				})}
+				})
+			) : (
+				<NoContent />
+			)}
 		</Container>
 	);
 };
@@ -75,11 +82,11 @@ const ChatProfile = ({
 				<h3>{chatPartner.username}</h3>
 				<div>
 					<p className=" truncate">
-						{lastMsg && `${lastMsgAuther}${info.lastMsg?.content}`}
+						{lastMsg && `${lastMsgAuther}${info.lastMsg?.content || ""}`}
 					</p>
 				</div>
 			</div>
-			<Link className=" absolute inset-0" href={`chat/${chatId}`} />
+			<Link className=" absolute inset-0" href={`chatapp/${chatId}`} />
 		</div>
 	);
 };

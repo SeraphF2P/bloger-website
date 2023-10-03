@@ -1,7 +1,7 @@
 import { usePusher } from "@/context/PusherContext";
 import axiosClient from "@/lib/axiosClient";
 import { cn } from "@/lib/cva";
-import { Container, ContentInput, NextImage } from "@/ui";
+import { Container, ContentInput, ErrorPages, NextImage } from "@/ui";
 import { api } from "@/utils/api";
 import { fromChatId } from "@/utils/index";
 import { ssgHelper } from "@/utils/ssgHelper";
@@ -9,7 +9,6 @@ import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion as m } from "framer-motion";
 import type { GetStaticPropsContext, InferGetStaticPropsType } from "next";
-import Error from "next/error";
 import Image from "next/image";
 import { useState, type FC } from "react";
 
@@ -24,13 +23,16 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 	const { data: chatPartnerProfile } =
 		api.user.getUserProfile.useQuery(chatPartnerId);
 
-	const { data: messages, isFetched } = useQuery({
+	const { data } = useQuery({
 		queryKey: [chatId],
 		queryFn: async () => {
-			return await axiosClient.get<ChatMSGType[] | []>(`chat?chatId=${chatId}`);
+			return await axiosClient.get<ChatMSGType[] | []>(
+				`chat/get?chatId=${chatId}`
+			);
 		},
 	});
-	const oldMessages = messages?.data || [];
+
+	const oldMessages = data?.data || [];
 	const [allMessages, setAllMessages] = useState<ChatMSGType[]>(
 		[...oldMessages].reverse()
 	);
@@ -45,10 +47,10 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
 	const sendMessage = useMutation({
 		mutationFn: async (val: string) => {
-			return await axiosClient.post("chat", { content: val, chatId });
+			return await axiosClient.post("chat/post", { content: val, chatId });
 		},
 		onError: (err) => {
-			console.log(err);
+			console.error(err);
 		},
 	});
 	usePusher({
@@ -73,14 +75,14 @@ const ChatPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 		},
 	});
 
-	if (!chatPartnerProfile) return <Error statusCode={400} withDarkMode />;
+	if (!chatPartnerProfile) return <ErrorPages status={404} />;
 	if (!auth.user || !chatId.includes(auth.user.id))
-		return <Error statusCode={401} withDarkMode />;
+		return <ErrorPages status={401} />;
 	return (
 		<Container className="p-0 pt-[70px] pb-8 ">
 			<section className="p-4 gap-2 flex-col-reverse  flex    overflow-y-scroll  remove-scroll-bar ">
 				<TypingIndicator userId={auth.user.id} chatId={chatId} />
-				{isFetched && allMessages && allMessages.length > 0
+				{allMessages && allMessages.length > 0
 					? allMessages.map((msg) => {
 							const isUser = auth.user.id == msg.autherId;
 							const isLastMessage =

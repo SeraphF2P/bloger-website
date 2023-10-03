@@ -38,12 +38,13 @@ export const friendRouter = createTRPCRouter({
   
     const chatIds = await ctx.redis.lrange(`chat:${ctx.userId}`,0,-1)
     
+    if(chatIds.length == 0) return [];
     
     const chatPartnerIds = chatIds.map(chatId =>{
       const [user1,user2] = fromChatId(chatId)
       return ctx.userId == user1 ? user2:user1
     })
-    if(chatPartnerIds.length <1) return [];
+    if(chatPartnerIds.length == 0) return [];
     
     const chatPartnerProfiles = await clerkClient.users.getUserList({userId:chatPartnerIds})
     return await Promise.all(chatPartnerProfiles.map(async(user)=>{

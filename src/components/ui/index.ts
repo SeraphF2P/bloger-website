@@ -5,10 +5,12 @@ import Btn, { type BtnProps } from "./Btn";
 import Container from "./Container";
 import { ContentInput } from "./ContentInput";
 import ErrorBoundary from "./ErrorBoundary";
+import ErrorPages from "./ErrorPages";
 import Icons from "./Icons";
 import Loading from "./Loading";
 import Modale from "./Modale";
 import NextImage from "./NextImage";
+import NoContent from "./NoContent";
 import NotificationDot from "./NotificationDot";
 import ScrollBar from "./ScrollBar";
 import StyledToggleBtn from "./StyledToggleBtn";
@@ -28,5 +30,7 @@ export {
   ToggleBtn,
   ContentInput,
   NotificationDot,
-  StyledToggleBtn
+  StyledToggleBtn,
+  NoContent,
+  ErrorPages
 };

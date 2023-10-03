@@ -1,6 +1,6 @@
 import BlogPost from "./BlogPost";
 import CommentsSec from "./CommentsSec";
-import NoContent from "./NoContent";
+import NoContent from "./ui/NoContent";
 
 
 import ScrollEndIndecator from "./ui/ScrollEndIndecator";

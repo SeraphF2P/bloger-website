@@ -1,7 +1,7 @@
 import { FriendshipHandlerBtn } from "../../components/profile";
 import { BlogPost, NoContent, ScrollEndIndecator } from "@/components/index";
 import { toast } from "@/lib/myToast";
-import { Container, Loading, NextImage } from "@/ui";
+import { Container, ErrorPages, Loading, NextImage } from "@/ui";
 import { api, type RouterOutputs } from "@/utils/api";
 import { ssgHelper } from "@/utils/ssgHelper";
 import { useUser } from "@clerk/nextjs";
@@ -80,10 +80,9 @@ const Profile: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 		{ userId },
 		{
 			getNextPageParam: (lastpage) => lastpage.nextCursor,
-			keepPreviousData: true,
 		}
 	);
-	if (!auther) return <Error statusCode={404} withDarkMode />;
+	if (!auther) return <ErrorPages status={404} />;
 
 	return (
 		<>

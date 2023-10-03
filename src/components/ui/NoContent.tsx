@@ -1,4 +1,4 @@
-import { Icons } from "./ui";
+import { Icons } from ".";
 
 const NoContent = ({ caption = "no content" }: { caption?: string }) => {
 	return (

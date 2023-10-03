@@ -52,10 +52,10 @@ const Navbar = () => {
 						isActivePath={asPath == "/notification"}
 					/>
 				</ListLink>
-				<ListLink href="/chat">
+				<ListLink href="/chatapp">
 					<ChatNotification
 						userId={user?.id || ""}
-						isActivePath={asPath.startsWith("/chat")}
+						isActivePath={asPath.startsWith("/chatapp")}
 					/>
 				</ListLink>
 				<ListLink href="/setting">
@@ -118,7 +118,7 @@ function ChatNotification({
 	usePusher({
 		key: `chatapp:${userId}`,
 		event: "messageNotifications",
-		cb: (msg) => {
+		cb: (msg: ChatMSGType) => {
 			if (asPath.endsWith(msg.chatId) == false) {
 				setMsgNotesCount((prev) => prev + 1);
 			}

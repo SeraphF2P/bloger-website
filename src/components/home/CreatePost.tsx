@@ -15,8 +15,14 @@ const CreateDraft = () => {
 	const [open, setopen] = useState(false);
 	const { register, handleSubmit, reset } = useForm<formValuesType>({
 		defaultValues: {
-			title: localStorage.getItem("draft-title") || "",
-			content: localStorage.getItem("draft-content") || "",
+			title:
+				(typeof window !== "undefined" &&
+					localStorage.getItem("draft-title")) ||
+				"",
+			content:
+				(typeof window !== "undefined" &&
+					localStorage.getItem("draft-content")) ||
+				"",
 		},
 	});
 	const { mutate, isLoading: isValidating } = api.post.publish.useMutation({
@@ -49,7 +55,7 @@ const CreateDraft = () => {
 	if (!auth.isSignedIn) return null;
 	return (
 		<Modale open={open} onOpenChange={setopen}>
-			<Modale.Btn className="  rounded px-8 py-4 gap-x-4 text-xl capitalize ">
+			<Modale.Btn className=" relative  rounded px-8 py-4 gap-x-4 text-xl capitalize ">
 				write a new post
 				<Icons.drafts className=" w-10 h-10" />
 			</Modale.Btn>

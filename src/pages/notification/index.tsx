@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const Notification: NextPage = () => {
 	const ctx = api.useContext();
-	const { data: notification, isLoading } = api.notification.getAll.useQuery(
+	const { data: notifications, isLoading } = api.notification.getAll.useQuery(
 		undefined,
 		{
 			onSuccess: () => {
@@ -18,12 +18,17 @@ const Notification: NextPage = () => {
 
 	return (
 		<Container layout className="gap-1">
-			{isLoading && <Loading.Mesh />}
-			{!!notification && <NoContent />}
-			<AnimatePresence>
-				{notification &&
-					notification?.map((note) => <Alert key={note.id} {...note} />)}
-			</AnimatePresence>
+			{isLoading ? (
+				<Loading.Mesh />
+			) : (
+				<AnimatePresence>
+					{notifications && notifications.length > 0 ? (
+						notifications.map((note) => <Alert key={note.id} {...note} />)
+					) : (
+						<NoContent />
+					)}
+				</AnimatePresence>
+			)}
 		</Container>
 	);
 };

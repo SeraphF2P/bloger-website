@@ -28,7 +28,7 @@ const Container = forwardRef<
 			transition={{ duration: 1 }}
 			className={cn(
 				fontOutfit.variable,
-				"font-outfit h-screen py-24  remove-scroll-bar  shadow shadow-dynamic/40 relative mx-auto flex w-full max-w-[420px] flex-col gap-8 overflow-y-scroll px-2",
+				"font-outfit h-screen py-24 text-revert-theme  remove-scroll-bar  shadow shadow-dynamic/40 relative mx-auto flex w-full max-w-[420px] flex-col gap-4 overflow-y-scroll px-2",
 				className
 			)}
 			{...props}
