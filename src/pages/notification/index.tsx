@@ -1,7 +1,7 @@
 import { NoContent } from "../../components";
 import { Container, Icons, Loading, NextImage } from "@/ui";
 import { api, type RouterOutputs } from "@/utils/api";
-import { AnimatePresence, Variants, motion as m } from "framer-motion";
+import { AnimatePresence, type Variants, motion as m } from "framer-motion";
 import { type NextPage } from "next";
 import Link from "next/link";
 

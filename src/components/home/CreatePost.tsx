@@ -4,7 +4,7 @@ import { toast } from "@/lib/myToast";
 import { Btn, Container, Icons, Modale } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
-import { ChangeEvent, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 
 type formValuesType = { title: string; content: string };

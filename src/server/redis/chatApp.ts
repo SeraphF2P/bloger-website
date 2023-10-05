@@ -6,7 +6,7 @@ import { fromChatId, toPusherKey } from "@/utils/index"
 
 const helper = createRedisHelper("chatapp")
  const chatapp={
-  post:helper<{content:string,chatId:string,autherId:string},{success:boolean,msg:ChatMSGType}>(async ({table,params})=>{
+  create:helper<{content:string,chatId:string,autherId:string},{success:boolean,msg:ChatMSGType}>(async ({table,params})=>{
     const id = nanoid()
     const createdAt = new Date()
     const msg ={
@@ -29,14 +29,15 @@ const helper = createRedisHelper("chatapp")
   } 
   return {success,msg}
   }),
-  get:helper<{chatId:string},ChatMSGType[] |[]>(async ({table,params})=>{
+  read:helper<{chatId:string,limit:number,cursor:number},ChatMSGType[] |[]>(async ({table,params:{chatId,limit,cursor}})=>{
 
-const ids = await redis.lrange(`${table}:${params.chatId}`,0,-1)
+const ids = await redis.lrange(`${table}:${chatId}`,-cursor -limit,-cursor-1)
     const msgs  = await Promise.all(
        ids.map( async id=>{
-         return await redis.hgetall(`${table}:${params.chatId}:${id}`) as ChatMSGType 
+         return await redis.hgetall(`${table}:${chatId}:${id}`) as ChatMSGType 
        })
       )
+     
    return  msgs 
   })
 }

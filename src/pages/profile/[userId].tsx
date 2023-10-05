@@ -15,7 +15,6 @@ import type {
 	GetStaticPropsContext,
 	InferGetStaticPropsType,
 } from "next";
-import Error from "next/error";
 import Head from "next/head";
 import type { FC } from "react";
 

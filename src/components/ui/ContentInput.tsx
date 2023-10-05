@@ -29,6 +29,9 @@ export const ContentInput: FC<contentInputType> = ({
 		if (ref.current && resetOnSubmit) {
 			ref.current.value = "";
 			content = "";
+			if (onHasValue) {
+				onHasValue(false);
+			}
 		}
 	};
 	const { className, ...rest } = props;

@@ -4,12 +4,10 @@ import { toast } from "@/lib/myToast";
 import { AlertModal, Btn, Icons } from "@/ui";
 import { api } from "@/utils/api";
 import { useUser } from "@clerk/nextjs";
-import { TRPCClientError } from "@trpc/client";
 import { AnimatePresence, motion as m } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { type FC } from "react";
-import { ZodError } from "zod";
 
 const createlikeSectionCaption = ({
 	isLiked,

@@ -3,7 +3,7 @@
 import { Thumb, Track } from "@/components/ui/ScrollBar";
 import { fontOutfit } from "@/config/fonts";
 import { cn } from "@/lib/cva";
-import { motion as m, HTMLMotionProps } from "framer-motion";
+import { motion as m, type HTMLMotionProps } from "framer-motion";
 import dynamic from "next/dynamic";
 import type { ComponentPropsWithRef } from "react";
 import { forwardRef, useRef } from "react";

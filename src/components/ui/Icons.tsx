@@ -20,6 +20,7 @@ import {
 	XCircleIcon,
 	Cog6ToothIcon,
 	InformationCircleIcon,
+	ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import type { ReactNode, SVGProps } from "react";
 
@@ -97,5 +98,6 @@ Icons.chat = ChatBubbleLeftRightIcon;
 Icons.NotificationIcons = NotificationIcons;
 Icons.gear = Cog6ToothIcon;
 Icons.info = InformationCircleIcon;
+Icons.refresh = ArrowPathIcon;
 
 export default Icons;

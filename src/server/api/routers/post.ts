@@ -1,7 +1,7 @@
 import { getInfinitePosts } from "@/utils/getInfinitePosts";
 import { postingRateLimit } from "@/utils/ratelimit";
 import { TRPCError } from "@trpc/server";
-import { ZodError, z } from "zod";
+import { z } from "zod";
 import {
   createTRPCRouter,
   privateProcedure,

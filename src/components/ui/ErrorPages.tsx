@@ -1,6 +1,6 @@
 import Container from "./Container";
 import Icons from "./Icons";
-import { FC } from "react";
+import type { FC } from "react";
 
 const pages = {
 	401: (
