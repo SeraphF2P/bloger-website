@@ -19,7 +19,7 @@ export const userRouter = createTRPCRouter({
 
     const [friendList,hasAfriendRequest] = await Promise.all([
          ctx.redis.lrange(`friendship:${autherId}`,0,-1),
-         ctx.redis.note.findMany({to:ctx.userId,type:"friendrequest"})
+         ctx.redis.exists(`note:${[autherId,ctx.userId].sort().join('-')}`)
     ])
 
       const friends = friendList ? await clerkClient.users.getUserList({
@@ -29,7 +29,7 @@ export const userRouter = createTRPCRouter({
           ...filterUser(user),
           friends:friends.map(f=>filterUser(f)), 
           isFriend:friendList.some(f=>f == ctx.userId),
-          hasAfriendRequest:hasAfriendRequest.length > 0
+          hasAfriendRequest:hasAfriendRequest === 1
         };
     }),
   getUserPosts: publicProcedure

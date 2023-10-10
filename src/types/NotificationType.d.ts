@@ -15,8 +15,6 @@ type NoteType = "friendrequest"|"friendrequestconfirmed"|"newlike"|"newcomment"
     to: string
     type:NoteType,
     onPost?:string,
-    seen?: boolean 
-    confirmed?: boolean 
     }
 }
 export {}

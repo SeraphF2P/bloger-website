@@ -11,7 +11,7 @@ const note ={
       const id = params.type == "friendrequest" ? `${params.from}-${params.to}`:nanoid();
       const createdAt =new Date()
     
-     const note  ={id,createdAt,seen:false,confirmed:false,...params} satisfies NotificationType
+     const note  ={id,createdAt,...params} satisfies NotificationType
     
      const Promises = await Promise.allSettled([
         redis.rpush(`${table}:${params.to}`,id),

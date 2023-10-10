@@ -68,7 +68,7 @@ export const ContentInput: FC<contentInputType> = ({
 						disabled={isValidating}
 						onClick={submitHandeler}
 						shape="circle"
-						className=" m-2  h-10 w-10 "
+						className=" m-2 flex-shrink-0  h-10 w-10 "
 					>
 						<Icons.send className=" w-6 h-6 " />
 					</Btn>

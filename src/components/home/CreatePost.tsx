@@ -30,7 +30,7 @@ const CreateDraft = () => {
 			reset();
 			localStorage.setItem("draft-title", "");
 			localStorage.setItem("draft-content", ""),
-				toast({ type: "success", message: "new draft has been created" });
+				toast({ type: "success", message: "post created successfully" });
 		},
 		onError: (e) => {
 			const errorMessage = e.data?.zodError?.fieldErrors[0] || [
@@ -61,14 +61,14 @@ const CreateDraft = () => {
 			</Modale.Btn>
 
 			<Modale.Content>
-				<Container className=" bg-slate-200  dark:bg-gray-800  ">
+				<Container className=" bg-card  ">
 					<form
 						// eslint-disable-next-line @typescript-eslint/no-misused-promises
 						onSubmit={handleSubmit(onSubmit)}
 						className=" space-y-4 "
 					>
 						<input
-							className=" form-input placeholder:text-revert-theme bg-slate-100  dark:bg-gray-900 w-full rounded border-0 "
+							className=" form-input w-full placeholder:text-revert-theme bg-card/70 rounded border-0 "
 							type="text"
 							placeholder="title"
 							{...register("title", {
@@ -88,7 +88,7 @@ const CreateDraft = () => {
 							})}
 						/>
 						<textarea
-							className=" form-textarea placeholder:text-revert-theme min-h-[240px]  resize-none w-full rounded border-0 bg-slate-100  dark:bg-gray-900 "
+							className=" form-input placeholder:text-revert-theme min-h-[240px]  resize-none w-full rounded border-0 bg-card/70 "
 							placeholder="content"
 							{...register("content", {
 								onChange: changeHandler((val) =>

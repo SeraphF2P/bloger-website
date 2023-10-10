@@ -63,7 +63,7 @@ const Search: NextPage = () => {
 					]}
 				/>
 			</div>
-			<section className=" flex flex-col gap-4 min-h-full pb-24  relative ">
+			<section className=" flex flex-col gap-4 min-h-full mb-24  relative ">
 				{isValidating && <Loading.Mesh />}
 				{filter == "user" &&
 					data?.users &&
