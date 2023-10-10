@@ -1,0 +1,20 @@
+{
+  "name": "bloger website",
+  "image": "bloger-website.png",
+  "isFinished": true,
+  "errors": [
+    "no database"
+  ],
+  "tec": [
+    "t3 stack",
+    "prisma",
+    "RTQ",
+    "framer-motion",
+    "Next (pages)",
+    "clerk",
+    "radix ui",
+    "redis "
+  ],
+  "url": "https://bloger-website-seraphf2p.vercel.app/",
+  "description": "bloger website more of a facebook app for blog articles "
+}

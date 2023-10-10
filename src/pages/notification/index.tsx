@@ -21,7 +21,7 @@ const Notification: NextPage = () => {
 			{isLoading ? (
 				<Loading.Mesh />
 			) : (
-				<AnimatePresence>
+				<AnimatePresence initial={false}>
 					{notifications && notifications.length > 0 ? (
 						notifications.map((note) => <Alert key={note.id} {...note} />)
 					) : (

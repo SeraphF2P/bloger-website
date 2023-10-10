@@ -9,6 +9,7 @@ export const MyPlugin = plugin(
         "--revert-theme": "226,232,240", //? slate["200"]
         "--theme-shadow": "245,245,245", //?
         "--primary": "139,92,246", //?violet["500"]
+        "--card": "51,65,85", //?slate["700"]
         "--alert": "200,50,50",
         "--success": "50,200,50",
       },
@@ -17,6 +18,7 @@ export const MyPlugin = plugin(
         "--revert-theme": "30,41,59", //? slate["800"]
         "--theme-shadow": "0,0,0", //?
         "--primary": "167,139,250", //?violet["400"]
+        "--card": "203,213,225", //?slate["300"]
         "--alert": "200,50,50",
         "--success": "50,200,50",
       },
@@ -68,6 +70,7 @@ export const MyPlugin = plugin(
           theme: "rgb(var(--theme),<alpha-value>)",
           "revert-theme": "rgb(var(--revert-theme),<alpha-value>)",
           primary: "rgb(var(--primary),<alpha-value>)",
+          card: "rgb(var(--card),<alpha-value>)",
           variant: "rgb(var(--variant,0,0,0),<alpha-value>)",
           alert: "rgb(var(--alert),<alpha-value>)",
           success: "rgb(var(--success),<alpha-value>)",

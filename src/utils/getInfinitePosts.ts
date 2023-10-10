@@ -26,9 +26,9 @@ export async function getInfinitePosts({
     cursor: cursor ? { id: cursor.id, createdAt: cursor.createdAt } : undefined,
     orderBy: [{ id: "desc" }, { createdAt: "desc" }],
     include: {
-      likes: {where:{
-        autherId:ctx.userId || undefined,
-      }},
+          likes:ctx.userId ? {where:{
+        autherId:ctx.userId,
+      }} :undefined,
       _count: { select: { likes: true, Comment: true } },
     },
   });
@@ -79,9 +79,9 @@ export async function getInfiniteProfilePosts({
     cursor: cursor ? { id: cursor.id, createdAt: cursor.createdAt } : undefined,
     orderBy: [{ id: "desc" }, { createdAt: "desc" }],
     include: {
-      likes: {where:{
-        autherId:ctx.userId || undefined,
-      }},
+      likes:ctx.userId ? {where:{
+        autherId:ctx.userId || "",
+      }} :undefined,
       _count: { select: { likes: true, Comment: true } },
     },
   });

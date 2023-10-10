@@ -9,7 +9,7 @@ const ClerkSignIn = () => {
 				elements: {
 					headerTitle: "text-revert-theme",
 					headerSubtitle: "text-revert-theme",
-					card: "w-[320px] bg-gray-100 dark:bg-gray-700 ",
+					card: "w-[320px] bg-card ",
 					footerActionText: "text-revert-theme",
 					socialButtonsIconButton: variants({
 						variant: "outline",

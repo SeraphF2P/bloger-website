@@ -22,7 +22,7 @@ const createlikeSectionCaption = ({
 		} else if (isLiked && likesCount > 1) {
 			return `you and ${likesCount - 1} other liked this post`;
 		} else {
-			return `${likesCount} people have liked this post`;
+			return `${likesCount} users have liked this post`;
 		}
 	}
 };
@@ -50,7 +50,7 @@ const BlogPost: FC<BlogPostType> = ({ auther, ...props }) => {
 	return (
 		<div
 			key={props.id}
-			className=" font-outfit   w-full rounded bg-slate-300 dark:bg-slate-700 shadow p-2"
+			className=" font-outfit   w-full rounded bg-card shadow p-2"
 		>
 			<div className=" flex">
 				<Link

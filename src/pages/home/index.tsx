@@ -11,7 +11,7 @@ const Home: NextPage = () => {
 		api.post.getAll.useInfiniteQuery(
 			{},
 			{
-				getNextPageParam: (lastPage) => lastPage.nextCursor,
+				getNextPageParam:  (lastPage) => lastPage.nextCursor,
 			}
 		);
 	const posts = data?.pages.flatMap((page) => page.posts);
@@ -25,6 +25,8 @@ const Home: NextPage = () => {
 				/>
 				<meta name="auther" content="jafer ali" />
 				<link rel="icon" href="/favicon.ico" />
+
+				<meta color="var(--theme)" />
 			</Head>
 
 			<Container>
@@ -35,13 +37,12 @@ const Home: NextPage = () => {
 						count={4}
 					/>
 				)}
-				{posts ? (
+				{posts &&
 					posts.map((props): JSX.Element => {
 						return <BlogPost key={props.id} {...props} />;
-					})
-				) : (
-					<NoContent />
-				)}
+					})}
+				{!isLoading && posts && posts.length === 0 ? <NoContent /> : null}
+
 				<ScrollEndIndecator
 					hasNextPage={hasNextPage || false}
 					fetchNextPage={fetchNextPage}

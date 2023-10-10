@@ -28,7 +28,8 @@ export const filterPosts = (
 ) => {
   const data = posts.map((post) => {
     const likesCount=post._count.likes
-    const isLiked=post.likes.length > 0
+       const isLiked= post.likes && post.likes.length > 0  
+
 	
     return {
       likesCount,
@@ -44,7 +45,7 @@ export const filterProfilePosts = (
 ) => {
   const data = posts.map((post) => {
    const likesCount=post._count.likes
-    const isLiked=post.likes.length > 0
+     const isLiked= post.likes && post.likes.length > 0  
     return {
       likesCount,
       commentsCount: post._count.Comment,
